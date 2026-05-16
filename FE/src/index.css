@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #1E3A8A; /* Xanh dương đậm */
+  --color-primary-light: #3B82F6; /* Xanh dương sáng */
+  --color-primary-pale: #EFF6FF; /* Xanh nhạt */
+  --color-accent: #E11D48; /* Đỏ hồng từ logo */
+}
+
+@layer base {
+  body {
+    @apply bg-white text-gray-800 antialiased font-sans;
+  }
+}
