@@ -1,7 +1,68 @@
 import React, { useState, useEffect } from 'react';
 import { Filter, Search, Award, Users, Activity, ChevronRight } from 'lucide-react';
+import { useTranslation } from '../../hooks/useTranslation';
+
+const trans = {
+  vi: {
+    subtitle: 'Đội ngũ Bác sĩ',
+    title: 'Chuyên gia y tế \nTận tâm vì bạn',
+    searchPlaceholder: 'Tìm tên bác sĩ...',
+    filterTitle: 'Bộ lọc tìm kiếm',
+    deptLabel: 'Khoa',
+    allDepts: 'Tất cả khoa',
+    specialtyLabel: 'Chuyên khoa',
+    allSpecialties: 'Tất cả chuyên khoa',
+    expLabel: 'Kinh nghiệm',
+    allExperience: 'Mọi kinh nghiệm',
+    expUnder5: 'Dưới 5 năm',
+    exp5To10: '5 - 10 năm',
+    expOver10: 'Trên 10 năm',
+    clearFilter: 'Xóa lọc',
+    applyFilter: 'Áp dụng',
+    tabAll: 'Tất cả',
+    selectDept: 'Chọn chuyên khoa',
+    noResults: 'Không tìm thấy bác sĩ nào phù hợp với tìm kiếm của bạn.',
+    yearsExperience: 'Chuyên gia với {exp} năm kinh nghiệm',
+    btnBookNow: 'Đặt khám ngay',
+    statTitle1: '200+',
+    statLabel1: 'Bác sĩ chuyên khoa',
+    statTitle2: '15+',
+    statLabel2: 'Năm kinh nghiệm trung bình',
+    statTitle3: '100%',
+    statLabel3: 'Tận tâm với nghề'
+  },
+  en: {
+    subtitle: 'Medical Experts',
+    title: 'Clinical Specialists \nDedicated to You',
+    searchPlaceholder: 'Search physician name...',
+    filterTitle: 'Search Filter Options',
+    deptLabel: 'Department',
+    allDepts: 'All Departments',
+    specialtyLabel: 'Specialty',
+    allSpecialties: 'All Specialties',
+    expLabel: 'Experience',
+    allExperience: 'All Experience levels',
+    expUnder5: 'Under 5 years',
+    exp5To10: '5 - 10 years',
+    expOver10: 'Over 10 years',
+    clearFilter: 'Clear Filters',
+    applyFilter: 'Apply',
+    tabAll: 'All',
+    selectDept: 'Select Specialized Department',
+    noResults: 'No physicians found matching your criteria.',
+    yearsExperience: 'Specialist with {exp} years of experience',
+    btnBookNow: 'Book Now',
+    statTitle1: '200+',
+    statLabel1: 'Specialist Doctors',
+    statTitle2: '15+',
+    statLabel2: 'Avg Years of Experience',
+    statTitle3: '100%',
+    statLabel3: 'Dedicated Care'
+  }
+};
 
 export default function Doctors() {
+  const { lang, t } = useTranslation(trans);
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -29,9 +90,26 @@ export default function Doctors() {
     experience: ''
   });
 
+  const getDeptTranslation = (dept) => {
+    if (!dept) return '';
+    const dLower = dept.toLowerCase();
+    if (dLower.includes('tổng quát') || dLower.includes('general')) return lang === 'vi' ? 'Khoa Nội tổng quát' : 'General Practice';
+    if (dLower.includes('xét nghiệm') || dLower.includes('lab')) return lang === 'vi' ? 'Xét nghiệm' : 'Laboratory';
+    return dept;
+  };
+
+  const getSpecialtyTranslation = (spec) => {
+    if (!spec) return '';
+    const sLower = spec.toLowerCase();
+    if (sLower.includes('nội') || sLower.includes('internal')) return lang === 'vi' ? 'Nội tổng quát' : 'Internal Medicine';
+    if (sLower.includes('ngoại') || sLower.includes('surgery')) return lang === 'vi' ? 'Ngoại khoa' : 'Surgery';
+    if (sLower.includes('xét nghiệm') || sLower.includes('laboratory')) return lang === 'vi' ? 'Xét nghiệm y khoa' : 'Medical Laboratory';
+    return spec;
+  };
+
   // Nhóm bác sĩ theo khoa
   const groupedDoctors = doctors.reduce((acc, doc) => {
-    const dept = doc.department || 'Chuyên Khoa Khác';
+    const dept = doc.department || (lang === 'vi' ? 'Chuyên Khoa Khác' : 'Other Specialties');
     if (!acc[dept]) acc[dept] = [];
     acc[dept].push(doc);
     return acc;
@@ -44,13 +122,10 @@ export default function Doctors() {
 
   // Lọc bác sĩ
   const filteredDoctors = doctors.filter(doc => {
-    // Search
     if (searchTerm && !doc.userId?.fullName?.toLowerCase().includes(searchTerm.toLowerCase())) return false;
     
-    // Tab active
     if (activeTab !== 'Tất cả' && doc.department !== activeTab) return false;
 
-    // Filters
     if (filters.department && doc.department !== filters.department) return false;
     if (filters.specialty && doc.specialty !== filters.specialty) return false;
     if (filters.experience) {
@@ -64,7 +139,7 @@ export default function Doctors() {
   });
 
   const filteredGrouped = filteredDoctors.reduce((acc, doc) => {
-    const dept = doc.department || 'Chuyên Khoa Khác';
+    const dept = doc.department || (lang === 'vi' ? 'Chuyên Khoa Khác' : 'Other Specialties');
     if (!acc[dept]) acc[dept] = [];
     acc[dept].push(doc);
     return acc;
@@ -76,8 +151,8 @@ export default function Doctors() {
         
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8 relative">
           <div className="max-w-2xl">
-            <h2 className="text-sm font-black text-primary uppercase tracking-[0.2em] mb-4">Đội ngũ Bác sĩ</h2>
-            <h3 className="text-4xl lg:text-5xl font-black text-[#102A63] leading-[1.1]">Chuyên gia y tế <br/>Tận tâm vì bạn</h3>
+            <h2 className="text-sm font-black text-primary uppercase tracking-[0.2em] mb-4">{t.subtitle}</h2>
+            <h3 className="text-4xl lg:text-5xl font-black text-[#102A63] leading-[1.1] whitespace-pre-line">{t.title}</h3>
           </div>
           
           <div className="flex gap-4 relative">
@@ -85,7 +160,7 @@ export default function Doctors() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input 
                 type="text" 
-                placeholder="Tìm tên bác sĩ..." 
+                placeholder={t.searchPlaceholder} 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-12 pr-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold w-64 focus:ring-2 focus:ring-primary/20 outline-none"
@@ -101,47 +176,47 @@ export default function Doctors() {
             {/* Filter Panel */}
             {showFilter && (
               <div className="absolute top-full right-0 mt-4 w-80 bg-white border border-gray-100 shadow-2xl rounded-3xl p-6 z-50">
-                <h4 className="font-black text-gray-900 mb-4 border-b border-gray-100 pb-3">Bộ lọc tìm kiếm</h4>
+                <h4 className="font-black text-gray-900 mb-4 border-b border-gray-100 pb-3">{t.filterTitle}</h4>
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Khoa</label>
+                    <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">{t.deptLabel}</label>
                     <select 
                       value={filters.department}
                       onChange={(e) => {
                         setFilters({...filters, department: e.target.value});
-                        if (e.target.value) setActiveTab('Tất cả'); // Reset tab if filtering by dept here
+                        if (e.target.value) setActiveTab('Tất cả');
                       }}
                       className="w-full p-3 bg-gray-50 rounded-xl border-none outline-none text-sm font-medium"
                     >
-                      <option value="">Tất cả khoa</option>
-                      {departments.map(d => <option key={d} value={d}>{d}</option>)}
+                      <option value="">{t.allDepts}</option>
+                      {departments.map(d => <option key={d} value={d}>{getDeptTranslation(d)}</option>)}
                     </select>
                   </div>
                   
                   <div>
-                    <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Chuyên khoa</label>
+                    <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">{t.specialtyLabel}</label>
                     <select 
                       value={filters.specialty}
                       onChange={(e) => setFilters({...filters, specialty: e.target.value})}
                       className="w-full p-3 bg-gray-50 rounded-xl border-none outline-none text-sm font-medium"
                     >
-                      <option value="">Tất cả chuyên khoa</option>
-                      {specialties.map(s => <option key={s} value={s}>{s}</option>)}
+                      <option value="">{t.allSpecialties}</option>
+                      {specialties.map(s => <option key={s} value={s}>{getSpecialtyTranslation(s)}</option>)}
                     </select>
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Kinh nghiệm</label>
+                    <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">{t.expLabel}</label>
                     <select 
                       value={filters.experience}
                       onChange={(e) => setFilters({...filters, experience: e.target.value})}
                       className="w-full p-3 bg-gray-50 rounded-xl border-none outline-none text-sm font-medium"
                     >
-                      <option value="">Mọi kinh nghiệm</option>
-                      <option value="0-5">Dưới 5 năm</option>
-                      <option value="5-10">5 - 10 năm</option>
-                      <option value="10+">Trên 10 năm</option>
+                      <option value="">{t.allExperience}</option>
+                      <option value="0-5">{t.expUnder5}</option>
+                      <option value="5-10">{t.exp5To10}</option>
+                      <option value="10+">{t.expOver10}</option>
                     </select>
                   </div>
                 </div>
@@ -151,13 +226,13 @@ export default function Doctors() {
                     onClick={() => setFilters({ department: '', specialty: '', experience: '' })}
                     className="text-sm font-bold text-gray-400 hover:text-gray-900 px-4"
                   >
-                    Xóa lọc
+                    {t.clearFilter}
                   </button>
                   <button 
                     onClick={() => setShowFilter(false)}
                     className="px-4 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:bg-blue-600"
                   >
-                    Áp dụng
+                    {t.applyFilter}
                   </button>
                 </div>
               </div>
@@ -175,7 +250,7 @@ export default function Doctors() {
                 : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
             }`}
           >
-            Tất cả
+            {t.tabAll}
           </button>
           
           <div className="relative">
@@ -188,9 +263,9 @@ export default function Doctors() {
                   : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
               }`}
             >
-              <option value="" disabled hidden>Chọn chuyên khoa</option>
+              <option value="" disabled hidden>{t.selectDept}</option>
               {departments.map(dept => (
-                <option key={dept} value={dept}>{dept}</option>
+                <option key={dept} value={dept}>{getDeptTranslation(dept)}</option>
               ))}
             </select>
             <ChevronRight size={14} className={`absolute right-4 top-1/2 -translate-y-1/2 rotate-90 pointer-events-none ${activeTab !== 'Tất cả' ? 'text-white' : 'text-gray-400'}`} />
@@ -205,7 +280,7 @@ export default function Doctors() {
           <div className="space-y-16">
             {Object.keys(filteredGrouped).length === 0 ? (
               <div className="text-center py-20 text-gray-500 font-medium">
-                Không tìm thấy bác sĩ nào phù hợp với tìm kiếm của bạn.
+                {t.noResults}
               </div>
             ) : (
               Object.entries(filteredGrouped).map(([department, deptDoctors], deptIndex) => (
@@ -214,7 +289,7 @@ export default function Doctors() {
                     <span className="w-8 h-8 rounded-lg bg-blue-100 text-primary flex items-center justify-center text-sm">
                       {deptIndex + 1}
                     </span>
-                    {department}
+                    {getDeptTranslation(department)}
                   </h3>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -243,7 +318,6 @@ export default function Doctors() {
                         'https://images.unsplash.com/photo-1582750433449-648ed127d09e?w=500&q=80'
                       ];
                       
-                      // Sử dụng avatar từ database nếu có, ngược lại dùng mảng fallback
                       const globalIndex = doctors.findIndex(doc => doc._id === d._id);
                       const idx = globalIndex !== -1 ? globalIndex : i;
                       const avatar = d.avatar || doctorImages[idx % doctorImages.length];
@@ -256,20 +330,20 @@ export default function Doctors() {
                               src={avatar} 
                               alt={name} 
                               onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=102A63&color=fff&size=512`; }}
-                              className="w-full h-full object-cover relative z-10 group-hover:scale-105 transition-transform duration-700" 
+                              className="w-full h-full object-cover relative z-10 group-hover:scale-105 transition-transform duration-500" 
                             />
                           </div>
                           
                           <div className="text-center w-full px-4">
-                            <span className="text-xs font-black tracking-widest text-primary uppercase mb-3 block">{d.specialty || department}</span>
+                            <span className="text-xs font-black tracking-widest text-primary uppercase mb-3 block">{getSpecialtyTranslation(d.specialty) || getDeptTranslation(department)}</span>
                             <h4 className="text-2xl font-black text-[#102A63] mb-2">{name}</h4>
-                            <p className="text-gray-500 font-medium mb-6">Chuyên gia với {d.experience} năm kinh nghiệm</p>
+                            <p className="text-gray-500 font-medium mb-6">{t.yearsExperience.replace('{exp}', d.experience)}</p>
                             
                             <button 
                               onClick={() => document.dispatchEvent(new CustomEvent('open-auth', { detail: 'login' }))}
                               className="w-full py-4 bg-white border-2 border-gray-100 text-gray-900 font-bold rounded-2xl hover:border-[#102A63] hover:bg-[#102A63] hover:text-white transition-all duration-300 shadow-sm hover:shadow-md"
                             >
-                              Đặt khám ngay
+                              {t.btnBookNow}
                             </button>
                           </div>
                         </div>
@@ -290,22 +364,22 @@ export default function Doctors() {
               <div className="w-16 h-16 mx-auto bg-white/10 rounded-2xl flex items-center justify-center mb-6">
                 <Users size={32} className="text-blue-200" />
               </div>
-              <h4 className="text-5xl font-black mb-2">200+</h4>
-              <p className="text-blue-200 font-medium uppercase tracking-widest text-sm">Bác sĩ chuyên khoa</p>
+              <h4 className="text-5xl font-black mb-2">{t.statTitle1}</h4>
+              <p className="text-blue-200 font-medium uppercase tracking-widest text-sm">{t.statLabel1}</p>
             </div>
             <div>
               <div className="w-16 h-16 mx-auto bg-white/10 rounded-2xl flex items-center justify-center mb-6">
                 <Award size={32} className="text-blue-200" />
               </div>
-              <h4 className="text-5xl font-black mb-2">15+</h4>
-              <p className="text-blue-200 font-medium uppercase tracking-widest text-sm">Năm kinh nghiệm trung bình</p>
+              <h4 className="text-5xl font-black mb-2">{t.statTitle2}</h4>
+              <p className="text-blue-200 font-medium uppercase tracking-widest text-sm">{t.statLabel2}</p>
             </div>
             <div>
               <div className="w-16 h-16 mx-auto bg-white/10 rounded-2xl flex items-center justify-center mb-6">
                 <Activity size={32} className="text-blue-200" />
               </div>
-              <h4 className="text-5xl font-black mb-2">100%</h4>
-              <p className="text-blue-200 font-medium uppercase tracking-widest text-sm">Tận tâm với nghề</p>
+              <h4 className="text-5xl font-black mb-2">{t.statTitle3}</h4>
+              <p className="text-blue-200 font-medium uppercase tracking-widest text-sm">{t.statLabel3}</p>
             </div>
           </div>
         </div>

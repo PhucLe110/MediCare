@@ -7,7 +7,7 @@ const User = require('../models/User');
 // @access  Private
 exports.getDoctors = async (req, res) => {
   try {
-    const doctors = await Doctor.find().populate('userId', 'fullName email phone');
+    const doctors = await Doctor.find().populate('userId', 'fullName email phone gender');
     res.status(200).json({ success: true, data: doctors });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

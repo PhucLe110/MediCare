@@ -8,6 +8,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
+  const [gender, setGender] = useState('Nam');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -37,7 +38,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
       const endpoint = mode === 'login' ? '/api/auth/login' : '/api/auth/register';
       const body = mode === 'login' 
         ? { email, password } 
-        : { fullName, email, password, phone, role: 'patient' };
+        : { fullName, email, password, phone, gender, role: 'patient' };
 
       const res = await fetch(`http://localhost:5000${endpoint}`, {
         method: 'POST',
@@ -50,7 +51,13 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
       if (data.success) {
         localStorage.setItem('userInfo', JSON.stringify(data.data));
         onClose(); // Close modal
-        navigate('/dashboard'); // Go to dashboard
+        if (data.data.role === 'admin') {
+          navigate('/admin');
+        } else if (data.data.role === 'lab_staff') {
+          navigate('/dashboard/lab-upload');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         setError(data.message);
       }
@@ -102,6 +109,29 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                     placeholder="0912345678"
                     value={phone} onChange={e => setPhone(e.target.value)}
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Giới tính</label>
+                  <div className="flex gap-4">
+                    <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border rounded-xl cursor-pointer transition-all font-bold text-sm bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700 has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-500 has-[:checked]:text-indigo-600">
+                      <input 
+                        type="radio" name="modalGender" value="Nam" 
+                        checked={gender === 'Nam'} 
+                        onChange={() => setGender('Nam')}
+                        className="hidden" 
+                      />
+                      Nam
+                    </label>
+                    <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border rounded-xl cursor-pointer transition-all font-bold text-sm bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700 has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-500 has-[:checked]:text-indigo-600">
+                      <input 
+                        type="radio" name="modalGender" value="Nữ" 
+                        checked={gender === 'Nữ'} 
+                        onChange={() => setGender('Nữ')}
+                        className="hidden" 
+                      />
+                      Nữ
+                    </label>
+                  </div>
                 </div>
               </>
             )}

@@ -1,23 +1,100 @@
 import React, { useState, useEffect } from 'react';
 import { Receipt, CheckCircle2, AlertCircle, ChevronRight, QrCode, FileText, X, User, Stethoscope, FlaskConical, Pill, Clock, Calendar, CreditCard } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 
 const API_URL = 'http://localhost:5000';
 const getAuthHeaders = () => ({ Authorization: `Bearer ${JSON.parse(localStorage.getItem('userInfo') || '{}').token}` });
-const fmt = (n) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n || 0);
-const TYPE_META = {
-  consultation: { label: 'Phí khám bệnh', icon: Stethoscope, color: '#3b82f6' },
-  lab:          { label: 'Xét nghiệm / Siêu âm', icon: FlaskConical, color: '#8b5cf6' },
-  medication:   { label: 'Đơn thuốc', icon: Pill, color: '#10b981' },
+
+const trans = {
+  vi: {
+    title: 'Thanh toán & Viện phí',
+    loading: 'Đang tải thông tin thanh toán...',
+    paid: 'Đã trả',
+    unpaid: 'Chờ trả',
+    recentVisits: 'Ca khám gần đây',
+    generalDept: 'Khám tổng quát',
+    selectVisit: 'Chọn một ca khám',
+    doctorTitle: 'Bác sĩ phụ trách',
+    needPay: 'Cần thanh toán',
+    paySub: 'Hoàn tất để nhận kết quả khám',
+    waitingBank: 'Đang chờ giao dịch ngân hàng...',
+    scanQr: 'Quét VietQR để thanh toán',
+    paidInvoices: 'Hóa đơn đã quyết toán',
+    noInvoices: 'Chưa có hóa đơn nào',
+    successPaid: 'Quyết toán thành công',
+    receipt: 'Biên lai',
+    eReceipt: 'Biên lai điện tử',
+    patient: 'Bệnh nhân',
+    department: 'Khoa',
+    doctorLabel: 'Bác sĩ',
+    time: 'Thời gian',
+    total: 'Tổng cộng',
+    paidSuccessMsg: 'Đã quyết toán thành công',
+    typeConsultation: 'Phí khám bệnh',
+    typeLab: 'Xét nghiệm / Siêu âm',
+    typeMedication: 'Đơn thuốc',
+    typeOther: 'Phí dịch vụ khác',
+  },
+  en: {
+    title: 'Billing & Invoices',
+    loading: 'Loading billing information...',
+    paid: 'Paid Total',
+    unpaid: 'Unpaid Fees',
+    recentVisits: 'Recent Visits',
+    generalDept: 'General Consultation',
+    selectVisit: 'Select a clinical visit',
+    doctorTitle: 'Attending Physician',
+    needPay: 'Requires Payment',
+    paySub: 'Complete payment to release clinical results',
+    waitingBank: 'Awaiting banking confirmation...',
+    scanQr: 'Scan VietQR code to settle',
+    paidInvoices: 'Settled Invoices',
+    noInvoices: 'No invoices settled yet',
+    successPaid: 'Settlement Succeeded',
+    receipt: 'Receipt',
+    eReceipt: 'Electronic Receipt',
+    patient: 'Patient',
+    department: 'Department',
+    doctorLabel: 'Physician',
+    time: 'Timestamp',
+    total: 'Total Amount',
+    paidSuccessMsg: 'Settlement Succeeded',
+    typeConsultation: 'Consultation Fee',
+    typeLab: 'Laboratory & Diagnostic Fee',
+    typeMedication: 'Prescription & Medicine Fee',
+    typeOther: 'Other Services Fee',
+  }
 };
-const getMeta = (t) => TYPE_META[t] || { label: t, icon: Receipt, color: '#6b7280' };
 
 export default function Billing() {
+  const { lang, t } = useTranslation(trans);
   const [bills, setBills]       = useState([]);
   const [loading, setLoading]   = useState(true);
   const [selId, setSelId]       = useState(null);
   const [payInfo, setPayInfo]   = useState(null);
   const [user, setUser]         = useState(null);
   const [modal, setModal]       = useState(null);
+
+  const fmt = (n) => {
+    const locale = lang === 'vi' ? 'vi-VN' : 'en-US';
+    const currency = lang === 'vi' ? 'VND' : 'USD';
+    const finalPrice = lang === 'vi' ? n : Math.round(n / 25000);
+    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(finalPrice || 0);
+  };
+
+  const TYPE_META = {
+    consultation: { label: t.typeConsultation, icon: Stethoscope, color: '#3b82f6' },
+    lab:          { label: t.typeLab, icon: FlaskConical, color: '#8b5cf6' },
+    medication:   { label: t.typeMedication, icon: Pill, color: '#10b981' },
+  };
+  const getMeta = (typeKey) => TYPE_META[typeKey] || { label: t.typeOther, icon: Receipt, color: '#6b7280' };
+
+  const getDoctorDisplayName = (name) => {
+    if (!name) return t.doctorTitle;
+    const trimmed = name.trim();
+    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
+    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
+  };
 
   useEffect(() => {
     setUser(JSON.parse(localStorage.getItem('userInfo') || '{}'));
@@ -53,7 +130,7 @@ export default function Billing() {
     const id = b.appointment?._id || 'other';
     if (!acc[id]) acc[id] = {
       id,
-      department: b.appointment?.doctor?.department || b.appointment?.department || 'Khám tổng quát',
+      department: b.appointment?.doctor?.department || b.appointment?.department || t.generalDept,
       specialty: b.appointment?.doctor?.specialty || '',
       date: b.appointment?.date || b.createdAt,
       doctor: b.appointment?.doctor?.userId?.fullName || null,
@@ -88,8 +165,8 @@ export default function Billing() {
           {/* Stats */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {[
-              { label: 'Đã trả', value: fmt(bills.filter(b=>b.status==='paid').reduce((s,b)=>s+b.totalAmount,0)), color: '#059669', bg: '#ecfdf5' },
-              { label: 'Chờ trả', value: fmt(bills.filter(b=>b.status==='unpaid').reduce((s,b)=>s+b.totalAmount,0)), color: '#d97706', bg: '#fffbeb' },
+              { label: t.paid, value: fmt(bills.filter(b=>b.status==='paid').reduce((s,b)=>s+b.totalAmount,0)), color: '#059669', bg: '#ecfdf5' },
+              { label: t.unpaid, value: fmt(bills.filter(b=>b.status==='unpaid').reduce((s,b)=>s+b.totalAmount,0)), color: '#d97706', bg: '#fffbeb' },
             ].map(s => (
               <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '10px 12px', border: '1px solid #e2e8f0' }}>
                 <p style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94a3b8', marginBottom: 3 }}>{s.label}</p>
@@ -101,13 +178,14 @@ export default function Billing() {
 
         {/* List */}
         <div style={{ padding: '14px 16px 8px', flexShrink: 0 }}>
-          <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.16em', color: '#94a3b8' }}>Ca khám gần đây</p>
+          <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.16em', color: '#94a3b8' }}>{t.recentVisits}</p>
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: '4px 10px 16px', scrollbarWidth: 'thin', scrollbarColor: '#e2e8f0 transparent' }}>
           {appList.map(app => {
             const active = selId === app.id;
             const d = new Date(app.date);
             const hasUnpaid = app.unpaid.length > 0;
+            const appMonth = lang === 'vi' ? `Th${d.getMonth()+1}` : d.toLocaleDateString('en-US', { month: 'short' });
             return (
               <button key={app.id} onClick={() => setSelId(app.id)}
                 style={{
@@ -126,7 +204,7 @@ export default function Billing() {
                   alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                   background: active ? 'var(--color-primary, #3b82f6)' : '#e2e8f0',
                 }}>
-                  <span style={{ fontSize: 9, fontWeight: 800, color: active ? 'rgba(255,255,255,0.8)' : '#94a3b8', lineHeight: 1, textTransform: 'uppercase' }}>Th{d.getMonth()+1}/{d.getFullYear().toString().slice(2)}</span>
+                  <span style={{ fontSize: 9, fontWeight: 800, color: active ? 'rgba(255,255,255,0.8)' : '#94a3b8', lineHeight: 1, textTransform: 'uppercase' }}>{appMonth}</span>
                   <span style={{ fontSize: 20, fontWeight: 900, color: active ? '#fff' : '#475569', lineHeight: 1, marginTop: 2 }}>{d.getDate()}</span>
                 </div>
                 {/* Info */}
@@ -138,10 +216,10 @@ export default function Billing() {
                     {hasUnpaid && <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#f59e0b', flexShrink: 0 }} />}
                   </div>
                   <p style={{ fontSize: 11, color: '#3b82f6', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 1 }}>
-                    {app.doctor ? `BS. ${app.doctor}` : 'BS. Phụ trách'}
+                    {getDoctorDisplayName(app.doctor)}
                   </p>
                   <p style={{ fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>
-                    {d.toLocaleDateString('vi-VN')}
+                    {lang === 'vi' ? d.toLocaleDateString('vi-VN') : d.toLocaleDateString('en-US')}
                   </p>
                 </div>
                 {active && <ChevronRight size={14} style={{ color: '#94a3b8', flexShrink: 0 }} />}
@@ -156,7 +234,7 @@ export default function Billing() {
         {!sel ? (
           <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
             <Receipt size={56} strokeWidth={1} style={{ marginBottom: 12, opacity: 0.3 }} />
-            <p style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em' }}>Chọn một ca khám</p>
+            <p style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em' }}>{t.selectVisit}</p>
           </div>
         ) : (
           <div style={{ maxWidth: 720, margin: '0 auto', padding: '40px 32px' }}>
@@ -167,10 +245,10 @@ export default function Billing() {
                 <h1 style={{ fontSize: 28, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.02em', marginBottom: 12, lineHeight: 1.2 }}>{sel.department}</h1>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#475569', fontWeight: 700, background: '#fff', padding: '5px 12px', borderRadius: 999, border: '1px solid #e2e8f0' }}>
-                    <Calendar size={13} color="#94a3b8" />{new Date(sel.date).toLocaleDateString('vi-VN')}
+                    <Calendar size={13} color="#94a3b8" />{lang === 'vi' ? new Date(sel.date).toLocaleDateString('vi-VN') : new Date(sel.date).toLocaleDateString('en-US')}
                   </span>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#0369a1', fontWeight: 700, background: '#e0f2fe', padding: '5px 12px', borderRadius: 999 }}>
-                    <User size={13} />BS. {sel.doctor || 'Phụ trách'}
+                    <User size={13} />{getDoctorDisplayName(sel.doctor)}
                   </span>
                 </div>
               </div>
@@ -186,17 +264,17 @@ export default function Billing() {
                     <AlertCircle size={18} color="#fff" />
                   </div>
                   <div>
-                    <p style={{ fontWeight: 900, fontSize: 14, color: '#c2410c', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cần thanh toán</p>
-                    <p style={{ fontSize: 11, color: '#ea580c', fontWeight: 600 }}>Hoàn tất để nhận kết quả khám</p>
+                    <p style={{ fontWeight: 900, fontSize: 14, color: '#c2410c', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t.needPay}</p>
+                    <p style={{ fontSize: 11, color: '#ea580c', fontWeight: 600 }}>{t.paySub}</p>
                   </div>
                   <p style={{ marginLeft: 'auto', fontSize: 22, fontWeight: 900, color: '#c2410c', letterSpacing: '-0.02em' }}>
                     {fmt(sel.unpaid.reduce((s, b) => s + b.totalAmount, 0))}
                   </p>
                 </div>
 
-                <div style={{ display: 'flex', gap: 0 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 0 }}>
                   {/* Items */}
-                  <div style={{ flex: 1, padding: '20px 24px', borderRight: '1px dashed #fed7aa' }}>
+                  <div style={{ flex: 1, minWidth: 280, padding: '20px 24px', borderRight: '1px dashed #fed7aa' }}>
                     {sel.unpaid.flatMap(bill => (bill.items||[]).map((item, i) => {
                       const m = getMeta(item.type); const Icon = m.icon;
                       return (
@@ -214,16 +292,16 @@ export default function Billing() {
                     }))}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
                       <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#6366f1', animation: 'pulse 1.5s infinite' }}></div>
-                      <p style={{ fontSize: 11, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Đang chờ giao dịch ngân hàng...</p>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.waitingBank}</p>
                     </div>
                   </div>
 
                   {/* QR */}
-                  <div style={{ width: 180, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 20, background: '#fffbf5' }}>
+                  <div style={{ width: '100%', maxWidth: 180, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 20, background: '#fffbf5', margin: '0 auto' }}>
                     <div style={{ background: '#fff', borderRadius: 20, padding: 14, boxShadow: '0 8px 30px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9', marginBottom: 10 }}>
                       <img src={qrUrl(sel.unpaid.reduce((s,b)=>s+b.totalAmount,0), sel.unpaid.map(b=>b._id))} alt="QR" style={{ width: 120, height: 120, objectFit: 'contain' }} />
                     </div>
-                    <p style={{ fontSize: 9, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.12em', textAlign: 'center' }}>Quét VietQR<br/>để thanh toán</p>
+                    <p style={{ fontSize: 9, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.12em', textAlign: 'center', lineHeight: 1.3 }}>{t.scanQr}</p>
                   </div>
                 </div>
               </div>
@@ -235,14 +313,14 @@ export default function Billing() {
                 <div style={{ width: 28, height: 28, borderRadius: 9, background: '#d1fae5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <CheckCircle2 size={16} color="#10b981" />
                 </div>
-                <h3 style={{ fontWeight: 900, fontSize: 13, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Hóa đơn đã quyết toán</h3>
+                <h3 style={{ fontWeight: 900, fontSize: 13, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.paidInvoices}</h3>
                 <div style={{ flex: 1, height: 1, background: '#e2e8f0', marginLeft: 6 }}></div>
               </div>
 
               {sel.paid.length === 0 ? (
                 <div style={{ background: '#fff', borderRadius: 24, border: '2px dashed #e2e8f0', padding: '60px 24px', textAlign: 'center' }}>
                   <Receipt size={40} strokeWidth={1} style={{ margin: '0 auto 12px', color: '#e2e8f0' }} />
-                  <p style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.15em' }}>Chưa có hóa đơn nào</p>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.15em' }}>{t.noInvoices}</p>
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -257,8 +335,12 @@ export default function Billing() {
                           <CheckCircle2 size={20} color="#fff" />
                         </div>
                         <div style={{ flex: 1 }}>
-                          <p style={{ fontSize: 10, fontWeight: 800, color: '#6ee7b7', textTransform: 'uppercase', letterSpacing: '0.12em', lineHeight: 1 }}>Quyết toán thành công</p>
-                          <p style={{ fontSize: 12, fontWeight: 600, color: '#64748b', marginTop: 2 }}>{new Date(bill.paidAt || bill.updatedAt).toLocaleString('vi-VN')}</p>
+                          <p style={{ fontSize: 10, fontWeight: 800, color: '#6ee7b7', textTransform: 'uppercase', letterSpacing: '0.12em', lineHeight: 1 }}>{t.successPaid}</p>
+                          <p style={{ fontSize: 12, fontWeight: 600, color: '#64748b', marginTop: 2 }}>
+                            {lang === 'vi'
+                              ? new Date(bill.paidAt || bill.updatedAt).toLocaleString('vi-VN')
+                              : new Date(bill.paidAt || bill.updatedAt).toLocaleString('en-US')}
+                          </p>
                         </div>
                         <p style={{ fontSize: 20, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.02em' }}>{fmt(bill.totalAmount)}</p>
                       </div>
@@ -285,7 +367,7 @@ export default function Billing() {
                                 onMouseEnter={e => { e.currentTarget.style.background='#0f172a'; e.currentTarget.style.color='#fff'; e.currentTarget.style.borderColor='#0f172a'; }}
                                 onMouseLeave={e => { e.currentTarget.style.background='#f1f5f9'; e.currentTarget.style.color='#475569'; e.currentTarget.style.borderColor='#e2e8f0'; }}
                               >
-                                <FileText size={12} /> Biên lai
+                                <FileText size={12} /> {t.receipt}
                               </button>
                             </div>
                           );
@@ -311,13 +393,18 @@ export default function Billing() {
             <div style={{ padding: '48px 40px 36px' }}>
               {/* Header */}
               <div style={{ textAlign: 'center', marginBottom: 28, paddingBottom: 24, borderBottom: '2px dashed #e2e8f0' }}>
-                <img src="/LOGO.png" alt="Logo" style={{ height: 32, margin: '0 auto 12px', filter: 'brightness(0)' }} />
-                <h3 style={{ fontSize: 18, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.01em', marginBottom: 4 }}>Biên lai điện tử</h3>
+                <img src="/LOGO.png" alt="Logo" style={{ height: 32, margin: '0 auto 12px' }} />
+                <h3 style={{ fontSize: 18, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.01em', marginBottom: 4 }}>{t.eReceipt}</h3>
                 <p style={{ fontSize: 11, color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em' }}>MediCare Hospital</p>
               </div>
               {/* Info rows */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24, fontSize: 12, fontWeight: 700 }}>
-                {[['Bệnh nhân', user?.fullName], ['Khoa', sel?.department], ['Bác sĩ', sel?.doctor || '—'], ['Thời gian', new Date(modal.paidAt||modal.updatedAt).toLocaleString('vi-VN')]].map(([k,v]) => (
+                {[
+                  [t.patient, user?.fullName],
+                  [t.department, sel?.department],
+                  [t.doctorLabel, getDoctorDisplayName(sel?.doctor)],
+                  [t.time, lang === 'vi' ? new Date(modal.paidAt||modal.updatedAt).toLocaleString('vi-VN') : new Date(modal.paidAt||modal.updatedAt).toLocaleString('en-US')]
+                ].map(([k,v]) => (
                   <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
                     <span style={{ color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 10 }}>{k}</span>
                     <span style={{ color: '#0f172a', textAlign: 'right' }}>{v}</span>
@@ -342,11 +429,11 @@ export default function Billing() {
               {/* Total */}
               <div style={{ paddingTop: 20, borderTop: '2px dashed #e2e8f0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <p style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748b' }}>Tổng cộng</p>
+                  <p style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748b' }}>{t.total}</p>
                   <p style={{ fontSize: 28, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.03em' }}>{fmt(modal.totalAmount)}</p>
                 </div>
                 <div style={{ background: '#10b981', borderRadius: 16, padding: '12px 20px', textAlign: 'center' }}>
-                  <p style={{ fontSize: 11, fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em' }}>Đã quyết toán thành công</p>
+                  <p style={{ fontSize: 11, fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em' }}>{t.paidSuccessMsg}</p>
                 </div>
               </div>
               <div style={{ textAlign: 'center', marginTop: 24, opacity: 0.1 }}>

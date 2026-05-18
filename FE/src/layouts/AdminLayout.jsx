@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, UserRoundCog, CalendarDays, 
-  FileStack, Pill, CreditCard, Bot, Settings, LogOut, ChevronLeft
+  FileStack, Pill, CreditCard, Bot, Settings, LogOut, ChevronLeft,
+  Sun, Moon, Globe
 } from 'lucide-react';
 
 const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [lang, setLang] = useState(localStorage.getItem('lang') || 'vi');
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
   useEffect(() => {
     const userInfo = localStorage.getItem('userInfo');
@@ -24,40 +27,106 @@ const AdminLayout = () => {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem('lang', lang);
+    window.dispatchEvent(new Event('language-change'));
+  }, [lang]);
+
+  useEffect(() => {
+    const handleLangChange = () => {
+      const currentLang = localStorage.getItem('lang') || 'vi';
+      if (currentLang !== lang) {
+        setLang(currentLang);
+      }
+    };
+    window.addEventListener('language-change', handleLangChange);
+    return () => window.removeEventListener('language-change', handleLangChange);
+  }, [lang]);
+
   const handleLogout = () => {
     localStorage.removeItem('userInfo');
     navigate('/');
   };
 
+  const trans = {
+    vi: {
+      dashboard: 'Tổng quan',
+      users: 'Tài khoản',
+      doctors: 'Bác sĩ',
+      appointments: 'Điều phối ca khám',
+      records: 'Hồ sơ y tế',
+      inventory: 'Kho thuốc',
+      billing: 'Viện phí',
+      ai: 'Hệ thống AI',
+      logout: 'Đăng xuất',
+      client: 'Về Client',
+      theme: 'Giao diện',
+      language: 'Ngôn ngữ',
+      light: 'Sáng',
+      dark: 'Tối',
+      serverStatus: 'Trạng thái Server',
+      roleAdmin: 'Admin',
+    },
+    en: {
+      dashboard: 'Overview',
+      users: 'Accounts',
+      doctors: 'Doctors',
+      appointments: 'Consultation Dispatch',
+      records: 'Medical Records',
+      inventory: 'Pharmacy Stock',
+      billing: 'Billing & Fees',
+      ai: 'AI Services',
+      logout: 'Sign Out',
+      client: 'To Client',
+      theme: 'Theme',
+      language: 'Language',
+      light: 'Light',
+      dark: 'Dark',
+      serverStatus: 'Server Status',
+      roleAdmin: 'Admin',
+    }
+  };
+
+  const t = trans[lang];
+
   const adminMenu = [
-    { name: 'Dashboard Thống kê', icon: LayoutDashboard, path: '/admin' },
-    { name: 'Tài khoản & Phân quyền', icon: Users, path: '/admin/users' },
-    { name: 'Bác sĩ & Chuyên khoa', icon: UserRoundCog, path: '/admin/doctors' },
-    { name: 'Điều phối Lịch khám', icon: CalendarDays, path: '/admin/appointments' },
-    { name: 'Hồ sơ & Dữ liệu y tế', icon: FileStack, path: '/admin/records' },
-    { name: 'Kho thuốc & Vật tư', icon: Pill, path: '/admin/inventory' },
-    { name: 'Viện phí & Doanh thu', icon: CreditCard, path: '/admin/billing' },
-    { name: 'Quản trị hệ thống AI', icon: Bot, path: '/admin/ai' },
+    { name: t.dashboard, icon: LayoutDashboard, path: '/admin' },
+    { name: t.users, icon: Users, path: '/admin/users' },
+    { name: t.doctors, icon: UserRoundCog, path: '/admin/doctors' },
+    { name: t.appointments, icon: CalendarDays, path: '/admin/appointments' },
+    { name: t.records, icon: FileStack, path: '/admin/records' },
+    { name: t.inventory, icon: Pill, path: '/admin/inventory' },
+    { name: t.billing, icon: CreditCard, path: '/admin/billing' },
+    { name: t.ai, icon: Bot, path: '/admin/ai' },
   ];
 
   if (!user) return null;
 
   return (
-    <div className="flex h-screen bg-slate-50 font-sans overflow-hidden">
+    <div className="flex h-screen bg-slate-50 font-sans overflow-hidden transition-colors duration-200">
       {/* Sidebar - Dark Premium Theme */}
       <div className="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl relative z-20">
         <div className="p-6 pb-2 border-b border-slate-800">
           <Link to="/admin" className="flex items-center gap-3">
-            <img src="/LOGO.png" alt="MediCare" className="h-8 brightness-0 invert" />
+            <img src="/LOGO.png" alt="MediCare" className="h-12 w-auto object-contain drop-shadow-md no-invert" />
             <span className="font-black text-white tracking-widest uppercase text-xl">Admin</span>
           </Link>
           <div className="mt-6 mb-4 p-4 bg-slate-800/50 rounded-2xl border border-slate-700/50 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/30">
-              A
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-extrabold text-lg shadow-lg shadow-indigo-500/30 shrink-0">
+              {user?.fullName?.charAt(0).toUpperCase()}
             </div>
-            <div>
-              <p className="text-sm font-bold text-white leading-tight">Quản trị viên</p>
-              <p className="text-xs text-indigo-300">System Admin</p>
+            <div className="overflow-hidden">
+              <p className="text-sm font-bold text-white leading-tight truncate">{user?.fullName}</p>
+              <p className="text-xs text-indigo-300 font-medium truncate">{t.roleAdmin}</p>
             </div>
           </div>
         </div>
@@ -85,12 +154,61 @@ const AdminLayout = () => {
           })}
         </div>
 
+        {/* Theme & Language Controls Panel */}
+        <div className="px-6 py-5 border-t border-slate-800 space-y-4 bg-slate-950/40">
+          {/* Theme Switcher */}
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-300 flex items-center gap-2">
+              <Sun size={14} className="text-indigo-400 animate-pulse" />
+              {t.theme}
+            </span>
+            <div className="flex bg-slate-800 p-0.5 rounded-lg border border-slate-700 shadow-inner">
+              <button 
+                onClick={() => setTheme('light')}
+                className={`p-1.5 rounded-md transition-all flex items-center justify-center ${theme === 'light' ? 'bg-indigo-500 text-white shadow-md scale-105' : 'text-slate-400 hover:text-white'}`}
+                title={t.light}
+              >
+                <Sun size={15} />
+              </button>
+              <button 
+                onClick={() => setTheme('dark')}
+                className={`p-1.5 rounded-md transition-all flex items-center justify-center ${theme === 'dark' ? 'bg-indigo-500 text-white shadow-md scale-105' : 'text-slate-400 hover:text-white'}`}
+                title={t.dark}
+              >
+                <Moon size={15} />
+              </button>
+            </div>
+          </div>
+
+          {/* Language Switcher */}
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-300 flex items-center gap-2">
+              <Globe size={14} className="text-indigo-400" />
+              {t.language}
+            </span>
+            <div className="flex bg-slate-800 p-0.5 rounded-lg border border-slate-700 shadow-inner">
+              <button 
+                onClick={() => setLang('vi')}
+                className={`px-3.5 py-1 rounded-md text-[10px] font-black tracking-wider transition-all ${lang === 'vi' ? 'bg-indigo-500 text-white shadow-md scale-105' : 'text-slate-400 hover:text-white'}`}
+              >
+                VI
+              </button>
+              <button 
+                onClick={() => setLang('en')}
+                className={`px-3.5 py-1 rounded-md text-[10px] font-black tracking-wider transition-all ${lang === 'en' ? 'bg-indigo-500 text-white shadow-md scale-105' : 'text-slate-400 hover:text-white'}`}
+              >
+                EN
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className="p-4 border-t border-slate-800">
           <button 
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-800 hover:bg-red-500/10 hover:text-red-400 text-slate-400 rounded-xl transition-all text-sm font-bold border border-transparent hover:border-red-500/20"
           >
-            <LogOut size={18} /> Đăng xuất
+            <LogOut size={18} /> {t.logout}
           </button>
         </div>
       </div>
@@ -106,11 +224,11 @@ const AdminLayout = () => {
           </div>
           <div className="flex items-center gap-5">
             <div className="text-sm text-slate-500 font-medium">
-              Server Status: <span className="text-emerald-500 font-bold ml-1 flex items-center inline-flex gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online</span>
+              {t.serverStatus}: <span className="text-emerald-500 font-bold ml-1 flex items-center inline-flex gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online</span>
             </div>
             <div className="h-6 w-px bg-slate-200"></div>
             <Link to="/dashboard" className="text-sm font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 transition-colors">
-              <ChevronLeft size={16} /> Về Client
+              <ChevronLeft size={16} /> {t.client}
             </Link>
           </div>
         </header>
@@ -134,3 +252,4 @@ const AdminLayout = () => {
 };
 
 export default AdminLayout;
+

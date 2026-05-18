@@ -2,37 +2,162 @@ import React, { useState, useEffect } from 'react';
 import {
   Calendar, FlaskConical, Pill, CreditCard, ChevronRight,
   Stethoscope, TrendingUp, Clock, CheckCircle2, AlertCircle,
-  Bell, Sparkles, ArrowUpRight
+  Sparkles, ArrowUpRight, Printer
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 
 const API = 'http://localhost:5000';
 const authH = () => ({ Authorization: `Bearer ${JSON.parse(localStorage.getItem('userInfo') || '{}').token}` });
-const fmt = (n) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n || 0);
 
-const STATUS = {
-  pending:   { label: 'Chờ xác nhận', color: '#d97706', bg: '#fef3c7' },
-  confirmed: { label: 'Đã xác nhận',  color: '#2563eb', bg: '#dbeafe' },
-  completed: { label: 'Đã khám',      color: '#059669', bg: '#d1fae5' },
-  cancelled: { label: 'Đã hủy',       color: '#dc2626', bg: '#fee2e2' },
-};
+const trans = {
+  vi: {
+    welcome: 'Xin chào',
+    upcomingCount: (c) => `Bạn có ${c} lịch hẹn sắp tới`,
+    healthyWish: 'Chúc bạn một ngày sức khỏe tốt lành',
+    apptSoon: 'Sắp đến giờ khám!',
+    unpaidAlert: (c) => `${c} hóa đơn chưa trả`,
+    payNow: 'Bấm để thanh toán →',
+    
+    statAppts: 'Lịch hẹn',
+    statApptsSub: (c) => `${c} đã khám`,
+    statLabs: 'Xét nghiệm',
+    statLabsSub: 'kết quả',
+    statRxs: 'Đơn thuốc',
+    statRxsSub: 'đơn thuốc',
+    statPaid: 'Đã thanh toán',
+    statPaidSub: (c) => `${c} hóa đơn`,
 
-const timeAgo = (t) => {
-  const s = (Date.now() - new Date(t)) / 1000;
-  if (s < 60) return 'Vừa xong';
-  if (s < 3600) return `${Math.floor(s / 60)} phút trước`;
-  if (s < 86400) return `${Math.floor(s / 3600)} giờ trước`;
-  return `${Math.floor(s / 86400)} ngày trước`;
+    myAppts: 'Lịch hẹn của bạn',
+    viewAll: 'Xem tất cả',
+    newAppt: '+ Đặt lịch mới',
+    noAppt: 'Chưa có lịch hẹn',
+    soon: 'Sắp đến!',
+    genDept: 'Khoa tổng quát',
+    doctorTitle: 'Bác sĩ phụ trách',
+
+    pending: 'Chờ xác nhận',
+    confirmed: 'Đã xác nhận',
+    completed: 'Đã khám',
+    cancelled: 'Đã hủy',
+
+    justNow: 'Vừa xong',
+    minsAgo: (m) => `${m} phút trước`,
+    hoursAgo: (h) => `${h} giờ trước`,
+    daysAgo: (d) => `${d} ngày trước`,
+
+    booking: 'Đặt lịch khám',
+    results: 'Kết quả XN',
+    prescriptions: 'Đơn thuốc',
+    billing: 'Thanh toán',
+  },
+  en: {
+    welcome: 'Welcome',
+    upcomingCount: (c) => `You have ${c} upcoming appointment${c > 1 ? 's' : ''}`,
+    healthyWish: 'Wishing you a healthy and productive day',
+    apptSoon: 'Consultation starting soon!',
+    unpaidAlert: (c) => `${c} unpaid bill${c > 1 ? 's' : ''}`,
+    payNow: 'Pay now →',
+
+    statAppts: 'Appointments',
+    statApptsSub: (c) => `${c} completed`,
+    statLabs: 'Lab Results',
+    statLabsSub: 'results available',
+    statRxs: 'Prescriptions',
+    statRxsSub: 'prescriptions',
+    statPaid: 'Total Paid',
+    statPaidSub: (c) => `${c} invoice${c > 1 ? 's' : ''}`,
+
+    myAppts: 'Your Appointments',
+    viewAll: 'View All',
+    newAppt: '+ New Appointment',
+    noAppt: 'No appointments scheduled',
+    soon: 'Soon!',
+    genDept: 'General Dept',
+    doctorTitle: 'Attending Physician',
+
+    pending: 'Pending',
+    confirmed: 'Confirmed',
+    completed: 'Completed',
+    cancelled: 'Cancelled',
+
+    justNow: 'Just now',
+    minsAgo: (m) => `${m} mins ago`,
+    hoursAgo: (h) => `${h} hours ago`,
+    daysAgo: (d) => `${d} days ago`,
+
+    booking: 'Book Appointment',
+    results: 'Lab Results',
+    prescriptions: 'Prescriptions',
+    billing: 'Billing & Fees',
+  }
 };
 
 export default function Dashboard() {
+  const { lang, t } = useTranslation(trans);
   const [user, setUser]         = useState(null);
   const [appts, setAppts]       = useState([]);
   const [bills, setBills]       = useState([]);
   const [labs, setLabs]         = useState([]);
   const [rxs, setRxs]           = useState([]);
   const [loading, setLoading]   = useState(true);
+  const [selectedTicketAppt, setSelectedTicketAppt] = useState(null);
   const navigate = useNavigate();
+
+  const fmt = (n) => {
+    const locale = lang === 'vi' ? 'vi-VN' : 'en-US';
+    const currency = lang === 'vi' ? 'VND' : 'USD';
+    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(n || 0);
+  };
+
+  const STATUS = {
+    pending:   { label: t.pending, color: '#d97706', bg: '#fef3c7' },
+    confirmed: { label: t.confirmed,  color: '#2563eb', bg: '#dbeafe' },
+    completed: { label: t.completed,      color: '#059669', bg: '#d1fae5' },
+    cancelled: { label: t.cancelled,       color: '#dc2626', bg: '#fee2e2' },
+  };
+
+  const timeAgo = (tDate) => {
+    const s = (Date.now() - new Date(tDate)) / 1000;
+    if (s < 60) return t.justNow;
+    if (s < 3600) return t.minsAgo(Math.floor(s / 60));
+    if (s < 86400) return t.hoursAgo(Math.floor(s / 3600));
+    return t.daysAgo(Math.floor(s / 86400));
+  };
+
+  const getDoctorDisplayName = (name) => {
+    if (!name) return t.doctorTitle;
+    const trimmed = name.trim();
+    if (trimmed.toLowerCase().startsWith('bs.') || trimmed.toLowerCase().startsWith('bs ') || trimmed.toLowerCase().startsWith('bác sĩ')) {
+      const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
+      return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
+    }
+    return lang === 'vi' ? `BS. ${trimmed}` : `Dr. ${trimmed}`;
+  };
+
+  const getLocalizedDept = (dept) => {
+    if (!dept) return '';
+    if (lang === 'vi') return dept;
+    const deptsMap = {
+      'Khoa Nội': 'Internal Medicine',
+      'Khoa Ngoại': 'Surgery',
+      'Khoa Nhi': 'Pediatrics',
+      'Khoa Sản': 'Obstetrics & Gynecology',
+      'Khoa Da liễu': 'Dermatology',
+      'Khoa Tai Mũi Họng': 'Otorhinolaryngology (ENT)',
+      'Khoa Mắt': 'Ophthalmology',
+      'Khoa Răng Hàm Mặt': 'Odonto-Stomatology',
+      'Khoa Tim mạch': 'Cardiology',
+      'Khoa Thần kinh': 'Neurology',
+      'Khoa Cơ xương khớp': 'Orthopedics & Rheumatology',
+      'Khoa Cấp cứu': 'Emergency Department',
+      'Khoa Xét nghiệm': 'Laboratory Medicine',
+      'Khoa Chẩn đoán hình ảnh': 'Diagnostic Imaging',
+      'Ngoại tổng quát': 'General Surgery',
+      'Nội tổng quát': 'General Internal Medicine',
+    };
+    return deptsMap[dept] || dept;
+  };
 
   useEffect(() => {
     const u = JSON.parse(localStorage.getItem('userInfo') || 'null');
@@ -54,7 +179,7 @@ export default function Dashboard() {
       } catch {}
       finally { setLoading(false); }
     })();
-  }, []);
+  }, [navigate]);
 
   const upcoming    = appts.filter(a => a.status === 'confirmed' || a.status === 'pending');
   const completed   = appts.filter(a => a.status === 'completed');
@@ -68,41 +193,15 @@ export default function Dashboard() {
     return diff >= 0 && diff <= 60;
   });
 
-  // Build notifications for panel
-  const notifs = [];
-  soonAppts.forEach(a => notifs.push({
-    id: `soon-${a._id}`, urgent: true, icon: Clock, color: '#dc2626', bg: '#fef2f2',
-    title: 'Sắp đến giờ khám!',
-    desc: `BS. ${a.doctor?.userId?.fullName || 'Phụ trách'} lúc ${a.time} hôm nay`,
-    time: new Date(),
-  }));
-  unpaidBills.forEach(b => notifs.push({
-    id: `bill-${b._id}`, urgent: true, icon: CreditCard, color: '#d97706', bg: '#fef3c7',
-    title: 'Hóa đơn chờ thanh toán',
-    desc: fmt(b.totalAmount),
-    time: b.createdAt,
-    link: '/dashboard/billing',
-  }));
-  upcoming.filter(a => !soonAppts.includes(a)).slice(0, 2).forEach(a => notifs.push({
-    id: `appt-${a._id}`, icon: Calendar, color: '#2563eb', bg: '#dbeafe',
-    title: `Lịch khám: ${a.doctor?.department || 'Tổng quát'}`,
-    desc: `${a.time} — ${new Date(a.date).toLocaleDateString('vi-VN')}`,
-    time: a.createdAt,
-    link: '/dashboard/booking',
-  }));
-  labs.slice(0, 1).forEach(l => notifs.push({
-    id: `lab-${l._id}`, icon: FlaskConical, color: '#7c3aed', bg: '#ede9fe',
-    title: 'Kết quả xét nghiệm mới',
-    desc: l.testName || 'Xem chi tiết',
-    time: l.createdAt,
-    link: '/dashboard/lab-results',
-  }));
+  const formattedDate = lang === 'vi'
+    ? new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long' })
+    : new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
   const STATS = [
-    { label: 'Lịch hẹn', value: upcoming.length, sub: `${completed.length} đã khám`, icon: Calendar, color: '#2563eb', bg: '#dbeafe', link: '/dashboard/booking' },
-    { label: 'Xét nghiệm', value: labs.length, sub: 'kết quả', icon: FlaskConical, color: '#7c3aed', bg: '#ede9fe', link: '/dashboard/lab-results' },
-    { label: 'Đơn thuốc', value: rxs.length, sub: 'đơn thuốc', icon: Pill, color: '#059669', bg: '#d1fae5', link: '/dashboard/prescriptions' },
-    { label: 'Đã thanh toán', value: fmt(paidTotal), sub: `${bills.filter(b=>b.status==='paid').length} hóa đơn`, icon: CreditCard, color: '#d97706', bg: '#fef3c7', link: '/dashboard/billing', money: true },
+    { label: t.statAppts, value: upcoming.length, sub: t.statApptsSub(completed.length), icon: Calendar, color: '#2563eb', bg: '#dbeafe', link: '/dashboard/booking' },
+    { label: t.statLabs, value: labs.length, sub: `${labs.length} ${t.statLabsSub}`, icon: FlaskConical, color: '#7c3aed', bg: '#ede9fe', link: '/dashboard/lab-results' },
+    { label: t.statRxs, value: rxs.length, sub: `${rxs.length} ${t.statRxsSub}`, icon: Pill, color: '#059669', bg: '#d1fae5', link: '/dashboard/prescriptions' },
+    { label: t.statPaid, value: fmt(paidTotal), sub: t.statPaidSub(bills.filter(b=>b.status==='paid').length), icon: CreditCard, color: '#d97706', bg: '#fef3c7', link: '/dashboard/billing', money: true },
   ];
 
   return (
@@ -119,15 +218,15 @@ export default function Dashboard() {
         <div style={{ position: 'absolute', bottom: -60, right: 100, width: 160, height: 160, background: 'rgba(255,255,255,0.03)', borderRadius: '50%' }} />
         <div>
           <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: 8 }}>
-            {new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long' })}
+            {formattedDate}
           </p>
           <h1 style={{ fontSize: 32, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', marginBottom: 10, lineHeight: 1.2 }}>
-            Xin chào, {user?.fullName?.split(' ').slice(-1)[0]} 👋
+            {t.welcome}, {user?.fullName?.split(' ').slice(-1)[0]} 👋
           </h1>
           <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', fontWeight: 500 }}>
             {upcoming.length > 0
-              ? `Bạn có ${upcoming.length} lịch hẹn sắp tới`
-              : 'Chúc bạn một ngày sức khỏe tốt lành'}
+              ? t.upcomingCount(upcoming.length)
+              : t.healthyWish}
           </p>
         </div>
         {soonAppts.length > 0 && (
@@ -138,10 +237,10 @@ export default function Dashboard() {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
               <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#f87171', animation: 'pulse 1s infinite' }} />
-              <p style={{ fontSize: 11, fontWeight: 800, color: '#fca5a5', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Sắp đến giờ khám!</p>
+              <p style={{ fontSize: 11, fontWeight: 800, color: '#fca5a5', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.apptSoon}</p>
             </div>
             <p style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>{soonAppts[0].time}</p>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>BS. {soonAppts[0].doctor?.userId?.fullName || 'Phụ trách'}</p>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>{getDoctorDisplayName(soonAppts[0].doctor?.userId?.fullName)}</p>
           </div>
         )}
         {unpaidBills.length > 0 && soonAppts.length === 0 && (
@@ -152,10 +251,10 @@ export default function Dashboard() {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
               <AlertCircle size={14} color="#fbbf24" />
-              <p style={{ fontSize: 11, fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{unpaidBills.length} hóa đơn chưa trả</p>
+              <p style={{ fontSize: 11, fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.unpaidAlert(unpaidBills.length)}</p>
             </div>
             <p style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>{fmt(unpaidBills.reduce((s,b)=>s+b.totalAmount,0))}</p>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>Bấm để thanh toán →</p>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>{t.payNow}</p>
           </div>
         )}
       </div>
@@ -191,7 +290,7 @@ export default function Dashboard() {
               <div style={{ width: 34, height: 34, borderRadius: 11, background: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #bfdbfe' }}>
                 <Calendar size={18} color="#2563eb" />
               </div>
-              <h3 style={{ fontWeight: 800, fontSize: 15, color: '#0f172a' }}>Lịch hẹn của bạn</h3>
+              <h3 style={{ fontWeight: 800, fontSize: 15, color: '#0f172a' }}>{t.myAppts}</h3>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={() => navigate('/dashboard/history')}
@@ -199,18 +298,18 @@ export default function Dashboard() {
                 onMouseEnter={e => e.currentTarget.style.background = '#cbd5e1'}
                 onMouseLeave={e => e.currentTarget.style.background = '#e2e8f0'}
               >
-                Xem tất cả
+                {t.viewAll}
               </button>
               <button onClick={() => navigate('/dashboard/booking')}
                 style={{ fontSize: 12, fontWeight: 700, color: '#fff', background: '#2563eb', border: 'none', borderRadius: 8, padding: '6px 14px', cursor: 'pointer', boxShadow: '0 2px 8px rgba(37,99,235,0.3)', transition: 'all 0.2s' }}
                 onMouseEnter={e => e.currentTarget.style.background = '#1d4ed8'}
                 onMouseLeave={e => e.currentTarget.style.background = '#2563eb'}
               >
-                + Đặt lịch mới
+                {t.newAppt}
               </button>
             </div>
           </div>
-          <div style={{ maxHeight: 420, overflowY: 'auto', scrollbarWidth: 'thin', scrollbarColor: '#cbd5e1 transparent' }}>
+          <div style={{ maxHeight: 420, overflowY: 'auto', overflowX: 'hidden', scrollbarWidth: 'thin', scrollbarColor: '#cbd5e1 transparent' }}>
             {loading ? (
               <div style={{ padding: 40, display: 'flex', justifyContent: 'center' }}>
                 <div style={{ width: 32, height: 32, border: '3px solid #e2e8f0', borderTopColor: '#2563eb', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
@@ -218,32 +317,72 @@ export default function Dashboard() {
             ) : appts.length === 0 ? (
               <div style={{ padding: '60px 24px', textAlign: 'center', color: '#94a3b8' }}>
                 <Calendar size={48} strokeWidth={1} style={{ margin: '0 auto 12px' }} />
-                <p style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>Chưa có lịch hẹn</p>
+                <p style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>{t.noAppt}</p>
               </div>
             ) : appts.slice(0, 5).map(a => {
               const st = STATUS[a.status] || STATUS.pending;
               const isSoon = soonAppts.some(s => s._id === a._id);
+              const apptDate = new Date(a.date);
+              const formattedApptMonth = lang === 'vi' ? `Th${apptDate.getMonth()+1}` : apptDate.toLocaleDateString('en-US', { month: 'short' });
               return (
-                <div key={a._id} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 24px', borderBottom: '1px solid #e2e8f0', background: isSoon ? '#fff7f7' : 'transparent', transition: 'background 0.15s' }}
-                  onMouseEnter={e => !isSoon && (e.currentTarget.style.background = '#f8fafc')}
-                  onMouseLeave={e => !isSoon && (e.currentTarget.style.background = 'transparent')}
+                <div key={a._id} onClick={() => navigate(`/dashboard/appointment/${a._id}`)}
+                  style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 24px', borderBottom: '1px solid #e2e8f0', background: isSoon ? '#fff7f7' : 'transparent', transition: 'all 0.15s', cursor: 'pointer' }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = '#f8fafc';
+                    e.currentTarget.style.transform = 'translateX(6px)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = isSoon ? '#fff7f7' : 'transparent';
+                    e.currentTarget.style.transform = 'none';
+                  }}
                 >
                   <div style={{ width: 48, height: 48, borderRadius: 15, background: st.bg, border: `1px solid ${st.color}40`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ fontSize: 10, fontWeight: 800, color: st.color, lineHeight: 1, textTransform: 'uppercase' }}>Th{new Date(a.date).getMonth()+1}</span>
-                    <span style={{ fontSize: 18, fontWeight: 900, color: st.color, lineHeight: 1 }}>{new Date(a.date).getDate()}</span>
+                    <span style={{ fontSize: 10, fontWeight: 800, color: st.color, lineHeight: 1, textTransform: 'uppercase' }}>{formattedApptMonth}</span>
+                    <span style={{ fontSize: 18, fontWeight: 900, color: st.color, lineHeight: 1 }}>{apptDate.getDate()}</span>
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontWeight: 800, fontSize: 14, color: '#1e293b', lineHeight: 1.3 }}>
-                      BS. {a.doctor?.userId?.fullName || 'Phụ trách'}
-                      {isSoon && <span style={{ marginLeft: 8, fontSize: 10, background: '#fee2e2', color: '#dc2626', padding: '2px 8px', borderRadius: 999, fontWeight: 800 }}>Sắp đến!</span>}
+                      {getDoctorDisplayName(a.doctor?.userId?.fullName)}
+                      {isSoon && <span style={{ marginLeft: 8, fontSize: 10, background: '#fee2e2', color: '#dc2626', padding: '2px 8px', borderRadius: 999, fontWeight: 800 }}>{t.soon}</span>}
                     </p>
                     <p style={{ fontSize: 12, color: '#64748b', marginTop: 3, fontWeight: 600 }}>
-                      {a.doctor?.department || 'Khoa tổng quát'} • {a.time}
+                      {getLocalizedDept(a.doctor?.department) || t.genDept} • {a.time}
                     </p>
                   </div>
-                  <span style={{ fontSize: 11, fontWeight: 800, color: st.color, background: st.bg, padding: '5px 12px', borderRadius: 999, whiteSpace: 'nowrap' }}>
-                    {st.label}
-                  </span>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    {a.status !== 'completed' && a.status !== 'cancelled' && (
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedTicketAppt(a);
+                        }}
+                        style={{
+                          fontSize: 11, fontWeight: 900, color: '#ea580c', background: '#ffedd5',
+                          border: '1px solid #fed7aa', padding: '5px 12px', borderRadius: 999,
+                          whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 6,
+                          cursor: 'pointer', transition: 'all 0.15s'
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.background = '#f97316';
+                          e.currentTarget.style.color = '#fff';
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.background = '#ffedd5';
+                          e.currentTarget.style.color = '#ea580c';
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                          <polyline points="14 2 14 8 20 8"/>
+                          <path d="m9 15 2 2 4-4"/>
+                        </svg>
+                        {lang === 'vi' ? 'Xem phiếu STT' : 'View Ticket'}
+                      </button>
+                    )}
+                    <span style={{ fontSize: 11, fontWeight: 800, color: st.color, background: st.bg, padding: '5px 12px', borderRadius: 999, whiteSpace: 'nowrap' }}>
+                      {st.label}
+                    </span>
+                  </div>
                 </div>
               );
             })}
@@ -259,10 +398,10 @@ export default function Dashboard() {
       {/* ── QUICK ACTIONS ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginTop: 20 }}>
         {[
-          { label: 'Đặt lịch khám', icon: Calendar, color: '#2563eb', bg: '#dbeafe', link: '/dashboard/booking' },
-          { label: 'Kết quả XN', icon: FlaskConical, color: '#7c3aed', bg: '#ede9fe', link: '/dashboard/lab-results' },
-          { label: 'Đơn thuốc', icon: Pill, color: '#059669', bg: '#d1fae5', link: '/dashboard/prescriptions' },
-          { label: 'Thanh toán', icon: CreditCard, color: '#d97706', bg: '#fef3c7', link: '/dashboard/billing' },
+          { label: t.booking, icon: Calendar, color: '#2563eb', bg: '#dbeafe', link: '/dashboard/booking' },
+          { label: t.results, icon: FlaskConical, color: '#7c3aed', bg: '#ede9fe', link: '/dashboard/lab-results' },
+          { label: t.prescriptions, icon: Pill, color: '#059669', bg: '#d1fae5', link: '/dashboard/prescriptions' },
+          { label: t.billing, icon: CreditCard, color: '#d97706', bg: '#fef3c7', link: '/dashboard/billing' },
         ].map(q => (
           <div key={q.label} onClick={() => navigate(q.link)}
             style={{ background: '#fff', borderRadius: 18, padding: '18px 20px', border: '1px solid #cbd5e1', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14, transition: 'all 0.2s', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}
@@ -281,6 +420,119 @@ export default function Dashboard() {
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
       `}</style>
+      {/* Premium Queue Ticket Check-in Modal */}
+      {selectedTicketAppt && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+          zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16
+        }}>
+          <div style={{
+            background: '#fff', borderRadius: 32, width: '100%', maxWidth: 400,
+            overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', border: '1px solid #f1f5f9',
+            fontFamily: 'Inter, system-ui, sans-serif'
+          }}>
+            {/* Ticket Header with Colorful Project Logo */}
+            <div style={{ padding: '24px 24px 16px', borderBottom: '1px dashed #cbd5e1', textAlign: 'center', position: 'relative' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+                <img src="/LOGO.png" alt="MediCare" style={{ height: 36, width: 'auto', objectFit: 'contain' }} />
+              </div>
+              <h3 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', margin: '8px 0 0', color: '#1e293b' }}>
+                {lang === 'vi' ? 'PHIẾU HẸN & SỐ THỨ TỰ' : 'QUEUE TICKET'}
+              </h3>
+              <p style={{ fontSize: 11, color: '#64748b', marginTop: 4, fontWeight: 600, margin: '4px 0 0' }}>
+                {lang === 'vi' ? 'Hệ thống Y tế thông minh MediCare' : 'MediCare Smart Hospital System'}
+              </p>
+              
+              {/* Left/Right ticket notches */}
+              <div style={{ position: 'absolute', left: -8, bottom: -8, width: 16, height: 16, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', zIndex: 10 }} />
+              <div style={{ position: 'absolute', right: -8, bottom: -8, width: 16, height: 16, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', zIndex: 10 }} />
+            </div>
+
+            {/* Ticket Body */}
+            <div style={{ padding: 24 }}>
+              {/* Big Queue Number */}
+              <div style={{ background: '#f0f7ff', border: '1px solid #e0f2fe', borderRadius: 16, padding: '16px 0', textAlign: 'center', marginBottom: 24 }}>
+                <p style={{ fontSize: 10, fontWeight: 800, color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 6px' }}>{lang === 'vi' ? 'Số Thứ Tự Của Bạn' : 'Your Queue Number'}</p>
+                <div style={{
+                  display: 'inline-flex', width: 88, height: 88, borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #102a63 0%, #2563eb 100%)', color: '#fff',
+                  alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 32,
+                  boxShadow: '0 10px 15px -3px rgba(59, 130, 246, 0.3)', margin: '8px 0'
+                }}>
+                  #{selectedTicketAppt.queueNumber || '01'}
+                </div>
+                <p style={{ fontSize: 10, fontWeight: 700, margin: '6px 0 0', color: '#64748b' }}>{lang === 'vi' ? 'Vui lòng theo dõi bảng điện tử tại sảnh chờ' : 'Please watch the monitor in the waiting hall'}</p>
+              </div>
+
+              {/* Ticket Details */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13, color: '#334155', fontWeight: 600 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
+                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{lang === 'vi' ? 'Mã ca khám:' : 'Ticket ID:'}</span>
+                  <span style={{ fontFamily: 'monospace', fontWeight: 900, color: '#1e293b', fontSize: 14 }}>{selectedTicketAppt.ticketNumber}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
+                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{lang === 'vi' ? 'Bệnh nhân:' : 'Patient:'}</span>
+                  <span style={{ fontWeight: 800, color: '#1e293b' }}>{user?.fullName}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
+                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{lang === 'vi' ? 'Bác sĩ khám:' : 'Physician:'}</span>
+                  <span style={{ fontWeight: 800, color: '#102a63' }}>{getDoctorDisplayName(selectedTicketAppt.doctor?.userId?.fullName)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
+                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{lang === 'vi' ? 'Chuyên khoa:' : 'Department:'}</span>
+                  <span style={{ fontWeight: 800, color: '#1e293b' }}>{getLocalizedDept(selectedTicketAppt.doctor?.department)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
+                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{lang === 'vi' ? 'Thời gian:' : 'Schedule:'}</span>
+                  <span style={{ fontWeight: 800, color: '#1e293b' }}>{selectedTicketAppt.time} • {new Date(selectedTicketAppt.date).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')}</span>
+                </div>
+              </div>
+
+              {/* Dummy Barcode using high-tech SVGs */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingTop: 20 }}>
+                <svg style={{ width: 256, height: 48 }} overflow="visible">
+                  {[...Array(32)].map((_, i) => (
+                    <rect 
+                      key={i} 
+                      x={i * 8} 
+                      y={0} 
+                      width={i % 3 === 0 ? 4 : i % 5 === 0 ? 1 : 2} 
+                      height={48} 
+                      fill="#1e293b" 
+                    />
+                  ))}
+                </svg>
+                <p style={{ fontSize: 9, color: '#94a3b8', fontFamily: 'monospace', margin: '8px 0 0', letterSpacing: '0.15em' }}>{selectedTicketAppt._id}</p>
+              </div>
+            </div>
+
+            {/* Ticket Footer Buttons */}
+            <div style={{ background: '#f8fafc', padding: '16px 24px', display: 'flex', gap: 12, borderTop: '1px solid #f1f5f9' }}>
+              <button 
+                onClick={() => window.print()}
+                style={{
+                  flex: 1, padding: '10px 0', background: '#102a63', color: '#fff',
+                  fontSize: 12, fontWeight: 700, borderRadius: 12, border: 'none',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                  boxShadow: '0 4px 6px -1px rgba(16, 42, 99, 0.2)'
+                }}
+              >
+                <Printer size={14} />
+                {lang === 'vi' ? 'In phiếu' : 'Print Ticket'}
+              </button>
+              <button 
+                onClick={() => setSelectedTicketAppt(null)}
+                style={{
+                  padding: '10px 16px', background: '#e2e8f0', color: '#475569',
+                  fontSize: 12, fontWeight: 700, borderRadius: 12, border: 'none', cursor: 'pointer'
+                }}
+              >
+                {lang === 'vi' ? 'Đóng' : 'Close'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

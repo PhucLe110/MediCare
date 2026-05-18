@@ -12,3 +12,16 @@
     @apply bg-white text-gray-800 antialiased font-sans;
   }
 }
+
+/* Smart Hue-Inverted Global Dark Mode */
+html.dark {
+  filter: invert(0.9) hue-rotate(180deg);
+  background-color: #0f172a;
+}
+html.dark img,
+html.dark video,
+html.dark canvas,
+html.dark iframe,
+html.dark .no-invert {
+  filter: invert(1) hue-rotate(180deg);
+}

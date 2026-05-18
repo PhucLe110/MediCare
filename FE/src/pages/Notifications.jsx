@@ -1,57 +1,115 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, Calendar, FlaskConical, Pill, CreditCard, CheckCircle2, Clock, ChevronRight, AlertCircle, Stethoscope } from 'lucide-react';
+import { Bell, Clock, CreditCard, ChevronRight, Stethoscope } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 
 const API = 'http://localhost:5000';
 const authH = () => ({ Authorization: `Bearer ${JSON.parse(localStorage.getItem('userInfo') || '{}').token}` });
-const fmt = (n) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n || 0);
 
-const timeAgo = (t) => {
-  const s = (Date.now() - new Date(t)) / 1000;
-  if (s < 60) return 'Vừa xong';
-  if (s < 3600) return `${Math.floor(s / 60)} phút trước`;
-  if (s < 86400) return `${Math.floor(s / 3600)} giờ trước`;
-  if (s < 86400 * 7) return `${Math.floor(s / 86400)} ngày trước`;
-  return new Date(t).toLocaleDateString('vi-VN');
-};
-
-const timeUntil = (date, time) => {
-  const apptTime = new Date(`${date}T${time}`);
-  const mins = Math.round((apptTime - Date.now()) / 60000);
-  if (mins <= 0) return 'Đã đến giờ';
-  if (mins < 60) return `còn ${mins} phút`;
-  return `còn ${Math.round(mins/60)} giờ`;
+const trans = {
+  vi: {
+    title: 'Thông báo',
+    all: 'Tất cả',
+    filterReminder: '⏰ Nhắc hẹn',
+    filterBill: 'Hóa đơn',
+    filterUpdate: 'Chẩn đoán',
+    loading: 'Đang tải thông báo...',
+    noNotifications: 'Không có thông báo',
+    urgentText: 'khẩn',
+    urgentCountText: 'thông báo cần chú ý',
+    defaultCountText: 'Cập nhật từ hệ thống MediCare',
+    timeJustNow: 'Vừa xong',
+    timeMinutesAgo: 'phút trước',
+    timeHoursAgo: 'giờ trước',
+    timeDaysAgo: 'ngày trước',
+    timeUntilReady: 'Đã đến giờ',
+    generalDept: 'Khoa tổng quát',
+    doctorTitle: 'Phụ trách',
+    apptReminderTitle: '⏰ Nhắc lịch khám — Sắp đến giờ!',
+    billTitle: 'Hóa đơn mới cập nhật',
+    billDescSuffix: '— Vui lòng hoàn tất để nhận kết quả khám',
+    completedApptTitle: 'Cập nhật chẩn bệnh của Bác sĩ',
+    completedApptDesc: 'BS. {doctor} đã cập nhật thông tin chẩn đoán và đơn thuốc cho ca khám ngày {date}',
+  },
+  en: {
+    title: 'Notifications',
+    all: 'All',
+    filterReminder: '⏰ Reminders',
+    filterBill: 'Billing',
+    filterUpdate: 'Diagnosis',
+    loading: 'Loading notification stream...',
+    noNotifications: 'No notifications',
+    urgentText: 'urgent',
+    urgentCountText: 'notifications require attention',
+    defaultCountText: 'MediCare system updates',
+    timeJustNow: 'Just now',
+    timeMinutesAgo: 'minutes ago',
+    timeHoursAgo: 'hours ago',
+    timeDaysAgo: 'days ago',
+    timeUntilReady: 'Scheduled time has arrived',
+    generalDept: 'General Consultation',
+    doctorTitle: 'Attending Doctor',
+    apptReminderTitle: '⏰ Appointment Reminder — Upcoming!',
+    billTitle: 'New Billing Statement Published',
+    billDescSuffix: '— Please complete payment to retrieve your laboratory results',
+    completedApptTitle: 'Clinical Record Updated',
+    completedApptDesc: 'Dr. {doctor} has successfully updated the medical diagnosis and prescription card for your visit on {date}',
+  }
 };
 
 export default function Notifications() {
+  const { lang, t } = useTranslation(trans);
   const [appts, setAppts]   = useState([]);
   const [bills, setBills]   = useState([]);
-  const [labs, setLabs]     = useState([]);
-  const [rxs, setRxs]       = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const navigate = useNavigate();
 
+  const fmt = (n) => {
+    return lang === 'vi'
+      ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n || 0)
+      : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format((n || 0) / 25000);
+  };
+
+  const getDoctorDisplayName = (name) => {
+    if (!name) return t.doctorTitle;
+    const trimmed = name.trim();
+    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
+    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
+  };
+
+  const timeAgo = (dateVal) => {
+    const s = (Date.now() - new Date(dateVal)) / 1000;
+    if (s < 60) return t.timeJustNow;
+    if (s < 3600) return `${Math.floor(s / 60)} ${lang === 'vi' ? 'phút trước' : 'mins ago'}`;
+    if (s < 86400) return `${Math.floor(s / 3600)} ${lang === 'vi' ? 'giờ trước' : 'hours ago'}`;
+    if (s < 86400 * 7) return `${Math.floor(s / 86400)} ${lang === 'vi' ? 'ngày trước' : 'days ago'}`;
+    return lang === 'vi' ? new Date(dateVal).toLocaleDateString('vi-VN') : new Date(dateVal).toLocaleDateString('en-US');
+  };
+
+  const timeUntil = (date, timeStr) => {
+    const apptTime = new Date(`${date}T${timeStr}`);
+    const mins = Math.round((apptTime - Date.now()) / 60000);
+    if (mins <= 0) return t.timeUntilReady;
+    if (mins < 60) return lang === 'vi' ? `còn ${mins} phút` : `${mins} mins remaining`;
+    return lang === 'vi' ? `còn ${Math.round(mins/60)} giờ` : `${Math.round(mins/60)} hours remaining`;
+  };
+
   useEffect(() => {
     (async () => {
       try {
-        const [ar, br, lr, rxr] = await Promise.all([
+        const [ar, br] = await Promise.all([
           fetch(`${API}/api/appointments`, { headers: authH() }),
           fetch(`${API}/api/bills/my`, { headers: authH() }),
-          fetch(`${API}/api/lab-results/my`, { headers: authH() }),
-          fetch(`${API}/api/prescriptions/my`, { headers: authH() }),
         ]);
-        const [ad, bd, ld, rxd] = await Promise.all([ar.json(), br.json(), lr.json(), rxr.json()]);
+        const [ad, bd] = await Promise.all([ar.json(), br.json()]);
         if (ad.success) setAppts(ad.data);
         if (bd.success) setBills(bd.data);
-        if (ld.success) setLabs(ld.data);
-        if (rxd.success) setRxs(rxd.data);
       } catch {}
       finally { setLoading(false); }
     })();
   }, []);
 
-  // Build all notifications
   const all = [];
 
   // 1. 1-hour appointment reminders
@@ -62,8 +120,8 @@ export default function Notifications() {
       all.push({
         id: `remind-${a._id}`, type: 'reminder', urgent: true,
         icon: Clock, color: '#dc2626', bg: '#fef2f2',
-        title: '⏰ Nhắc lịch khám — Sắp đến giờ!',
-        desc: `BS. ${a.doctor?.userId?.fullName || 'Phụ trách'} • ${a.doctor?.department || 'Khoa tổng quát'} • ${a.time} — ${timeUntil(a.date, a.time)}`,
+        title: t.apptReminderTitle,
+        desc: `${getDoctorDisplayName(a.doctor?.userId?.fullName)} • ${a.doctor?.department || t.generalDept} • ${a.time} — ${timeUntil(a.date, a.time)}`,
         time: new Date(),
         link: '/dashboard/history',
       });
@@ -75,19 +133,22 @@ export default function Notifications() {
     all.push({
       id: `bill-unpaid-${b._id}`, type: 'bill', urgent: true,
       icon: CreditCard, color: '#d97706', bg: '#fef3c7',
-      title: 'Hóa đơn mới cập nhật',
-      desc: `${fmt(b.totalAmount)} — Vui lòng hoàn tất để nhận kết quả khám`,
+      title: t.billTitle,
+      desc: `${fmt(b.totalAmount)} ${t.billDescSuffix}`,
       time: b.createdAt, link: '/dashboard/billing',
     });
   });
 
   // 3. Completed appointments (Cập nhật chẩn bệnh)
   appts.filter(a => a.status === 'completed').slice(0, 5).forEach(a => {
+    const dateFormatted = lang === 'vi' 
+      ? new Date(a.date).toLocaleDateString('vi-VN')
+      : new Date(a.date).toLocaleDateString('en-US');
     all.push({
       id: `done-${a._id}`, type: 'update',
       icon: Stethoscope, color: '#059669', bg: '#d1fae5',
-      title: 'Cập nhật chẩn bệnh của Bác sĩ',
-      desc: `BS. ${a.doctor?.userId?.fullName || 'Phụ trách'} đã cập nhật thông tin chẩn đoán và đơn thuốc cho ca khám ngày ${new Date(a.date).toLocaleDateString('vi-VN')}`,
+      title: t.completedApptTitle,
+      desc: t.completedApptDesc.replace('{doctor}', getDoctorDisplayName(a.doctor?.userId?.fullName)).replace('{date}', dateFormatted),
       time: a.updatedAt || a.createdAt, link: `/dashboard/appointment/${a._id}`,
     });
   });
@@ -99,10 +160,10 @@ export default function Notifications() {
   });
 
   const FILTERS = [
-    { key: 'all',      label: 'Tất cả' },
-    { key: 'reminder', label: '⏰ Nhắc hẹn' },
-    { key: 'bill',     label: 'Hóa đơn' },
-    { key: 'update',   label: 'Chẩn đoán' },
+    { key: 'all',      label: t.all },
+    { key: 'reminder', label: t.filterReminder },
+    { key: 'bill',     label: t.filterBill },
+    { key: 'update',   label: t.filterUpdate },
   ];
 
   const displayed = filter === 'all' ? all : all.filter(n => n.type === filter);
@@ -118,15 +179,15 @@ export default function Notifications() {
             <Bell size={24} color="#fff" />
           </div>
           <div>
-            <h1 style={{ fontSize: 28, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.02em', lineHeight: 1 }}>Thông báo</h1>
+            <h1 style={{ fontSize: 28, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.02em', lineHeight: 1 }}>{t.title}</h1>
             <p style={{ fontSize: 12, color: '#94a3b8', fontWeight: 600, marginTop: 4 }}>
-              {urgentCount > 0 ? `${urgentCount} thông báo cần chú ý` : 'Cập nhật từ hệ thống MediCare'}
+              {urgentCount > 0 ? `${urgentCount} ${t.urgentCountText}` : t.defaultCountText}
             </p>
           </div>
           {urgentCount > 0 && (
             <div style={{ marginLeft: 'auto', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 12, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444', animation: 'pulse 1s infinite', display: 'block' }} />
-              <p style={{ fontSize: 12, fontWeight: 800, color: '#dc2626' }}>{urgentCount} khẩn</p>
+              <p style={{ fontSize: 12, fontWeight: 800, color: '#dc2626' }}>{urgentCount} {t.urgentText}</p>
             </div>
           )}
         </div>
@@ -168,7 +229,7 @@ export default function Notifications() {
       ) : displayed.length === 0 ? (
         <div style={{ padding: '80px 24px', textAlign: 'center', color: '#cbd5e1' }}>
           <Bell size={64} strokeWidth={1} style={{ margin: '0 auto 16px' }} />
-          <p style={{ fontWeight: 700, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.15em' }}>Không có thông báo</p>
+          <p style={{ fontWeight: 700, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.15em' }}>{t.noNotifications}</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

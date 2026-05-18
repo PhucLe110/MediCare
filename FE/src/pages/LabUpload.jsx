@@ -1,20 +1,70 @@
 import React, { useState, useRef } from 'react';
 import { Upload, FlaskConical, User, FileText, CheckCircle2, AlertCircle, Loader2, X } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 
 const API_URL = 'http://localhost:5000';
 
-const TEST_TYPES = [
-  { value: 'blood', label: 'Xét nghiệm máu' },
-  { value: 'urine', label: 'Xét nghiệm nước tiểu' },
-  { value: 'xray', label: 'Chụp X-Quang' },
-  { value: 'mri', label: 'Chụp MRI' },
-  { value: 'ct', label: 'Chụp CT Scan' },
-  { value: 'ultrasound', label: 'Siêu âm' },
-  { value: 'ecg', label: 'Điện tâm đồ (ECG)' },
-  { value: 'other', label: 'Loại khác' },
-];
+const trans = {
+  vi: {
+    toastAttached: 'Vui lòng đính kèm file kết quả.',
+    toastPatientId: 'Vui lòng nhập mã bệnh nhân.',
+    toastTestName: 'Vui lòng nhập tên xét nghiệm.',
+    toastConnError: 'Lỗi kết nối, vui lòng thử lại.',
+    toastSending: 'Đang gửi...',
+    toastSendSuccess: 'Gửi kết quả thành công!',
+    title: 'Gửi Kết Quả Xét Nghiệm',
+    subtitle: 'Nhân viên xét nghiệm - Tải lên và gửi kết quả đến bệnh nhân',
+    patientIdLabel: 'Mã Bệnh nhân (BN-XXXXXX)',
+    patientIdPlaceholder: 'VD: BN000001',
+    testNameLabel: 'Tên xét nghiệm',
+    testNamePlaceholder: 'VD: Công thức máu toàn bộ',
+    testTypeLabel: 'Loại xét nghiệm',
+    notesLabel: 'Ghi chú kết quả (Tùy chọn)',
+    notesPlaceholder: 'Ví dụ: Bạch cầu hơi cao, cần theo dõi thêm...',
+    uploadZoneText: 'Kéo thả file vào đây hoặc click để chọn',
+    uploadZoneSub: 'Hỗ trợ PDF, JPG, PNG — Tối đa 10MB',
+    btnSubmit: 'Gửi kết quả tới bệnh nhân',
+    typeBlood: 'Xét nghiệm máu',
+    typeUrine: 'Xét nghiệm nước tiểu',
+    typeXray: 'Chụp X-Quang',
+    typeMri: 'Chụp MRI',
+    typeCt: 'Chụp CT Scan',
+    typeUltrasound: 'Siêu âm',
+    typeEcg: 'Điện tâm đồ (ECG)',
+    typeOther: 'Loại khác',
+  },
+  en: {
+    toastAttached: 'Please attach the test result file.',
+    toastPatientId: 'Please enter the patient ID.',
+    toastTestName: 'Please enter the test name.',
+    toastConnError: 'Connection error, please try again.',
+    toastSending: 'Sending...',
+    toastSendSuccess: 'Test results successfully sent!',
+    title: 'Submit Laboratory Results',
+    subtitle: 'Lab Technician - Upload and send test results to patient dashboard',
+    patientIdLabel: 'Patient Identification Code (BN-XXXXXX)',
+    patientIdPlaceholder: 'e.g., BN000001',
+    testNameLabel: 'Clinical Test Name',
+    testNamePlaceholder: 'e.g., Complete Blood Count (CBC)',
+    testTypeLabel: 'Clinical Test Category',
+    notesLabel: 'Diagnostic Advisory Notes (Optional)',
+    notesPlaceholder: 'e.g., Mild elevation in WBC, request follow-up observation...',
+    uploadZoneText: 'Drag and drop clinical report here, or browse files',
+    uploadZoneSub: 'Supports PDF, JPG, PNG formats — Maximum file size 10MB',
+    btnSubmit: 'Dispatch Test Result to Patient',
+    typeBlood: 'Blood Test',
+    typeUrine: 'Urinalysis',
+    typeXray: 'X-Ray Imaging',
+    typeMri: 'MRI Scan',
+    typeCt: 'CT Scan',
+    typeUltrasound: 'Ultrasound',
+    typeEcg: 'Electrocardiogram (ECG)',
+    typeOther: 'Other Test',
+  }
+};
 
 const LabUpload = () => {
+  const { lang, t } = useTranslation(trans);
   const [form, setForm] = useState({
     patientId: '',
     testName: '',
@@ -26,6 +76,17 @@ const LabUpload = () => {
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ show: false, type: 'success', message: '' });
   const fileRef = useRef();
+
+  const TEST_TYPES = [
+    { value: 'blood', label: t.typeBlood },
+    { value: 'urine', label: t.typeUrine },
+    { value: 'xray', label: t.typeXray },
+    { value: 'mri', label: t.typeMri },
+    { value: 'ct', label: t.typeCt },
+    { value: 'ultrasound', label: t.typeUltrasound },
+    { value: 'ecg', label: t.typeEcg },
+    { value: 'other', label: t.typeOther },
+  ];
 
   const showToast = (message, type = 'success') => {
     setToast({ show: true, type, message });
@@ -46,9 +107,9 @@ const LabUpload = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) return showToast('Vui lòng đính kèm file kết quả.', 'error');
-    if (!form.patientId.trim()) return showToast('Vui lòng nhập mã bệnh nhân.', 'error');
-    if (!form.testName.trim()) return showToast('Vui lòng nhập tên xét nghiệm.', 'error');
+    if (!file) return showToast(t.toastAttached, 'error');
+    if (!form.patientId.trim()) return showToast(t.toastPatientId, 'error');
+    if (!form.testName.trim()) return showToast(t.toastTestName, 'error');
 
     setLoading(true);
     try {
@@ -68,14 +129,14 @@ const LabUpload = () => {
       const data = await res.json();
 
       if (data.success) {
-        showToast(data.message, 'success');
+        showToast(lang === 'vi' ? 'Gửi kết quả thành công!' : 'Test results successfully sent!', 'success');
         setForm({ patientId: '', testName: '', testType: 'blood', notes: '' });
         setFile(null);
       } else {
         showToast(data.message, 'error');
       }
     } catch (err) {
-      showToast('Lỗi kết nối, vui lòng thử lại.', 'error');
+      showToast(t.toastConnError, 'error');
     } finally {
       setLoading(false);
     }
@@ -99,8 +160,8 @@ const LabUpload = () => {
           <FlaskConical size={32} />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Gửi Kết Quả Xét Nghiệm</h1>
-          <p className="text-gray-500 mt-1">Nhân viên xét nghiệm - Tải lên và gửi kết quả đến bệnh nhân</p>
+          <h1 className="text-2xl font-bold text-gray-800">{t.title}</h1>
+          <p className="text-gray-500 mt-1">{t.subtitle}</p>
         </div>
       </div>
 
@@ -110,31 +171,31 @@ const LabUpload = () => {
         {/* Patient ID */}
         <div className="relative z-10">
           <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-            <User size={16} className="text-primary" /> Mã Bệnh nhân (BN-XXXXXX)
+            <User size={16} className="text-primary" /> {t.patientIdLabel}
           </label>
           <input
             type="text"
             className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-mono"
-            placeholder="VD: BN000001"
+            placeholder={t.patientIdPlaceholder}
             value={form.patientId}
             onChange={e => setForm({...form, patientId: e.target.value})}
           />
         </div>
 
         {/* Test Name & Type */}
-        <div className="grid grid-cols-2 gap-4 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Tên xét nghiệm</label>
+            <label className="block text-sm font-bold text-gray-700 mb-2">{t.testNameLabel}</label>
             <input
               type="text"
               className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-              placeholder="VD: Công thức máu toàn bộ"
+              placeholder={t.testNamePlaceholder}
               value={form.testName}
               onChange={e => setForm({...form, testName: e.target.value})}
             />
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Loại xét nghiệm</label>
+            <label className="block text-sm font-bold text-gray-700 mb-2">{t.testTypeLabel}</label>
             <select
               className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all"
               value={form.testType}
@@ -147,11 +208,11 @@ const LabUpload = () => {
 
         {/* Notes */}
         <div className="relative z-10">
-          <label className="block text-sm font-bold text-gray-700 mb-2">Ghi chú kết quả (Tùy chọn)</label>
+          <label className="block text-sm font-bold text-gray-700 mb-2">{t.notesLabel}</label>
           <textarea
             rows="3"
             className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none resize-none transition-all"
-            placeholder="Ví dụ: Bạch cầu hơi cao, cần theo dõi thêm..."
+            placeholder={t.notesPlaceholder}
             value={form.notes}
             onChange={e => setForm({...form, notes: e.target.value})}
           ></textarea>
@@ -169,7 +230,7 @@ const LabUpload = () => {
         >
           <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={handleFileChange} />
           {file ? (
-            <div className="flex items-center justify-center gap-4">
+            <div className="flex items-center justify-center gap-4 animate-in fade-in">
               <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                 <FileText size={24} className="text-green-600" />
               </div>
@@ -186,8 +247,8 @@ const LabUpload = () => {
               <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Upload size={28} className="text-gray-400" />
               </div>
-              <p className="font-bold text-gray-700 mb-1">Kéo thả file vào đây hoặc click để chọn</p>
-              <p className="text-sm text-gray-400">Hỗ trợ PDF, JPG, PNG — Tối đa 10MB</p>
+              <p className="font-bold text-gray-700 mb-1">{t.uploadZoneText}</p>
+              <p className="text-sm text-gray-400">{t.uploadZoneSub}</p>
             </>
           )}
         </div>
@@ -198,7 +259,7 @@ const LabUpload = () => {
           disabled={loading}
           className="w-full py-4 bg-gradient-to-r from-teal-600 to-blue-600 text-white font-bold rounded-2xl hover:from-teal-700 hover:to-blue-700 transition-all shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait relative z-10"
         >
-          {loading ? <><Loader2 size={20} className="animate-spin" /> Đang gửi...</> : <><FlaskConical size={20} /> Gửi kết quả tới bệnh nhân</>}
+          {loading ? <><Loader2 size={20} className="animate-spin" /> {t.toastSending}</> : <><FlaskConical size={20} /> {t.btnSubmit}</>}
         </button>
       </form>
     </div>

@@ -30,6 +30,16 @@ const userSchema = new mongoose.Schema({
     enum: ['patient', 'doctor', 'admin', 'lab_staff'],
     default: 'patient'
   },
+  gender: {
+    type: String,
+    enum: ['Nam', 'Nữ'],
+    default: 'Nam'
+  },
+  status: {
+    type: String,
+    enum: ['active', 'blocked'],
+    default: 'active'
+  },
   patientId: {
     type: String,
     unique: true,
@@ -51,7 +61,7 @@ const userSchema = new mongoose.Schema({
 // Generate patientId before saving if not exists
 userSchema.pre('save', async function() {
   if (!this.patientId && this.role === 'patient') {
-    const count = await mongoose.model('User').countDocuments();
+    const count = await mongoose.model('User').countDocuments({ role: 'patient' });
     this.patientId = `BN${String(count + 1).padStart(6, '0')}`;
   }
 

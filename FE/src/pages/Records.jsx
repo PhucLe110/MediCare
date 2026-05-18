@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FolderHeart, Calendar, FileText, Download, HeartPulse, Activity, UserCircle, Edit3, Save, Info, CheckCircle2, Droplet, Ruler, Scale, Loader2, ChevronRight } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
+
 const API_URL = 'http://localhost:5000';
 
 const getAuthHeaders = () => {
@@ -11,7 +13,151 @@ const getAuthHeaders = () => {
   };
 };
 
+const trans = {
+  vi: {
+    title: 'Hồ Sơ Sức Khỏe',
+    sub: 'Quản lý toàn diện dữ liệu y tế cá nhân của bạn',
+    exportPdf: 'Xuất PDF',
+    tabPersonal: 'Thông tin cá nhân',
+    tabMedical: 'Bệnh án điện tử',
+    notFilled: 'Chưa có thông tin sức khỏe!',
+    notFilledSub: 'Việc cung cấp các thông tin cơ bản (nhóm máu, dị ứng) là bắt buộc để Bác sĩ có cơ sở chẩn đoán chính xác và kê đơn thuốc an toàn.',
+    updateNow: 'Cập nhật ngay',
+    healthProfile: 'Chỉ số sinh tồn & Tiền sử bệnh',
+    edit: 'Chỉnh sửa',
+    saving: 'Đang lưu...',
+    save: 'Lưu thông tin',
+    toastSaveSuccess: 'Lưu thành công',
+    toastSaveSuccessSub: 'Thông tin sức khỏe đã được lưu thành công!',
+    toastLoadError: 'Không thể tải dữ liệu sức khỏe và bệnh án.',
+    toastSaveError: 'Lưu thất bại.',
+    toastConnError: 'Lỗi kết nối, không thể lưu dữ liệu.',
+    bloodType: 'Nhóm máu',
+    selectBloodType: 'Chọn nhóm máu',
+    height: 'Chiều cao (cm)',
+    weight: 'Cân nặng (kg)',
+    bloodPressure: 'Huyết áp trung bình',
+    allergies: 'Tiền sử Dị ứng (Thuốc, Thức ăn...)',
+    allergiesPlaceholder: 'Ghi rõ dị ứng với loại thuốc hay thức ăn nào...',
+    noAllergies: 'Không ghi nhận dị ứng',
+    noAllergiesDisplay: 'Không có hoặc chưa cập nhật',
+    medicalHistory: 'Bệnh lý nền (Tiểu đường, Huyết áp...)',
+    medicalHistoryPlaceholder: 'Liệt kê các bệnh lý mãn tính đang điều trị...',
+    noMedicalHistory: 'Không ghi nhận bệnh nền',
+    noMedicalHistoryDisplay: 'Không có hoặc chưa cập nhật',
+    treatmentHistory: 'Lịch sử Chẩn đoán & Điều trị',
+    treatmentHistorySub: 'Toàn bộ lịch sử đặt khám của bạn tại hệ thống MediCare, sắp xếp theo thứ tự mới nhất.',
+    noMedicalHistoryData: 'Chưa có lịch sử khám bệnh',
+    noMedicalHistoryDataSub: 'Bạn chưa có ca khám nào được ghi nhận trong hệ thống.',
+    confirmed: 'Đã xác nhận',
+    completed: 'Hoàn thành',
+    cancelled: 'Đã hủy',
+    ticketCode: 'Mã phiếu:',
+    queueNo: 'Số thứ tự:',
+    symptoms: 'Triệu chứng:',
+    generalDept: 'Khám tổng quát',
+    billingStatus: 'Thanh toán:',
+    paid: 'Đã thanh toán',
+    unpaid: 'Chưa thanh toán',
+    viewDetails: 'Xem thông tin chi tiết',
+    futureRecordsMsg: 'Chẩn đoán và đơn thuốc sẽ có sau khi bác sĩ hoàn tất ca khám',
+    doctorTitle: 'Bác sĩ phụ trách',
+
+    pdfTitle: 'HỒ SƠ SỨC KHỎE CÁ NHÂN',
+    pdfSub: 'Bệnh viện Đa khoa MediCare',
+    pdfPatientInfo: 'Thông tin bệnh nhân',
+    pdfPatientName: 'Họ và tên',
+    pdfPhone: 'Số điện thoại',
+    pdfVitalSigns: 'Chỉ số sinh tồn',
+    pdfBloodType: 'Nhóm máu',
+    pdfBloodPressure: 'Huyết áp',
+    pdfHeight: 'Chiều cao',
+    pdfWeight: 'Cân nặng',
+    pdfMedicalHistory: 'Tiền sử bệnh lý',
+    pdfAllergies: 'Tiền sử Dị ứng',
+    pdfHistoryTitle: 'Lịch sử Khám bệnh & Bệnh án điện tử',
+    pdfNoHistory: 'Chưa có lịch sử khám bệnh ghi nhận trên hệ thống.',
+    pdfTableDate: 'Ngày khám',
+    pdfTableDept: 'Chuyên khoa / Khoa',
+    pdfTableDoctor: 'Bác sĩ điều trị',
+    pdfTableSymptoms: 'Triệu chứng lâm sàng',
+    pdfTableStatus: 'Trạng thái',
+    pdfFooterMsg: 'Báo cáo sức khỏe toàn diện tự động từ hệ thống quản lý MediCare Hospital • Ngày lập:',
+  },
+  en: {
+    title: 'Health Profile',
+    sub: 'Comprehensive management of your personal medical records',
+    exportPdf: 'Export PDF',
+    tabPersonal: 'Personal Info',
+    tabMedical: 'Electronic Records',
+    notFilled: 'No health profile entered!',
+    notFilledSub: 'Providing key information (blood type, allergies) is mandatory to help doctors diagnose accurately and prescribe safely.',
+    updateNow: 'Update Now',
+    healthProfile: 'Vital Signs & Medical History',
+    edit: 'Edit Profile',
+    saving: 'Saving...',
+    save: 'Save Profile',
+    toastSaveSuccess: 'Save Succeeded',
+    toastSaveSuccessSub: 'Health profile updated successfully!',
+    toastLoadError: 'Could not load health profile and medical records.',
+    toastSaveError: 'Save failed.',
+    toastConnError: 'Connection error, could not save profile.',
+    bloodType: 'Blood Group',
+    selectBloodType: 'Select blood group',
+    height: 'Height (cm)',
+    weight: 'Weight (kg)',
+    bloodPressure: 'Blood Pressure',
+    allergies: 'Allergies & Sensitivities (Meds, Food...)',
+    allergiesPlaceholder: 'Specify any known allergies to drugs or foods...',
+    noAllergies: 'No known allergies',
+    noAllergiesDisplay: 'None reported or not updated',
+    medicalHistory: 'Pre-existing Conditions (Diabetes, HBP...)',
+    medicalHistoryPlaceholder: 'List chronic illnesses or pre-existing conditions...',
+    noMedicalHistory: 'No chronic conditions recorded',
+    noMedicalHistoryDisplay: 'None reported or not updated',
+    treatmentHistory: 'Diagnostic & Treatment Logs',
+    treatmentHistorySub: 'Comprehensive clinical booking history within the MediCare ecosystem, sorted chronologically.',
+    noMedicalHistoryData: 'No Clinical History',
+    noMedicalHistoryDataSub: 'You have no clinical consultations recorded yet.',
+    confirmed: 'Confirmed',
+    completed: 'Completed',
+    cancelled: 'Cancelled',
+    ticketCode: 'Ticket ID:',
+    queueNo: 'Queue No:',
+    symptoms: 'Symptoms:',
+    generalDept: 'General Consultation',
+    billingStatus: 'Billing:',
+    paid: 'Paid',
+    unpaid: 'Unpaid',
+    viewDetails: 'View Details',
+    futureRecordsMsg: 'Diagnosis and prescriptions will be available once the physician completes the consultation.',
+    doctorTitle: 'Attending Physician',
+
+    pdfTitle: 'PERSONAL HEALTH PROFILE',
+    pdfSub: 'MediCare General Hospital',
+    pdfPatientInfo: 'Patient Details',
+    pdfPatientName: 'Full Name',
+    pdfPhone: 'Phone Number',
+    pdfVitalSigns: 'Vital Indicators',
+    pdfBloodType: 'Blood Group',
+    pdfBloodPressure: 'Blood Pressure',
+    pdfHeight: 'Height',
+    pdfWeight: 'Weight',
+    pdfMedicalHistory: 'Clinical Background',
+    pdfAllergies: 'Allergies Profile',
+    pdfHistoryTitle: 'Clinical Consultations & Electronic Records',
+    pdfNoHistory: 'No clinical consultations recorded in the system database.',
+    pdfTableDate: 'Schedule',
+    pdfTableDept: 'Specialty / Dept',
+    pdfTableDoctor: 'Attending Doctor',
+    pdfTableSymptoms: 'Clinical Symptoms',
+    pdfTableStatus: 'Status',
+    pdfFooterMsg: 'Automated health report generated from MediCare Hospital Administration • Issued on:',
+  }
+};
+
 const Records = () => {
+  const { lang, t } = useTranslation(trans);
   const location = useLocation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(location.state?.activeTab || 'personal');
@@ -33,61 +179,51 @@ const Records = () => {
     isFilled: false
   });
 
+  const getDoctorDisplayName = (name) => {
+    if (!name) return t.doctorTitle;
+    const trimmed = name.trim();
+    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
+    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
+  };
+
   const showToast = (message, type = 'success') => {
     setToast({ show: true, type, message });
     setTimeout(() => setToast({ show: false, type: 'success', message: '' }), 3000);
   };
 
-  // Fetch health profile on component mount
+  // Fetch health profile and medical history on component mount
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/users/health-profile`, {
-          headers: getAuthHeaders()
-        });
-        const data = await res.json();
-        if (data.success && data.data) {
-          setPersonalInfo(prev => ({ ...prev, ...data.data }));
-        }
-      } catch (err) {
-        showToast('Không thể tải dữ liệu sức khỏe.', 'error');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, []);
-
-  // Fetch medical data when switching to medical tab
-  useEffect(() => {
-    if (activeTab !== 'medical') return;
-    const fetchMedicalData = async () => {
-      setApptLoading(true);
-      try {
-        const [apptRes, rxRes, labRes] = await Promise.all([
+        const [profileRes, apptRes, rxRes, labRes] = await Promise.all([
+          fetch(`${API_URL}/api/users/health-profile`, { headers: getAuthHeaders() }),
           fetch(`${API_URL}/api/appointments`, { headers: getAuthHeaders() }),
           fetch(`${API_URL}/api/prescriptions/my`, { headers: getAuthHeaders() }),
           fetch(`${API_URL}/api/lab-results/my`, { headers: getAuthHeaders() }),
         ]);
+        const profileData = await profileRes.json();
         const apptData = await apptRes.json();
         const rxData = await rxRes.json();
         const labData = await labRes.json();
-        
+
+        if (profileData.success && profileData.data) {
+          setPersonalInfo(prev => ({ ...prev, ...profileData.data }));
+        }
         if (apptData.success) setAppointments(apptData.data);
         if (rxData.success) setPrescriptions(rxData.data);
         if (labData.success) setLabResults(labData.data);
       } catch (err) {
-        showToast('Không thể tải lịch sử bệnh án.', 'error');
+        showToast(t.toastLoadError, 'error');
       } finally {
-        setApptLoading(false);
+        setLoading(false);
       }
     };
-    fetchMedicalData();
-  }, [activeTab]);
+    fetchData();
+  }, []);
 
   // Scroll to highlighted appointment if provided in location state
   useEffect(() => {
-    if (!apptLoading && location.state?.highlightApptId && activeTab === 'medical') {
+    if (!loading && location.state?.highlightApptId && activeTab === 'medical') {
       setTimeout(() => {
         const el = document.getElementById(`appt-${location.state.highlightApptId}`);
         if (el) {
@@ -95,7 +231,7 @@ const Records = () => {
         }
       }, 500); // Wait for render
     }
-  }, [apptLoading, location.state?.highlightApptId, activeTab]);
+  }, [loading, location.state?.highlightApptId, activeTab]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -109,17 +245,228 @@ const Records = () => {
       if (data.success) {
         setPersonalInfo(prev => ({ ...prev, ...data.data }));
         setIsEditing(false);
-        showToast('Thông tin sức khỏe đã được lưu thành công!');
+        showToast(t.toastSaveSuccessSub);
       } else {
-        showToast(data.message || 'Lưu thất bại.', 'error');
+        showToast(data.message || t.toastSaveError, 'error');
       }
     } catch (err) {
-      showToast('Lỗi kết nối, không thể lưu dữ liệu.', 'error');
+      showToast(t.toastConnError, 'error');
     } finally {
       setSaving(false);
     }
   };
 
+  const handleExportPDF = () => {
+    const printWindow = window.open('', '_blank');
+    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+    
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>${t.pdfTitle} - MediCare Hospital</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+            body {
+              font-family: 'Inter', sans-serif;
+              color: #1e293b;
+              padding: 40px;
+              line-height: 1.6;
+            }
+            .header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              border-bottom: 3px solid #102a63;
+              padding-bottom: 20px;
+              margin-bottom: 40px;
+            }
+            .logo {
+              height: 50px;
+            }
+            .title {
+              text-align: right;
+            }
+            .title h1 {
+              margin: 0;
+              font-size: 24px;
+              color: #102a63;
+              font-weight: 900;
+            }
+            .title p {
+              margin: 5px 0 0 0;
+              font-size: 12px;
+              color: #64748b;
+              font-weight: 700;
+              text-transform: uppercase;
+            }
+            .section {
+              margin-bottom: 35px;
+            }
+            .section-title {
+              font-size: 16px;
+              font-weight: 800;
+              color: #102a63;
+              text-transform: uppercase;
+              border-bottom: 1px solid #e2e8f0;
+              padding-bottom: 8px;
+              margin-bottom: 15px;
+            }
+            .grid {
+              display: grid;
+              grid-template-cols: 1fr 1fr;
+              gap: 20px;
+            }
+            .info-item {
+              background: #f8fafc;
+              padding: 15px;
+              border-radius: 12px;
+              border: 1px solid #f1f5f9;
+            }
+            .info-label {
+              font-size: 11px;
+              text-transform: uppercase;
+              color: #94a3b8;
+              font-weight: 700;
+              margin-bottom: 5px;
+            }
+            .info-value {
+              font-size: 15px;
+              font-weight: 700;
+              color: #334155;
+            }
+            .full-width {
+              grid-column: span 2;
+            }
+            .footer {
+              margin-top: 60px;
+              border-top: 1px solid #e2e8f0;
+              padding-top: 20px;
+              text-align: center;
+              font-size: 11px;
+              color: #94a3b8;
+              font-weight: 600;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <img src="${window.location.origin}/LOGO.png" class="logo" />
+            <div class="title">
+              <h1>${t.pdfTitle}</h1>
+              <p>${t.pdfSub}</p>
+            </div>
+          </div>
+          
+          <div class="section">
+            <div class="section-title">${t.pdfPatientInfo}</div>
+            <div class="grid">
+              <div class="info-item">
+                <div class="info-label">${t.pdfPatientName}</div>
+                <div class="info-value">${userInfo.fullName || (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">${t.pdfPhone}</div>
+                <div class="info-value">${userInfo.phone || (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="section">
+            <div class="section-title">${t.pdfVitalSigns}</div>
+            <div class="grid">
+              <div class="info-item">
+                <div class="info-label">${t.pdfBloodType}</div>
+                <div class="info-value">${personalInfo.bloodType || (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">${t.pdfBloodPressure}</div>
+                <div class="info-value">${personalInfo.bloodPressure || (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">${t.pdfHeight}</div>
+                <div class="info-value">${personalInfo.height ? personalInfo.height + ' cm' : (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">${t.pdfWeight}</div>
+                <div class="info-value">${personalInfo.weight ? personalInfo.weight + ' kg' : (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">${t.pdfMedicalHistory}</div>
+            <div class="grid">
+              <div class="info-item full-width">
+                <div class="info-label">${t.pdfAllergies}</div>
+                <div class="info-value" style="color: #b91c1c;">${personalInfo.allergies || t.noAllergies}</div>
+              </div>
+              <div class="info-item full-width">
+                <div class="info-label">${t.medicalHistory}</div>
+                <div class="info-value">${personalInfo.medicalHistory || t.noMedicalHistory}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bệnh án điện tử / Lịch sử khám bệnh -->
+          <div class="section" style="page-break-before: always; margin-top: 40px;">
+            <div class="section-title">${t.pdfHistoryTitle}</div>
+            ${appointments.length === 0 ? `
+              <p style="font-size: 13px; color: #94a3b8; font-style: italic;">${t.pdfNoHistory}</p>
+            ` : `
+              <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 15px;">
+                <thead>
+                  <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0; text-align: left;">
+                    <th style="padding: 12px 10px; font-weight: 700; color: #475569;">${t.pdfTableDate}</th>
+                    <th style="padding: 12px 10px; font-weight: 700; color: #475569;">${t.pdfTableDept}</th>
+                    <th style="padding: 12px 10px; font-weight: 700; color: #475569;">${t.pdfTableDoctor}</th>
+                    <th style="padding: 12px 10px; font-weight: 700; color: #475569;">${t.pdfTableSymptoms}</th>
+                    <th style="padding: 12px 10px; font-weight: 700; color: #475569; text-align: right;">${t.pdfTableStatus}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${[...appointments].reverse().map(appt => {
+                    const dateStr = lang === 'vi' 
+                      ? new Date(appt.date).toLocaleDateString('vi-VN')
+                      : new Date(appt.date).toLocaleDateString('en-US');
+                    const statusText = appt.status === 'completed' ? t.completed : appt.status === 'confirmed' ? t.confirmed : t.cancelled;
+                    const statusColor = appt.status === 'completed' ? '#16a34a' : appt.status === 'confirmed' ? '#2563eb' : '#94a3b8';
+                    const docName = getDoctorDisplayName(appt.doctor?.userId?.fullName);
+                    return `
+                      <tr style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 12px 10px; font-weight: 700; color: #334155;">
+                          ${dateStr}<br/>
+                          <span style="font-size: 10px; color: #94a3b8; font-weight: 500;">${appt.time}</span>
+                        </td>
+                        <td style="padding: 12px 10px; font-weight: 700; color: #102a63;">
+                          ${appt.doctor?.specialty || appt.doctor?.department || t.generalDept}<br/>
+                          <span style="font-size: 10px; color: #64748b; font-weight: 500;">${appt.doctor?.department || ''}</span>
+                        </td>
+                        <td style="padding: 12px 10px; font-weight: 600; color: #334155;">${docName}</td>
+                        <td style="padding: 12px 10px; color: #64748b; font-style: italic;">${appt.symptoms || (lang === 'vi' ? 'Khám định kỳ' : 'Routine check-up')}</td>
+                        <td style="padding: 12px 10px; text-align: right; font-weight: 700; color: ${statusColor};">${statusText}</td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            `}
+          </div>
+
+          <div class="footer">
+            ${t.pdfFooterMsg} ${lang === 'vi' ? new Date().toLocaleDateString('vi-VN') : new Date().toLocaleDateString('en-US')}
+          </div>
+          
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
 
   if (loading) {
     return (
@@ -141,7 +488,7 @@ const Records = () => {
             <CheckCircle2 size={18} />
           </div>
           <div>
-            <h4 className="font-bold text-gray-800 text-sm">{toast.type === 'error' ? 'Đã có lỗi xảy ra' : 'Lưu thành công'}</h4>
+            <h4 className="font-bold text-gray-800 text-sm">{toast.type === 'error' ? (lang === 'vi' ? 'Đã có lỗi xảy ra' : 'Error occurred') : t.toastSaveSuccess}</h4>
             <p className="text-xs text-gray-500">{toast.message}</p>
           </div>
         </div>
@@ -153,12 +500,12 @@ const Records = () => {
             <FolderHeart size={32} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-primary">Hồ Sơ Sức Khỏe</h1>
-            <p className="text-gray-500 mt-1">Quản lý toàn diện dữ liệu y tế cá nhân của bạn</p>
+            <h1 className="text-2xl font-bold text-gray-800 bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-primary">{t.title}</h1>
+            <p className="text-gray-500 mt-1">{t.sub}</p>
           </div>
         </div>
-        <button className="px-5 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-primary hover:text-primary transition-all flex items-center gap-2 text-sm font-bold shadow-sm group">
-          <Download size={16} className="group-hover:-translate-y-0.5 transition-transform" /> Xuất PDF
+        <button onClick={handleExportPDF} className="px-5 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-primary hover:text-primary transition-all flex items-center gap-2 text-sm font-bold shadow-sm group">
+          <Download size={16} className="group-hover:-translate-y-0.5 transition-transform" /> {t.exportPdf}
         </button>
       </div>
 
@@ -170,7 +517,7 @@ const Records = () => {
             activeTab === 'personal' ? 'bg-primary text-white shadow-md' : 'bg-transparent text-gray-500 hover:bg-gray-50'
           }`}
         >
-          <UserCircle size={18} /> Thông tin cá nhân
+          <UserCircle size={18} /> {t.tabPersonal}
         </button>
         <button 
           onClick={() => setActiveTab('medical')}
@@ -178,7 +525,7 @@ const Records = () => {
             activeTab === 'medical' ? 'bg-primary text-white shadow-md' : 'bg-transparent text-gray-500 hover:bg-gray-50'
           }`}
         >
-          <FileText size={18} /> Bệnh án điện tử
+          <FileText size={18} /> {t.tabMedical}
         </button>
       </div>
 
@@ -194,15 +541,15 @@ const Records = () => {
                 <Info size={24} />
               </div>
               <div className="z-10">
-                <h3 className="text-orange-800 font-bold text-lg mb-1">Chưa có thông tin sức khỏe!</h3>
+                <h3 className="text-orange-800 font-bold text-lg mb-1">{t.notFilled}</h3>
                 <p className="text-orange-700 text-sm mb-4 max-w-2xl leading-relaxed">
-                  Việc cung cấp các thông tin cơ bản (nhóm máu, dị ứng) là <strong>bắt buộc</strong> để Bác sĩ có cơ sở chẩn đoán chính xác và kê đơn thuốc an toàn.
+                  {t.notFilledSub}
                 </p>
                 <button 
                   onClick={() => setIsEditing(true)}
                   className="px-6 py-2.5 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-all shadow-md hover:shadow-lg"
                 >
-                  Cập nhật ngay
+                  {t.updateNow}
                 </button>
               </div>
             </div>
@@ -213,14 +560,14 @@ const Records = () => {
             
             <div className="flex justify-between items-center mb-8 pb-6 border-b border-gray-50">
               <h2 className="text-xl font-bold text-gray-800 flex items-center gap-3">
-                <HeartPulse className="text-primary" /> Chỉ số sinh tồn & Tiền sử bệnh
+                <HeartPulse className="text-primary" /> {t.healthProfile}
               </h2>
               {!isEditing ? (
                 <button 
                   onClick={() => setIsEditing(true)}
                   className="px-5 py-2.5 bg-blue-50 text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all flex items-center gap-2 text-sm"
                 >
-                  <Edit3 size={16} /> Chỉnh sửa
+                  <Edit3 size={16} /> {t.edit}
                 </button>
               ) : (
                 <button 
@@ -229,7 +576,7 @@ const Records = () => {
                   className="px-6 py-2.5 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 transition-all flex items-center gap-2 text-sm shadow-md shadow-green-500/20 disabled:opacity-70 disabled:cursor-wait"
                 >
                   {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                  {saving ? 'Đang lưu...' : 'Lưu thông tin'}
+                  {saving ? t.saving : t.save}
                 </button>
               )}
             </div>
@@ -237,14 +584,14 @@ const Records = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               <div className="space-y-6">
                 <div>
-                  <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2"><Droplet size={16} className="text-red-500" /> Nhóm máu</label>
+                  <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2"><Droplet size={16} className="text-red-500" /> {t.bloodType}</label>
                   {isEditing ? (
                     <select 
                       className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                       value={personalInfo.bloodType}
                       onChange={(e) => setPersonalInfo({...personalInfo, bloodType: e.target.value})}
                     >
-                      <option value="">Chọn nhóm máu</option>
+                      <option value="">{t.selectBloodType}</option>
                       <option value="O+">O+</option>
                       <option value="O-">O-</option>
                       <option value="A+">A+</option>
@@ -256,14 +603,14 @@ const Records = () => {
                     </select>
                   ) : (
                     <div className="p-4 bg-gray-50/80 rounded-xl border border-gray-100 flex items-center">
-                      <span className="text-lg font-bold text-gray-800">{personalInfo.bloodType || 'Chưa cập nhật'}</span>
+                      <span className="text-lg font-bold text-gray-800">{personalInfo.bloodType || (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</span>
                     </div>
                   )}
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2"><Ruler size={16} className="text-blue-500" /> Chiều cao (cm)</label>
+                    <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2"><Ruler size={16} className="text-blue-500" /> {t.height}</label>
                     {isEditing ? (
                       <input type="number" className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all" value={personalInfo.height} onChange={(e) => setPersonalInfo({...personalInfo, height: e.target.value})} placeholder="VD: 165" />
                     ) : (
@@ -273,7 +620,7 @@ const Records = () => {
                     )}
                   </div>
                   <div>
-                    <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2"><Scale size={16} className="text-green-500" /> Cân nặng (kg)</label>
+                    <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2"><Scale size={16} className="text-green-500" /> {t.weight}</label>
                     {isEditing ? (
                       <input type="number" className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all" value={personalInfo.weight} onChange={(e) => setPersonalInfo({...personalInfo, weight: e.target.value})} placeholder="VD: 55" />
                     ) : (
@@ -285,12 +632,12 @@ const Records = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2"><Activity size={16} className="text-purple-500" /> Huyết áp trung bình</label>
+                  <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2"><Activity size={16} className="text-purple-500" /> {t.bloodPressure}</label>
                   {isEditing ? (
                     <input type="text" className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all" value={personalInfo.bloodPressure} onChange={(e) => setPersonalInfo({...personalInfo, bloodPressure: e.target.value})} placeholder="VD: 110/70" />
                   ) : (
                     <div className="p-4 bg-gray-50/80 rounded-xl border border-gray-100 flex items-center">
-                      <span className="text-lg font-bold text-gray-800">{personalInfo.bloodPressure || 'Chưa cập nhật'}</span>
+                      <span className="text-lg font-bold text-gray-800">{personalInfo.bloodPressure || (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</span>
                     </div>
                   )}
                 </div>
@@ -298,23 +645,23 @@ const Records = () => {
 
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Tiền sử Dị ứng (Thuốc, Thức ăn...)</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">{t.allergies}</label>
                   {isEditing ? (
-                    <textarea rows="4" className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 resize-none outline-none transition-all" value={personalInfo.allergies} onChange={(e) => setPersonalInfo({...personalInfo, allergies: e.target.value})} placeholder="Ghi rõ dị ứng với loại thuốc hay thức ăn nào..."></textarea>
+                    <textarea rows="4" className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 resize-none outline-none transition-all" value={personalInfo.allergies} onChange={(e) => setPersonalInfo({...personalInfo, allergies: e.target.value})} placeholder={t.allergiesPlaceholder}></textarea>
                   ) : (
                     <div className="min-h-[100px] bg-red-50/30 p-5 rounded-2xl border border-red-100">
-                      {personalInfo.allergies ? <p className="text-red-700 font-medium leading-relaxed">{personalInfo.allergies}</p> : <p className="text-gray-400 italic text-sm">Không có hoặc chưa cập nhật</p>}
+                      {personalInfo.allergies ? <p className="text-red-700 font-medium leading-relaxed">{personalInfo.allergies}</p> : <p className="text-gray-400 italic text-sm">{t.noAllergiesDisplay}</p>}
                     </div>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Bệnh lý nền (Tiểu đường, Huyết áp...)</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">{t.medicalHistory}</label>
                   {isEditing ? (
-                    <textarea rows="4" className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 resize-none outline-none transition-all" value={personalInfo.medicalHistory} onChange={(e) => setPersonalInfo({...personalInfo, medicalHistory: e.target.value})} placeholder="Liệt kê các bệnh lý mãn tính đang điều trị..."></textarea>
+                    <textarea rows="4" className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 resize-none outline-none transition-all" value={personalInfo.medicalHistory} onChange={(e) => setPersonalInfo({...personalInfo, medicalHistory: e.target.value})} placeholder={t.medicalHistoryPlaceholder}></textarea>
                   ) : (
                     <div className="min-h-[100px] bg-orange-50/30 p-5 rounded-2xl border border-orange-100">
-                      {personalInfo.medicalHistory ? <p className="text-orange-800 font-medium leading-relaxed">{personalInfo.medicalHistory}</p> : <p className="text-gray-400 italic text-sm">Không có hoặc chưa cập nhật</p>}
+                      {personalInfo.medicalHistory ? <p className="text-orange-800 font-medium leading-relaxed">{personalInfo.medicalHistory}</p> : <p className="text-gray-400 italic text-sm">{t.noMedicalHistoryDisplay}</p>}
                     </div>
                   )}
                 </div>
@@ -328,8 +675,8 @@ const Records = () => {
       {activeTab === 'medical' && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 relative">
-            <h2 className="text-xl font-bold text-gray-800 mb-2">Lịch sử Chẩn đoán & Điều trị</h2>
-            <p className="text-gray-500 text-sm mb-10">Toàn bộ lịch sử đặt khám của bạn tại hệ thống MediCare, sắp xếp theo thứ tự mới nhất.</p>
+            <h2 className="text-xl font-bold text-gray-800 mb-2">{t.treatmentHistory}</h2>
+            <p className="text-gray-500 text-sm mb-10">{t.treatmentHistorySub}</p>
 
             {apptLoading ? (
               <div className="space-y-4 animate-pulse">
@@ -340,8 +687,8 @@ const Records = () => {
                 <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                   <FileText size={36} className="text-gray-300" />
                 </div>
-                <h3 className="font-bold text-gray-500 text-lg mb-1">Chưa có lịch sử khám bệnh</h3>
-                <p className="text-gray-400 text-sm">Bạn chưa có ca khám nào được ghi nhận trong hệ thống.</p>
+                <h3 className="font-bold text-gray-500 text-lg mb-1">{t.noMedicalHistoryData}</h3>
+                <p className="text-gray-400 text-sm">{t.noMedicalHistoryDataSub}</p>
               </div>
             ) : (
               <div className="relative">
@@ -350,9 +697,7 @@ const Records = () => {
                   {[...appointments].reverse().map((appt, idx) => {
                     const isLatest = idx === 0;
                     const statusColor = appt.status === 'confirmed' ? 'bg-blue-500' : appt.status === 'completed' ? 'bg-green-500' : 'bg-gray-400';
-                    const statusLabel = appt.status === 'confirmed' ? 'Đã xác nhận' : appt.status === 'completed' ? 'Hoàn thành' : appt.status === 'cancelled' ? 'Đã hủy' : appt.status;
-                    const rx = prescriptions.find(p => p.appointment === appt._id || p.appointment?._id === appt._id);
-                    const labs = labResults.filter(l => l.appointment === appt._id || l.appointment?._id === appt._id);
+                    const statusLabel = appt.status === 'confirmed' ? t.confirmed : appt.status === 'completed' ? t.completed : appt.status === 'cancelled' ? t.cancelled : appt.status;
                     const isHighlighted = location.state?.highlightApptId === appt._id;
                     
                     return (
@@ -362,45 +707,45 @@ const Records = () => {
                           <div className="flex flex-col md:flex-row justify-between items-start mb-5 gap-4">
                             <div>
                               <h4 className="font-bold text-gray-800 text-xl group-hover:text-primary transition-colors">
-                                {appt.doctor?.specialty || appt.doctor?.department || 'Khám tổng quát'}
+                                {appt.doctor?.specialty || appt.doctor?.department || t.generalDept}
                               </h4>
                               <p className="text-sm text-gray-500 font-medium mt-1">
-                                {appt.doctor?.department} • BS. {appt.doctor?.userId?.fullName}
+                                {appt.doctor?.department} • {getDoctorDisplayName(appt.doctor?.userId?.fullName)}
                               </p>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
                               <span className={`px-3 py-1 text-xs font-bold text-white rounded-full ${statusColor}`}>{statusLabel}</span>
                               <span className="px-4 py-2 bg-white border border-gray-200 text-gray-600 text-sm font-bold rounded-xl flex items-center gap-2 shadow-sm">
                                 <Calendar size={14} className="text-primary" />
-                                {new Date(appt.date).toLocaleDateString('vi-VN')} • {appt.time}
+                                {lang === 'vi' ? new Date(appt.date).toLocaleDateString('vi-VN') : new Date(appt.date).toLocaleDateString('en-US')} • {appt.time}
                               </span>
                             </div>
                           </div>
 
                           <div className={`p-5 rounded-2xl border mb-5 text-sm text-gray-700 space-y-3 ${isLatest ? 'bg-white border-gray-100 shadow-sm' : 'bg-gray-50 border-transparent'}`}>
                             <div className="flex gap-3">
-                              <strong className="text-gray-500 shrink-0 w-36">Mã phiếu:</strong>
+                              <strong className="text-gray-500 shrink-0 w-36">{t.ticketCode}</strong>
                               <span className="font-mono font-bold text-primary">{appt.ticketNumber || 'N/A'}</span>
                             </div>
                             <div className="h-px w-full bg-gray-100"></div>
                             <div className="flex gap-3">
-                              <strong className="text-gray-500 shrink-0 w-36">Số thứ tự:</strong>
+                              <strong className="text-gray-500 shrink-0 w-36">{t.queueNo}</strong>
                               <span className="font-bold text-orange-500">#{appt.queueNumber || '--'}</span>
                             </div>
                             {appt.symptoms && (
                               <>
                                 <div className="h-px w-full bg-gray-100"></div>
                                 <div className="flex gap-3">
-                                  <strong className="text-gray-500 shrink-0 w-36">Triệu chứng:</strong>
+                                  <strong className="text-gray-500 shrink-0 w-36">{t.symptoms}</strong>
                                   <span className="text-gray-700 italic">{appt.symptoms}</span>
                                 </div>
                               </>
                             )}
                             <div className="h-px w-full bg-gray-100"></div>
                             <div className="flex gap-3">
-                              <strong className="text-gray-500 shrink-0 w-36">Thanh toán:</strong>
+                              <strong className="text-gray-500 shrink-0 w-36">{t.billingStatus}</strong>
                               <span className={`font-bold ${appt.paymentStatus === 'paid' ? 'text-green-600' : 'text-orange-500'}`}>
-                                {appt.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                                {appt.paymentStatus === 'paid' ? t.paid : t.unpaid}
                               </span>
                             </div>
                           </div>
@@ -409,13 +754,13 @@ const Records = () => {
                             <div className="mt-5 flex justify-end">
                               <button onClick={() => navigate(`/dashboard/appointment/${appt._id}`)}
                                 className="px-5 py-2.5 bg-primary text-white font-bold rounded-xl flex items-center gap-2 hover:bg-primary-dark transition-all shadow-md shadow-primary/20">
-                                Xem thông tin chi tiết <ChevronRight size={16}/>
+                                {t.viewDetails} <ChevronRight size={16}/>
                               </button>
                             </div>
                           ) : (
                             <div className="flex gap-3">
                               <span className="px-4 py-3 w-full text-gray-500 bg-gray-50/80 border border-gray-100 text-sm font-medium rounded-xl flex items-center justify-center gap-2">
-                                <Info size={16} className="text-gray-400"/> Chẩn đoán và đơn thuốc sẽ có sau khi bác sĩ hoàn tất ca khám
+                                <Info size={16} className="text-gray-400"/> {t.futureRecordsMsg}
                               </span>
                             </div>
                           )}

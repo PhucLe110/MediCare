@@ -22,3 +22,15 @@ exports.protect = async (req, res, next) => {
     return res.status(401).json({ success: false, message: 'Token không hợp lệ' });
   }
 };
+
+exports.authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: `Vai trò tài khoản (${req.user?.role || 'none'}) không được phép truy cập tài nguyên này`
+      });
+    }
+    next();
+  };
+};

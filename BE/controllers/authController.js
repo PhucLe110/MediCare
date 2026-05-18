@@ -13,7 +13,7 @@ const generateToken = (id) => {
 // @access  Public
 exports.register = async (req, res) => {
   try {
-    const { fullName, email, password, phone } = req.body;
+    const { fullName, email, password, phone, gender } = req.body;
 
     // Check if user exists
     const userExists = await User.findOne({ email });
@@ -27,7 +27,8 @@ exports.register = async (req, res) => {
       fullName,
       email,
       password,
-      phone
+      phone,
+      gender: gender || 'Nam'
     });
 
     res.status(201).json({
@@ -38,6 +39,7 @@ exports.register = async (req, res) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
+        gender: user.gender,
         patientId: user.patientId,
         token: generateToken(user._id)
       }
@@ -64,6 +66,10 @@ exports.login = async (req, res) => {
 
     if (!user) {
       return res.status(401).json({ success: false, message: 'Thông tin đăng nhập không hợp lệ' });
+    }
+
+    if (user.status === 'blocked') {
+      return res.status(403).json({ success: false, message: 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin!' });
     }
 
     // Check if password matches

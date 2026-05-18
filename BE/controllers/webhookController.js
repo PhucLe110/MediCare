@@ -13,7 +13,10 @@ exports.handleSePayWebhook = async (req, res) => {
     fs.appendFileSync('sepay_webhook.log', `[${new Date().toISOString()}] Auth: ${authHeader} | Body: ${JSON.stringify(req.body)}\n`);
 
     // Validate SePay Webhook Secret
-    if (process.env.SEPAY_WEBHOOK_SECRET && authHeader !== `Apikey ${process.env.SEPAY_WEBHOOK_SECRET}`) {
+    const expectedAuth = process.env.SEPAY_WEBHOOK_SECRET ? `apikey ${process.env.SEPAY_WEBHOOK_SECRET.toLowerCase()}` : '';
+    const actualAuth = authHeader ? authHeader.toLowerCase() : '';
+    
+    if (expectedAuth && actualAuth !== expectedAuth) {
       console.warn('[SePay Webhook] Unauthorized attempt with header:', authHeader);
       return res.status(401).json({ success: false, message: 'Unauthorized Webhook' });
     }

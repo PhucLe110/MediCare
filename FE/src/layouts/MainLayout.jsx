@@ -1,16 +1,103 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Search, Bell, Bot, ChevronRight } from 'lucide-react';
+import { Search, Bell, Bot, ChevronRight, Sun, Moon } from 'lucide-react';
 import AuthModal from '../components/AuthModal';
 
 const MainLayout = () => {
   const location = useLocation();
   const [authModal, setAuthModal] = React.useState({ isOpen: false, mode: 'login' });
+  const [lang, setLang] = React.useState(localStorage.getItem('lang') || 'vi');
+  const [theme, setTheme] = React.useState(localStorage.getItem('theme') || 'light');
+
+  React.useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  React.useEffect(() => {
+    localStorage.setItem('lang', lang);
+    window.dispatchEvent(new Event('language-change'));
+  }, [lang]);
+
+  React.useEffect(() => {
+    const handleLangChange = () => {
+      const currentLang = localStorage.getItem('lang') || 'vi';
+      if (currentLang !== lang) {
+        setLang(currentLang);
+      }
+    };
+    window.addEventListener('language-change', handleLangChange);
+    return () => window.removeEventListener('language-change', handleLangChange);
+  }, [lang]);
+
+  const trans = {
+    vi: {
+      home: 'Trang chủ',
+      about: 'Giới thiệu',
+      services: 'Dịch vụ',
+      doctors: 'Bác sĩ',
+      login: 'Đăng nhập',
+      register: 'Đăng ký',
+      footerDesc: 'MediCare – Hệ thống quản lý bệnh viện thông minh, đồng hành cùng sức khỏe của bạn và gia đình.',
+      quickLinks: 'Liên kết nhanh',
+      news: 'Tin tức',
+      support: 'Hỗ trợ',
+      faq: 'Câu hỏi thường gặp',
+      userGuide: 'Hướng dẫn sử dụng',
+      privacyPolicy: 'Chính sách bảo mật',
+      termsOfUse: 'Điều khoản sử dụng',
+      contactInfo: 'Thông tin liên hệ',
+      address: '123 Đường Lê Lợi, Quận 1,\nTP. Hồ Chí Minh',
+      phone: '(028) 1234 5678',
+      email: 'support@medicare.vn',
+      downloadApp: 'Tải ứng dụng',
+      appStoreSubtitle: 'Download on the',
+      playStoreSubtitle: 'GET IT ON',
+      copyright: '© 2024 MediCare. Tất cả quyền được bảo lưu.',
+      terms: 'Điều khoản',
+      privacy: 'Bảo mật',
+      cookies: 'Cookies'
+    },
+    en: {
+      home: 'Home',
+      about: 'About Us',
+      services: 'Services',
+      doctors: 'Doctors',
+      login: 'Sign In',
+      register: 'Register',
+      footerDesc: 'MediCare – Intelligent Clinical Management System, companion to you and your family\'s health.',
+      quickLinks: 'Quick Links',
+      news: 'News & Press',
+      support: 'Support Hub',
+      faq: 'Frequently Asked Questions',
+      userGuide: 'User Manual & Guides',
+      privacyPolicy: 'Privacy & Security Policy',
+      termsOfUse: 'Terms of Service',
+      contactInfo: 'Contact Information',
+      address: '123 Le Loi Street, District 1,\nHo Chi Minh City, Vietnam',
+      phone: '(+84) 28 1234 5678',
+      email: 'support@medicare.vn',
+      downloadApp: 'Mobile Applications',
+      appStoreSubtitle: 'Download on the',
+      playStoreSubtitle: 'GET IT ON',
+      copyright: '© 2024 MediCare Hospital. All Rights Reserved.',
+      terms: 'Terms',
+      privacy: 'Privacy',
+      cookies: 'Cookies'
+    }
+  };
+
+  const t = trans[lang];
+
   const navItems = [
-    { name: 'Trang chủ', path: '/' },
-    { name: 'Giới thiệu', path: '/about' },
-    { name: 'Dịch vụ', path: '/services' },
-    { name: 'Bác sĩ', path: '/doctors' }
+    { name: t.home, path: '/' },
+    { name: t.about, path: '/about' },
+    { name: t.services, path: '/services' },
+    { name: t.doctors, path: '/doctors' }
   ];
 
   React.useEffect(() => {
@@ -22,13 +109,13 @@ const MainLayout = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-gray-800 font-sans">
+    <div className="min-h-screen bg-white text-gray-800 font-sans transition-colors duration-200">
       <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center cursor-pointer">
-              <img src="/LOGO.png" alt="MediCare Logo" className="h-16 w-auto object-contain drop-shadow-md" />
+               <img src="/LOGO.png" alt="MediCare Logo" className="h-16 w-auto object-contain drop-shadow-md no-invert" />
             </Link>
 
             {/* Navigation */}
@@ -48,20 +135,62 @@ const MainLayout = () => {
               ))}
             </nav>
 
-            {/* Actions */}
-            <div className="flex items-center space-x-4">
-              <button 
-                onClick={() => setAuthModal({ isOpen: true, mode: 'login' })}
-                className="px-5 py-2.5 bg-white text-primary border border-primary text-sm font-bold rounded-full hover:bg-blue-50 transition-all"
-              >
-                Đăng nhập
-              </button>
-              <button 
-                onClick={() => setAuthModal({ isOpen: true, mode: 'register' })}
-                className="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-full hover:bg-primary-dark transition-all shadow-md shadow-primary/20"
-              >
-                Đăng ký
-              </button>
+            {/* Actions & Toggles */}
+            <div className="flex items-center space-x-6">
+              {/* Modern Navbar Controls */}
+              <div className="flex items-center gap-2.5 bg-gray-50 border border-gray-200/80 p-1 rounded-full shadow-inner">
+                {/* Theme Switcher */}
+                <div className="flex bg-gray-200/40 p-0.5 rounded-full">
+                  <button 
+                    onClick={() => setTheme('light')}
+                    className={`p-1.5 rounded-full transition-all flex items-center justify-center ${theme === 'light' ? 'bg-white text-primary shadow-sm scale-105' : 'text-gray-500 hover:text-gray-800'}`}
+                    title={lang === 'vi' ? 'Chế độ Sáng' : 'Light Mode'}
+                  >
+                    <Sun size={13} />
+                  </button>
+                  <button 
+                    onClick={() => setTheme('dark')}
+                    className={`p-1.5 rounded-full transition-all flex items-center justify-center ${theme === 'dark' ? 'bg-white text-primary shadow-sm scale-105' : 'text-gray-500 hover:text-gray-800'}`}
+                    title={lang === 'vi' ? 'Chế độ Tối' : 'Dark Mode'}
+                  >
+                    <Moon size={13} />
+                  </button>
+                </div>
+
+                <span className="w-px h-3.5 bg-gray-300"></span>
+
+                {/* Language Switcher */}
+                <div className="flex bg-gray-200/40 p-0.5 rounded-full mr-1">
+                  <button 
+                    onClick={() => setLang('vi')}
+                    className={`px-2.5 py-0.5 rounded-full text-[9px] font-black tracking-wider transition-all ${lang === 'vi' ? 'bg-white text-primary shadow-sm scale-105' : 'text-gray-500 hover:text-gray-800'}`}
+                  >
+                    VI
+                  </button>
+                  <button 
+                    onClick={() => setLang('en')}
+                    className={`px-2.5 py-0.5 rounded-full text-[9px] font-black tracking-wider transition-all ${lang === 'en' ? 'bg-white text-primary shadow-sm scale-105' : 'text-gray-500 hover:text-gray-800'}`}
+                  >
+                    EN
+                  </button>
+                </div>
+              </div>
+
+              {/* Auth Buttons */}
+              <div className="flex items-center space-x-3">
+                <button 
+                  onClick={() => setAuthModal({ isOpen: true, mode: 'login' })}
+                  className="px-5 py-2.5 bg-white text-primary border border-primary text-sm font-bold rounded-full hover:bg-blue-50 transition-all"
+                >
+                  {t.login}
+                </button>
+                <button 
+                  onClick={() => setAuthModal({ isOpen: true, mode: 'register' })}
+                  className="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-full hover:bg-primary-dark transition-all shadow-md shadow-primary/20"
+                >
+                  {t.register}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -86,7 +215,7 @@ const MainLayout = () => {
               <img src="/LOGO.png" alt="MediCare" className="h-16 w-auto drop-shadow-md" />
             </div>
             <p className="text-blue-200 text-sm leading-relaxed mb-6">
-              MediCare – Hệ thống quản lý bệnh viện thông minh, đồng hành cùng sức khỏe của bạn và gia đình.
+              {t.footerDesc}
             </p>
             <div className="flex gap-4">
               <a href="#" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors text-white">
@@ -105,51 +234,51 @@ const MainLayout = () => {
           </div>
           
           <div>
-            <h4 className="font-bold text-sm uppercase tracking-wider mb-6 text-white">Liên kết nhanh</h4>
+            <h4 className="font-bold text-sm uppercase tracking-wider mb-6 text-white">{t.quickLinks}</h4>
             <ul className="space-y-3 text-sm text-blue-200">
-              <li><Link to="/" className="hover:text-white transition-colors">Trang chủ</Link></li>
-              <li><a href="#" className="hover:text-white transition-colors">Giới thiệu</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Dịch vụ</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Bác sĩ</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Tin tức</a></li>
+              <li><Link to="/" className="hover:text-white transition-colors">{t.home}</Link></li>
+              <li><Link to="/about" className="hover:text-white transition-colors">{t.about}</Link></li>
+              <li><Link to="/services" className="hover:text-white transition-colors">{t.services}</Link></li>
+              <li><Link to="/doctors" className="hover:text-white transition-colors">{t.doctors}</Link></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t.news}</a></li>
             </ul>
           </div>
           
           <div>
-            <h4 className="font-bold text-sm uppercase tracking-wider mb-6 text-white">Hỗ trợ</h4>
+            <h4 className="font-bold text-sm uppercase tracking-wider mb-6 text-white">{t.support}</h4>
             <ul className="space-y-3 text-sm text-blue-200">
-              <li><a href="#" className="hover:text-white transition-colors">Câu hỏi thường gặp</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Hướng dẫn sử dụng</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Chính sách bảo mật</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Điều khoản sử dụng</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t.faq}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t.userGuide}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t.privacyPolicy}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t.termsOfUse}</a></li>
             </ul>
           </div>
           
           <div>
-            <h4 className="font-bold text-sm uppercase tracking-wider mb-6 text-white">Thông tin liên hệ</h4>
-            <ul className="space-y-4 text-sm text-blue-200">
+            <h4 className="font-bold text-sm uppercase tracking-wider mb-6 text-white">{t.contactInfo}</h4>
+            <ul className="space-y-4 text-sm text-blue-200 animate-in fade-in duration-300">
               <li className="flex items-start gap-3">
                 <span className="mt-0.5 text-blue-400">📍</span>
-                <span className="leading-relaxed">123 Đường Lê Lợi, Quận 1,<br/>TP. Hồ Chí Minh</span>
+                <span className="leading-relaxed whitespace-pre-line">{t.address}</span>
               </li>
               <li className="flex items-center gap-3">
                 <span className="text-blue-400">📞</span>
-                <span>(028) 1234 5678</span>
+                <span>{t.phone}</span>
               </li>
               <li className="flex items-center gap-3">
                 <span className="text-blue-400">✉️</span>
-                <span>support@medicare.vn</span>
+                <span>{t.email}</span>
               </li>
             </ul>
           </div>
-
+ 
           <div>
-            <h4 className="font-bold text-sm uppercase tracking-wider mb-6 text-white">Tải ứng dụng</h4>
+            <h4 className="font-bold text-sm uppercase tracking-wider mb-6 text-white">{t.downloadApp}</h4>
             <div className="space-y-3">
               <a href="#" className="flex items-center gap-3 bg-white/10 hover:bg-white/20 transition-colors rounded-xl px-4 py-2.5 border border-white/5">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><path d="M12 18h.01"></path></svg>
                 <div className="text-left">
-                  <p className="text-[10px] text-blue-200 uppercase font-medium">Download on the</p>
+                  <p className="text-[10px] text-blue-200 uppercase font-medium">{t.appStoreSubtitle}</p>
                   <p className="text-sm font-bold text-white leading-none mt-0.5">App Store</p>
                 </div>
               </a>
@@ -158,23 +287,23 @@ const MainLayout = () => {
                   <path d="M3 20.5v-17c0-.5.4-.6.8-.2l16 8c.4.2.4.6 0 .8l-16 8c-.4.4-.8.3-.8-.2z" />
                 </svg>
                 <div className="text-left">
-                  <p className="text-[10px] text-blue-200 uppercase font-medium">GET IT ON</p>
+                  <p className="text-[10px] text-blue-200 uppercase font-medium">{t.playStoreSubtitle}</p>
                   <p className="text-sm font-bold text-white leading-none mt-0.5">Google Play</p>
                 </div>
               </a>
             </div>
           </div>
         </div>
-
+ 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="pt-8 border-t border-blue-800/50 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-blue-300">
-              © 2024 MediCare. Tất cả quyền được bảo lưu.
+              {t.copyright}
             </p>
             <div className="flex gap-6 text-sm text-blue-300">
-              <a href="#" className="hover:text-white transition-colors">Điều khoản</a>
-              <a href="#" className="hover:text-white transition-colors">Bảo mật</a>
-              <a href="#" className="hover:text-white transition-colors">Cookies</a>
+              <a href="#" className="hover:text-white transition-colors">{t.terms}</a>
+              <a href="#" className="hover:text-white transition-colors">{t.privacy}</a>
+              <a href="#" className="hover:text-white transition-colors">{t.cookies}</a>
             </div>
           </div>
         </div>

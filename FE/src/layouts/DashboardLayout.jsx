@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, CalendarPlus, Bot, FolderHeart, 
-  FileText, Pill, CreditCard, Bell, Settings, FlaskConical, LogOut
+  FileText, Pill, CreditCard, Bell, FlaskConical, LogOut,
+  Sun, Moon, Globe
 } from 'lucide-react';
 
 const DashboardLayout = () => {
@@ -10,11 +11,17 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [notifCount, setNotifCount] = useState(0);
+  const [lang, setLang] = useState(localStorage.getItem('lang') || 'vi');
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
   useEffect(() => {
     const userInfo = localStorage.getItem('userInfo');
     if (userInfo) {
       const u = JSON.parse(userInfo);
+      if (u.role === 'admin') {
+        navigate('/admin');
+        return;
+      }
       setUser(u);
       // Fetch notification count (unpaid bills + pending appointments)
       const h = { Authorization: `Bearer ${u.token}` };
@@ -31,54 +38,130 @@ const DashboardLayout = () => {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem('lang', lang);
+    window.dispatchEvent(new Event('language-change'));
+  }, [lang]);
+
+  useEffect(() => {
+    const handleLangChange = () => {
+      const currentLang = localStorage.getItem('lang') || 'vi';
+      if (currentLang !== lang) {
+        setLang(currentLang);
+      }
+    };
+    window.addEventListener('language-change', handleLangChange);
+    return () => window.removeEventListener('language-change', handleLangChange);
+  }, [lang]);
+
   const handleLogout = () => {
     localStorage.removeItem('userInfo');
     navigate('/');
   };
 
+  const trans = {
+    vi: {
+      dashboard: 'Tổng quan',
+      booking: 'Đặt lịch khám',
+      ai: 'AI tư vấn sức khỏe',
+      records: 'Hồ sơ sức khỏe',
+      results: 'Kết quả xét nghiệm',
+      prescriptions: 'Đơn thuốc',
+      billing: 'Thanh toán',
+      notifications: 'Thông báo',
+      logout: 'Đăng xuất',
+      patientId: 'Mã BN',
+      theme: 'Giao diện',
+      language: 'Ngôn ngữ',
+      light: 'Sáng',
+      dark: 'Tối',
+      loading: 'Đang tải...',
+      roleUser: 'Bệnh nhân',
+      roleLabStaff: 'Nhân viên Xét nghiệm',
+      roleAdmin: 'Admin',
+      labDesk: 'Bàn làm việc XN',
+    },
+    en: {
+      dashboard: 'Overview',
+      booking: 'Book Appointment',
+      ai: 'AI Health Triage',
+      records: 'Health Records',
+      results: 'Lab Results',
+      prescriptions: 'Prescriptions',
+      billing: 'Billing & Fees',
+      notifications: 'Notifications',
+      logout: 'Sign Out',
+      patientId: 'BN Code',
+      theme: 'Appearance',
+      language: 'Language',
+      light: 'Light',
+      dark: 'Dark',
+      loading: 'Loading...',
+      roleUser: 'Patient',
+      roleLabStaff: 'Lab Technician',
+      roleAdmin: 'System Admin',
+      labDesk: 'Lab Workspace',
+    }
+  };
+
+  const t = trans[lang];
+
   const patientMenuItems = [
-    { name: 'Tổng quan', icon: LayoutDashboard, path: '/dashboard' },
-    { name: 'Đặt lịch khám', icon: CalendarPlus, path: '/dashboard/booking' },
-    { name: 'AI tư vấn sức khỏe', icon: Bot, path: '/dashboard/ai' },
-    { name: 'Hồ sơ sức khỏe', icon: FolderHeart, path: '/dashboard/records' },
-    { name: 'Kết quả xét nghiệm', icon: FileText, path: '/dashboard/lab-results' },
-    { name: 'Đơn thuốc', icon: Pill, path: '/dashboard/prescriptions' },
-    { name: 'Thanh toán', icon: CreditCard, path: '/dashboard/billing' },
-    { name: 'Thông báo', icon: Bell, path: '/dashboard/notifications', badge: notifCount },
-    { name: 'Cài đặt', icon: Settings, path: '/dashboard/settings' },
+    { name: t.dashboard, icon: LayoutDashboard, path: '/dashboard' },
+    { name: t.booking, icon: CalendarPlus, path: '/dashboard/booking' },
+    { name: t.ai, icon: Bot, path: '/dashboard/ai' },
+    { name: t.records, icon: FolderHeart, path: '/dashboard/records' },
+    { name: t.results, icon: FileText, path: '/dashboard/lab-results' },
+    { name: t.prescriptions, icon: Pill, path: '/dashboard/prescriptions' },
+    { name: t.billing, icon: CreditCard, path: '/dashboard/billing' },
+    { name: t.notifications, icon: Bell, path: '/dashboard/notifications', badge: notifCount },
   ];
 
   const labStaffMenuItems = [
-    { name: 'Bàn làm việc XN', icon: FlaskConical, path: '/dashboard/lab-upload' },
+    { name: t.labDesk, icon: FlaskConical, path: '/dashboard/lab-upload' },
   ];
 
   const menuItems = user?.role === 'lab_staff' ? labStaffMenuItems : patientMenuItems;
 
-  if (!user) return <div className="min-h-screen flex items-center justify-center">Đang tải...</div>;
+  if (!user) return <div className="min-h-screen flex items-center justify-center font-bold text-gray-500">{t.loading}</div>;
 
   return (
-    <div className="flex min-h-screen bg-gray-50 font-sans">
+    <div className="flex min-h-screen bg-gray-50 font-sans transition-colors duration-200">
       {/* Sidebar */}
-      <aside className="w-64 bg-primary text-white flex flex-col fixed h-full z-20">
+      <aside className="w-64 bg-primary text-white flex flex-col fixed h-full z-20 shadow-xl shadow-blue-900/10">
         <div className="p-6">
           <Link to="/dashboard" className="flex items-center cursor-pointer mb-8">
-            <img src="/LOGO.png" alt="MediCare" className="h-12 w-auto object-contain drop-shadow-md" />
+            <img src="/LOGO.png" alt="MediCare" className="h-12 w-auto object-contain drop-shadow-md no-invert" />
           </Link>
 
           {/* User Profile Summary */}
-          <div className="flex items-center gap-3 mb-8 bg-white/10 p-3 rounded-xl border border-white/10">
-            <div className="w-10 h-10 rounded-full bg-blue-100 text-primary flex items-center justify-center font-bold text-lg overflow-hidden shrink-0">
+          <div className="flex items-center gap-3 mb-6 bg-white/10 p-4 rounded-2xl border border-white/10 shadow-inner">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 text-white flex items-center justify-center font-extrabold text-lg shadow-lg shadow-blue-500/25 shrink-0 animate-pulse-slow">
               {user?.fullName?.charAt(0).toUpperCase()}
             </div>
             <div className="overflow-hidden">
-              <h3 className="font-bold text-sm truncate">{user?.fullName}</h3>
-              <p className="text-xs text-blue-200 truncate">Mã BN: {user?.patientId}</p>
+              <h3 className="font-extrabold text-sm text-white truncate leading-tight">{user?.fullName}</h3>
+              <p className="text-[11px] text-blue-200 font-bold mt-1 truncate leading-none">
+                {user?.role === 'patient' 
+                  ? `${t.patientId}: ${user?.patientId}` 
+                  : (user?.role === 'lab_staff' ? t.roleLabStaff : t.roleAdmin)
+                }
+              </p>
             </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 pb-4 overflow-y-auto space-y-1 scrollbar-thin">
+        <nav className="flex-1 px-4 overflow-y-auto space-y-1 scrollbar-thin">
           {menuItems.map((item, index) => {
             const isActive = location.pathname === item.path || (index === 0 && location.pathname === '/dashboard');
             return (
@@ -87,14 +170,14 @@ const DashboardLayout = () => {
                 to={item.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                   isActive 
-                    ? 'bg-white text-primary font-bold shadow-sm' 
-                    : 'text-blue-100 hover:bg-white/10 hover:text-white'
+                    ? 'bg-white text-primary font-bold shadow-md shadow-blue-950/10 scale-[1.02]' 
+                    : 'text-blue-100 hover:bg-white/10 hover:text-white hover:translate-x-1'
                 }`}
               >
-                <item.icon size={20} />
+                <item.icon size={18} />
                 <span className="text-sm flex-1">{item.name}</span>
                 {item.badge > 0 && (
-                  <span className="text-[10px] font-black bg-orange-400 text-white rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                  <span className="text-[10px] font-black bg-orange-400 text-white rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 animate-pulse">
                     {item.badge > 9 ? '9+' : item.badge}
                   </span>
                 )}
@@ -103,14 +186,63 @@ const DashboardLayout = () => {
           })}
         </nav>
 
+        {/* Theme & Language Controls Panel */}
+        <div className="px-6 py-5 border-t border-white/10 space-y-4 bg-gradient-to-b from-blue-950/20 to-blue-950/40">
+          {/* Theme Switcher */}
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-blue-100 flex items-center gap-2">
+              <Sun size={14} className="text-blue-300 animate-pulse" />
+              {t.theme}
+            </span>
+            <div className="flex bg-white/5 p-0.5 rounded-lg border border-white/10 shadow-inner">
+              <button 
+                onClick={() => setTheme('light')}
+                className={`p-1.5 rounded-md transition-all flex items-center justify-center ${theme === 'light' ? 'bg-white text-primary shadow-md scale-105' : 'text-blue-200 hover:text-white'}`}
+                title={t.light}
+              >
+                <Sun size={15} />
+              </button>
+              <button 
+                onClick={() => setTheme('dark')}
+                className={`p-1.5 rounded-md transition-all flex items-center justify-center ${theme === 'dark' ? 'bg-white text-primary shadow-md scale-105' : 'text-blue-200 hover:text-white'}`}
+                title={t.dark}
+              >
+                <Moon size={15} />
+              </button>
+            </div>
+          </div>
+
+          {/* Language Switcher */}
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-blue-100 flex items-center gap-2">
+              <Globe size={14} className="text-blue-300" />
+              {t.language}
+            </span>
+            <div className="flex bg-white/5 p-0.5 rounded-lg border border-white/10 shadow-inner">
+              <button 
+                onClick={() => setLang('vi')}
+                className={`px-3.5 py-1 rounded-md text-[10px] font-black tracking-wider transition-all ${lang === 'vi' ? 'bg-white text-primary shadow-md scale-105' : 'text-blue-200 hover:text-white'}`}
+              >
+                VI
+              </button>
+              <button 
+                onClick={() => setLang('en')}
+                className={`px-3.5 py-1 rounded-md text-[10px] font-black tracking-wider transition-all ${lang === 'en' ? 'bg-white text-primary shadow-md scale-105' : 'text-blue-200 hover:text-white'}`}
+              >
+                EN
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Logout Button */}
-        <div className="p-4 mt-auto border-t border-white/10">
+        <div className="p-4 border-t border-white/10">
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all text-blue-100 hover:bg-white/10 hover:text-white"
+            className="flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all text-blue-100 hover:bg-white/10 hover:text-white hover:translate-x-1"
           >
-            <LogOut size={20} />
-            <span className="text-sm font-medium">Đăng xuất</span>
+            <LogOut size={18} />
+            <span className="text-sm font-medium">{t.logout}</span>
           </button>
         </div>
       </aside>

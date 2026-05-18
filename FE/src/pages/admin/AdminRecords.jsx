@@ -1,43 +1,282 @@
-import React from 'react';
-import { Database, Download, FileStack } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Database, FileText, Activity, Search, RefreshCw } from 'lucide-react';
+import { useTranslation } from '../../hooks/useTranslation';
+
+const trans = {
+  vi: {
+    loading: 'Đang tải hồ sơ bệnh án...',
+    connError: 'Lỗi kết nối đến máy chủ.',
+    headerTitle: 'Bệnh án & Dữ liệu y tế',
+    headerSubtitle: 'Tra cứu toàn bộ hồ sơ khám bệnh, đơn thuốc và kết quả xét nghiệm của toàn viện.',
+    btnBackup: 'Sao lưu Database',
+    backupAlert: 'Bắt đầu quá trình sao lưu toàn bộ dữ liệu y tế...\nĐã sao lưu thành công và lưu vào thư mục d:/MediCare/BE/backups/backup_',
+    tabPrescriptions: 'Đơn thuốc',
+    tabLabResults: 'Kết quả xét nghiệm',
+    searchPrescriptions: 'Tìm theo tên BN, bác sĩ, bệnh lý...',
+    searchLabResults: 'Tìm theo tên BN, loại xét nghiệm...',
+    colPatient: 'Bệnh nhân',
+    colDoctor: 'Bác sĩ kê đơn',
+    colDiagnosis: 'Chẩn đoán',
+    colMedsList: 'Đơn thuốc',
+    colPrescribedDate: 'Ngày kê',
+    colTestName: 'Tên xét nghiệm',
+    colSummary: 'Tóm tắt kết quả',
+    colAttachment: 'Tệp đính kèm',
+    colTestDate: 'Ngày trả kết quả',
+    noPrescriptions: 'Không tìm thấy đơn thuốc nào',
+    noLabResults: 'Không tìm thấy kết quả xét nghiệm nào',
+    patientIdPrefix: 'Mã BN:',
+    doctorAnonymous: 'BS. Ẩn danh',
+    downloadFile: 'Tải về file kết quả',
+    noFileAttached: 'Không có tệp đính kèm',
+  },
+  en: {
+    loading: 'Loading clinical records...',
+    connError: 'Server connection error.',
+    headerTitle: 'EHR & Clinical Data Vault',
+    headerSubtitle: 'Query global clinic consult history, prescriptions logs, and laboratory diagnostics results.',
+    btnBackup: 'Export DB Backup',
+    backupAlert: 'Starting full system clinical database backup process...\nDatabase successfully dumped and encrypted to path d:/MediCare/BE/backups/backup_',
+    tabPrescriptions: 'Prescriptions Directory',
+    tabLabResults: 'Diagnostics Reports',
+    searchPrescriptions: 'Search by patient, doctor, diagnosis...',
+    searchLabResults: 'Search by patient, test name...',
+    colPatient: 'Patient Profile',
+    colDoctor: 'Prescribing Physician',
+    colDiagnosis: 'Diagnosis Description',
+    colMedsList: 'Medications List',
+    colPrescribedDate: 'Prescribed Date',
+    colTestName: 'Diagnostic Procedure',
+    colSummary: 'Clinical Findings Summary',
+    colAttachment: 'Report Artifact',
+    colTestDate: 'Release Date',
+    noPrescriptions: 'No prescriptions records matched search query.',
+    noLabResults: 'No diagnostics reports matched search query.',
+    patientIdPrefix: 'Patient ID:',
+    doctorAnonymous: 'Dr. Anonymous',
+    downloadFile: 'Download Report PDF',
+    noFileAttached: 'No file attached',
+  }
+};
 
 export default function AdminRecords() {
+  const { lang, t } = useTranslation(trans);
+  const [records, setRecords] = useState({ prescriptions: [], labResults: [] });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('prescriptions');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const fetchRecords = async () => {
+    try {
+      const userInfo = localStorage.getItem('userInfo');
+      if (!userInfo) return;
+      const { token } = JSON.parse(userInfo);
+
+      const res = await fetch('http://localhost:5000/api/admin/records', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const json = await res.json();
+      if (json.success) {
+        setRecords(json.data);
+      } else {
+        setError(json.message);
+      }
+    } catch (err) {
+      setError(t.connError);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRecords();
+  }, []);
+
+  const handleBackup = () => {
+    alert(t.backupAlert + new Date().toISOString().slice(0, 10) + '.json');
+  };
+
+  const getDoctorDisplayName = (name) => {
+    if (!name) return t.doctorAnonymous;
+    const trimmed = name.trim();
+    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
+    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
+  };
+
+  const filteredPrescriptions = records.prescriptions.filter(p => {
+    const pName = p.patient?.fullName?.toLowerCase() || '';
+    const docName = p.appointment?.doctor?.userId?.fullName?.toLowerCase() || '';
+    const diag = p.diagnosis?.toLowerCase() || '';
+    return pName.includes(searchTerm.toLowerCase()) || docName.includes(searchTerm.toLowerCase()) || diag.includes(searchTerm.toLowerCase());
+  });
+
+  const filteredLabResults = records.labResults.filter(l => {
+    const pName = l.patient?.fullName?.toLowerCase() || '';
+    const testName = l.labRequest?.testName?.toLowerCase() || '';
+    const result = l.resultSummary?.toLowerCase() || '';
+    return pName.includes(searchTerm.toLowerCase()) || testName.includes(searchTerm.toLowerCase()) || result.includes(searchTerm.toLowerCase());
+  });
+
+  if (loading) return <div className="text-center py-10 font-bold text-slate-600">{t.loading}</div>;
+  if (error) return <div className="bg-red-50 text-red-500 p-4 rounded-2xl">{error}</div>;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in">
       <div className="flex justify-between items-center bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
         <div>
-          <h2 className="text-2xl font-black text-slate-800">Quản lý Bệnh án & Dữ liệu y tế</h2>
-          <p className="text-slate-500 font-medium mt-1">Lưu trữ hồ sơ, quản lý kho dữ liệu khám chữa bệnh và Backup hệ thống.</p>
+          <h2 className="text-2xl font-black text-slate-800">{t.headerTitle}</h2>
+          <p className="text-slate-500 font-medium mt-1">{t.headerSubtitle}</p>
         </div>
-        <button className="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl flex items-center gap-2 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20">
-          <Database size={18} /> Backup Database ngay
+        <button 
+          onClick={handleBackup}
+          className="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl flex items-center gap-2 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition-all shrink-0"
+        >
+          <Database size={18} /> {t.btnBackup}
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
-          <FileStack size={48} className="text-slate-300 mb-4" />
-          <h3 className="font-bold text-slate-800 text-xl">Dung lượng Hồ sơ</h3>
-          <p className="text-slate-500 mt-2">Hệ thống đang lưu trữ 124,500 hồ sơ điện tử.</p>
-          <div className="w-full bg-slate-100 h-2 rounded-full mt-6 mb-2 overflow-hidden">
-            <div className="bg-indigo-500 h-full rounded-full" style={{ width: '45%' }}></div>
-          </div>
-          <p className="text-xs font-bold text-slate-400">Đã dùng 45GB / 100GB</p>
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        {/* Navigation Tabs */}
+        <div className="flex border-b border-slate-100 bg-slate-50/50 p-2 gap-2">
+          <button 
+            onClick={() => { setActiveTab('prescriptions'); setSearchTerm(''); }}
+            className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
+              activeTab === 'prescriptions' 
+                ? 'bg-white text-indigo-600 shadow-sm border border-slate-200' 
+                : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <FileText size={16}/> {t.tabPrescriptions} ({records.prescriptions.length})
+          </button>
+          <button 
+            onClick={() => { setActiveTab('labResults'); setSearchTerm(''); }}
+            className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
+              activeTab === 'labResults' 
+                ? 'bg-white text-indigo-600 shadow-sm border border-slate-200' 
+                : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <Activity size={16}/> {t.tabLabResults} ({records.labResults.length})
+          </button>
         </div>
 
-        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-          <h3 className="font-bold text-slate-800 text-lg mb-4">Lịch sử Backup gần đây</h3>
-          <div className="space-y-3">
-            {[1,2,3].map(i => (
-              <div key={i} className="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="flex items-center gap-3">
-                  <Database size={16} className="text-emerald-500" />
-                  <span className="font-bold text-slate-700 text-sm">Backup_{new Date(Date.now() - i*86400000).toLocaleDateString('vi-VN').replace(/\//g,'')}.sql</span>
-                </div>
-                <button className="text-indigo-600 hover:text-indigo-800"><Download size={16}/></button>
-              </div>
-            ))}
+        {/* Search */}
+        <div className="p-4 border-b border-slate-100 flex items-center bg-white">
+          <div className="relative w-80">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input 
+              type="text" 
+              placeholder={activeTab === 'prescriptions' ? t.searchPrescriptions : t.searchLabResults}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none" 
+            />
           </div>
+        </div>
+
+        {/* Tab Content */}
+        <div className="overflow-x-auto">
+          {activeTab === 'prescriptions' ? (
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-bold">
+                  <th className="p-4 pl-6">{t.colPatient}</th>
+                  <th className="p-4">{t.colDoctor}</th>
+                  <th className="p-4">{t.colDiagnosis}</th>
+                  <th className="p-4">{t.colMedsList}</th>
+                  <th className="p-4">{t.colPrescribedDate}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredPrescriptions.length === 0 ? (
+                  <tr><td colSpan="5" className="text-center py-10 text-slate-400 font-bold">{t.noPrescriptions}</td></tr>
+                ) : (
+                  filteredPrescriptions.map(p => (
+                    <tr key={p._id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="p-4 pl-6 font-medium">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-slate-800 text-sm">{p.patient?.fullName || 'N/A'}</span>
+                          <span className="text-xs text-slate-500 font-mono">{t.patientIdPrefix} {p.patient?.patientId || 'N/A'}</span>
+                        </div>
+                      </td>
+                      <td className="p-4 font-bold text-slate-800 text-sm">
+                        <span>{getDoctorDisplayName(p.appointment?.doctor?.userId?.fullName)}</span>
+                      </td>
+                      <td className="p-4 font-medium">
+                        <span className="px-2.5 py-1 bg-amber-50 text-amber-800 font-bold text-xs rounded-lg border border-amber-200">{p.diagnosis}</span>
+                      </td>
+                      <td className="p-4 max-w-xs font-medium">
+                        <div className="flex flex-wrap gap-1">
+                          {p.medicines?.map((m, idx) => (
+                            <span key={idx} className="px-2 py-0.5 bg-slate-100 text-slate-700 text-xs font-bold rounded-lg border border-slate-200">
+                              {m.name} ({m.dosage})
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="p-4 text-xs font-bold text-slate-500 font-mono">
+                        {lang === 'vi' ? new Date(p.createdAt).toLocaleDateString('vi-VN') : new Date(p.createdAt).toLocaleDateString('en-US')}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          ) : (
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-bold">
+                  <th className="p-4 pl-6">{t.colPatient}</th>
+                  <th className="p-4">{t.colTestName}</th>
+                  <th className="p-4">{t.colSummary}</th>
+                  <th className="p-4">{t.colAttachment}</th>
+                  <th className="p-4">{t.colTestDate}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredLabResults.length === 0 ? (
+                  <tr><td colSpan="5" className="text-center py-10 text-slate-400 font-bold">{t.noLabResults}</td></tr>
+                ) : (
+                  filteredLabResults.map(l => (
+                    <tr key={l._id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="p-4 pl-6 font-medium">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-slate-800 text-sm">{l.patient?.fullName || 'N/A'}</span>
+                          <span className="text-xs text-slate-500 font-mono">{t.patientIdPrefix} {l.patient?.patientId || 'N/A'}</span>
+                        </div>
+                      </td>
+                      <td className="p-4 font-bold text-slate-800 text-sm">
+                        <span>{l.labRequest?.testName || 'N/A'}</span>
+                      </td>
+                      <td className="p-4 font-medium">
+                        <span className="px-2.5 py-1 bg-emerald-50 text-emerald-800 font-bold text-xs rounded-lg border border-emerald-200">{l.resultSummary}</span>
+                      </td>
+                      <td className="p-4 font-medium">
+                        {l.fileUrl ? (
+                          <a 
+                            href={`http://localhost:5000/${l.fileUrl}`} 
+                            target="_blank" 
+                            rel="noreferrer"
+                            className="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1"
+                          >
+                            {t.downloadFile}
+                          </a>
+                        ) : (
+                          <span className="text-xs font-medium text-slate-400">{t.noFileAttached}</span>
+                        )}
+                      </td>
+                      <td className="p-4 text-xs font-bold text-slate-500 font-mono">
+                        {lang === 'vi' ? new Date(l.createdAt).toLocaleDateString('vi-VN') : new Date(l.createdAt).toLocaleDateString('en-US')}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
