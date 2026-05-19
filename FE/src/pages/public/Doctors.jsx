@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Filter, Search, Award, Users, Activity, ChevronRight } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -67,7 +68,7 @@ export default function Doctors() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/doctors')
+    fetch(`${API_URL}/api/doctors`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {

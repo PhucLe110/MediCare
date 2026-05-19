@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Download, Search, CheckCircle2, Clock, ShieldAlert, AlertCircle } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -81,7 +82,7 @@ export default function AdminBilling() {
       if (!userInfo) return;
       const { token } = JSON.parse(userInfo);
 
-      const res = await fetch('http://localhost:5000/api/admin/bills', {
+      const res = await fetch(`${API_URL}/api/admin/bills`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -136,7 +137,7 @@ export default function AdminBilling() {
       if (!userInfo) return;
       const { token } = JSON.parse(userInfo);
 
-      const res = await fetch(`http://localhost:5000/api/bills/${billId}/pay`, {
+      const res = await fetch(`${API_URL}/api/bills/${billId}/pay`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`

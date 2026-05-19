@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, CreditCard, CalendarDays, UserRoundCog, ArrowUpRight, ArrowDownRight, Bot } from 'lucide-react';
@@ -135,7 +136,7 @@ export default function AdminDashboard() {
         if (!userInfo) return;
         const { token } = JSON.parse(userInfo);
 
-        const res = await fetch('http://localhost:5000/api/admin/dashboard-stats', {
+        const res = await fetch(`${API_URL}/api/admin/dashboard-stats`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

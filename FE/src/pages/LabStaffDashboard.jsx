@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   FlaskConical, Clock, CheckCircle2, AlertTriangle, User,
@@ -5,7 +6,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 
-const API_URL = 'http://localhost:5000';
+// const API_URL = API_URL;
 
 const getAuthHeaders = () => {
   const u = JSON.parse(localStorage.getItem('userInfo') || '{}');

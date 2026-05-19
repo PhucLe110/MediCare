@@ -1,8 +1,9 @@
+import { API_URL } from '../config';
 import React, { useState, useRef } from 'react';
 import { Upload, FlaskConical, User, FileText, CheckCircle2, AlertCircle, Loader2, X } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 
-const API_URL = 'http://localhost:5000';
+// const API_URL = API_URL;
 
 const trans = {
   vi: {

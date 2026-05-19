@@ -1,9 +1,10 @@
+import { API_URL } from '../config';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Stethoscope, TestTube2, Pill, FileCheck2, Calendar, Clock, CreditCard, Activity, Printer } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 
-const API_URL = 'http://localhost:5000';
+// const API_URL = API_URL;
 const authH = () => ({ Authorization: `Bearer ${JSON.parse(localStorage.getItem('userInfo') || '{}').token}` });
 
 const trans = {

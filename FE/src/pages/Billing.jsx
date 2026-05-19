@@ -1,8 +1,9 @@
+import { API_URL } from '../config';
 import React, { useState, useEffect } from 'react';
 import { Receipt, CheckCircle2, AlertCircle, ChevronRight, QrCode, FileText, X, User, Stethoscope, FlaskConical, Pill, Clock, Calendar, CreditCard } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 
-const API_URL = 'http://localhost:5000';
+// const API_URL = API_URL;
 const getAuthHeaders = () => ({ Authorization: `Bearer ${JSON.parse(localStorage.getItem('userInfo') || '{}').token}` });
 
 const trans = {

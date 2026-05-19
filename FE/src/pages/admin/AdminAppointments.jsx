@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, AlertCircle, CheckCircle, XCircle, Search, UserRoundCheck, RefreshCw, X, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -132,7 +133,7 @@ export default function AdminAppointments() {
       if (!userInfo) return;
       const { token } = JSON.parse(userInfo);
 
-      const res = await fetch('http://localhost:5000/api/admin/appointments', {
+      const res = await fetch(`${API_URL}/api/admin/appointments`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -187,7 +188,7 @@ export default function AdminAppointments() {
       if (!userInfo) return;
       const { token } = JSON.parse(userInfo);
 
-      const res = await fetch(`http://localhost:5000/api/admin/appointments/${apptId}/available-doctors?date=${date}&time=${time}`, {
+      const res = await fetch(`${API_URL}/api/admin/appointments/${apptId}/available-doctors?date=${date}&time=${time}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -221,7 +222,7 @@ export default function AdminAppointments() {
       if (!userInfo) return;
       const { token } = JSON.parse(userInfo);
 
-      const res = await fetch(`http://localhost:5000/api/admin/appointments/${selectedAppt._id}/reschedule`, {
+      const res = await fetch(`${API_URL}/api/admin/appointments/${selectedAppt._id}/reschedule`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -264,7 +265,7 @@ export default function AdminAppointments() {
       if (!userInfo) return;
       const { token } = JSON.parse(userInfo);
 
-      const res = await fetch(`http://localhost:5000/api/admin/appointments/${apptId}/status`, {
+      const res = await fetch(`${API_URL}/api/admin/appointments/${apptId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

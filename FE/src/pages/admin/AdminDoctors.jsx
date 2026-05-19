@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Trash2, Edit3, Stethoscope, X, AlertCircle, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -149,7 +150,7 @@ export default function AdminDoctors() {
       if (!userInfo) return;
       const { token } = JSON.parse(userInfo);
 
-      const res = await fetch('http://localhost:5000/api/admin/doctors', {
+      const res = await fetch(`${API_URL}/api/admin/doctors`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -229,7 +230,7 @@ export default function AdminDoctors() {
       if (!userInfo) return;
       const { token } = JSON.parse(userInfo);
 
-      const res = await fetch(`http://localhost:5000/api/admin/doctors/${id}`, {
+      const res = await fetch(`${API_URL}/api/admin/doctors/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -270,8 +271,8 @@ export default function AdminDoctors() {
       }
 
       const url = editingDoctor 
-        ? `http://localhost:5000/api/admin/doctors/${editingDoctor._id}`
-        : 'http://localhost:5000/api/admin/doctors';
+        ? `${API_URL}/api/admin/doctors/${editingDoctor._id}`
+        : `${API_URL}/api/admin/doctors`;
 
       const method = editingDoctor ? 'PUT' : 'POST';
 

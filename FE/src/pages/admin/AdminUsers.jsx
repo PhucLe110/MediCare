@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Search, Ban, CheckCircle, ShieldAlert, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -93,7 +94,7 @@ export default function AdminUsers() {
       if (!userInfo) return;
       const { token } = JSON.parse(userInfo);
 
-      const res = await fetch('http://localhost:5000/api/admin/users', {
+      const res = await fetch(`${API_URL}/api/admin/users`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -153,7 +154,7 @@ export default function AdminUsers() {
       if (!userInfo) return;
       const { token } = JSON.parse(userInfo);
 
-      const res = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+      const res = await fetch(`${API_URL}/api/admin/users/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -179,7 +180,7 @@ export default function AdminUsers() {
       if (!userInfo) return;
       const { token } = JSON.parse(userInfo);
 
-      const res = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+      const res = await fetch(`${API_URL}/api/admin/users/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -26,8 +27,8 @@ const DashboardLayout = () => {
       // Fetch notification count (unpaid bills + pending appointments)
       const h = { Authorization: `Bearer ${u.token}` };
       Promise.all([
-        fetch('http://localhost:5000/api/bills/my', { headers: h }).then(r => r.json()),
-        fetch('http://localhost:5000/api/appointments', { headers: h }).then(r => r.json()),
+        fetch(`${API_URL}/api/bills/my`, { headers: h }).then(r => r.json()),
+        fetch(`${API_URL}/api/appointments`, { headers: h }).then(r => r.json()),
       ]).then(([bd, ad]) => {
         const unpaid = bd.success ? bd.data.filter(b => b.status === 'unpaid').length : 0;
         const pending = ad.success ? ad.data.filter(a => a.status === 'pending').length : 0;

@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import React, { useState } from 'react';
 import { Bot, Activity, ArrowRight, Loader2, RefreshCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -101,7 +102,7 @@ const AITriage = () => {
 
     try {
       const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-      const res = await fetch('http://localhost:5000/api/ai/predict', {
+      const res = await fetch(`${API_URL}/api/ai/predict`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

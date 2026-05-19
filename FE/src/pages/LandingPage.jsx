@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Bot, FolderHeart, CreditCard, Activity, ShieldCheck, FileText, ChevronRight, Stethoscope, HeartPulse, Brain, Bone, Eye, Star, CheckCircle2, Award, Users, Clock } from 'lucide-react';
@@ -150,7 +151,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/doctors')
+    fetch(`${API_URL}/api/doctors`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {

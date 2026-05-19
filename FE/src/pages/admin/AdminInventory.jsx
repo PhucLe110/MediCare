@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Pill, AlertCircle, Plus, Search, X, Edit3, Trash2, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -128,7 +129,7 @@ export default function AdminInventory() {
       if (!userInfo) return;
       const { token } = JSON.parse(userInfo);
 
-      const res = await fetch('http://localhost:5000/api/admin/medicines', {
+      const res = await fetch(`${API_URL}/api/admin/medicines`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -206,7 +207,7 @@ export default function AdminInventory() {
       if (!userInfo) return;
       const { token } = JSON.parse(userInfo);
 
-      const res = await fetch(`http://localhost:5000/api/admin/medicines/${id}`, {
+      const res = await fetch(`${API_URL}/api/admin/medicines/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -243,8 +244,8 @@ export default function AdminInventory() {
       };
 
       const url = editingMed 
-        ? `http://localhost:5000/api/admin/medicines/${editingMed._id}`
-        : 'http://localhost:5000/api/admin/medicines';
+        ? `${API_URL}/api/admin/medicines/${editingMed._id}`
+        : `${API_URL}/api/admin/medicines`;
 
       const method = editingMed ? 'PUT' : 'POST';
 

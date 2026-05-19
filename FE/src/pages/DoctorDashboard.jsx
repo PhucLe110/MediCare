@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import React, { useState, useEffect } from 'react';
 import { 
   Users, Award, DollarSign, Calendar, Clipboard, 
@@ -40,7 +41,7 @@ const DoctorDashboard = () => {
   // Notifications/Errors
   const [toast, setToast] = useState(null);
 
-  const API_URL = 'http://localhost:5000';
+  // const API_URL = API_URL;
   const user = JSON.parse(localStorage.getItem('userInfo') || '{}');
   const authHeader = { Authorization: `Bearer ${user.token}` };
 

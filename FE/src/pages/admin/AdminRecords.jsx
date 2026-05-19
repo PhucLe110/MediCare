@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Database, FileText, Activity, Search, RefreshCw } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -73,7 +74,7 @@ export default function AdminRecords() {
       if (!userInfo) return;
       const { token } = JSON.parse(userInfo);
 
-      const res = await fetch('http://localhost:5000/api/admin/records', {
+      const res = await fetch(`${API_URL}/api/admin/records`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -257,7 +258,7 @@ export default function AdminRecords() {
                       <td className="p-4 font-medium">
                         {l.fileUrl ? (
                           <a 
-                            href={`http://localhost:5000/${l.fileUrl}`} 
+                            href={`${API_URL}/${l.fileUrl}`} 
                             target="_blank" 
                             rel="noreferrer"
                             className="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1"

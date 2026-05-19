@@ -1,9 +1,10 @@
+import { API_URL } from '../config';
 import React, { useState, useEffect } from 'react';
 import { FolderHeart, Calendar, FileText, Download, HeartPulse, Activity, UserCircle, Edit3, Save, Info, CheckCircle2, Droplet, Ruler, Scale, Loader2, ChevronRight } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
 
-const API_URL = 'http://localhost:5000';
+// const API_URL = API_URL;
 
 const getAuthHeaders = () => {
   const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');

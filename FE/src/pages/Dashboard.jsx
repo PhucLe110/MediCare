@@ -1,3 +1,4 @@
+import { API_URL as API } from '../config';
 import React, { useState, useEffect } from 'react';
 import {
   Calendar, FlaskConical, Pill, CreditCard, ChevronRight,
@@ -7,7 +8,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
 
-const API = 'http://localhost:5000';
+// const API = API;
 const authH = () => ({ Authorization: `Bearer ${JSON.parse(localStorage.getItem('userInfo') || '{}').token}` });
 
 const trans = {
