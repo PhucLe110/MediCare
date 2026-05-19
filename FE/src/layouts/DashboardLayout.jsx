@@ -90,6 +90,7 @@ const DashboardLayout = () => {
       roleLabStaff: 'Nhân viên Xét nghiệm',
       roleAdmin: 'Admin',
       labDesk: 'Bàn làm việc XN',
+      shiftDesk: 'Lịch trực khám',
     },
     en: {
       dashboard: 'Overview',
@@ -111,6 +112,7 @@ const DashboardLayout = () => {
       roleLabStaff: 'Lab Technician',
       roleAdmin: 'System Admin',
       labDesk: 'Lab Workspace',
+      shiftDesk: 'Shift Management',
     }
   };
 
@@ -133,6 +135,7 @@ const DashboardLayout = () => {
 
   const doctorMenuItems = [
     { name: lang === 'vi' ? 'Bàn khám bác sĩ' : 'Doctor Workspace', icon: LayoutDashboard, path: '/dashboard/doctor' },
+    { name: t.shiftDesk, icon: CalendarPlus, path: '/dashboard/doctor-shifts' },
   ];
 
   const menuItems = user?.role === 'lab_staff' 

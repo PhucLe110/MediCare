@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, UserRoundCog, CalendarDays, 
   FileStack, Pill, CreditCard, Bot, Settings, LogOut, ChevronLeft,
-  Sun, Moon, Globe
+  Sun, Moon, Globe, CalendarClock
 } from 'lucide-react';
 
 const AdminLayout = () => {

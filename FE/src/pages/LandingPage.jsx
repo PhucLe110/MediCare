@@ -355,7 +355,7 @@ const LandingPage = () => {
               { img: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=500&q=80', name: t.service3Name, desc: t.service3Desc },
               { img: 'https://images.unsplash.com/photo-1531983412531-1f49a365ffed?w=500&q=80', name: t.service4Name, desc: t.service4Desc },
               { img: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=500&q=80', name: t.service5Name, desc: t.service5Desc },
-              { img: 'https://images.unsplash.com/photo-1612538498456-e861df91d4d0?w=500&q=80', name: t.service6Name, desc: t.service6Desc },
+              { img: 'https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=500&q=80', name: t.service6Name, desc: t.service6Desc },
               { img: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=500&q=80', name: t.service7Name, desc: t.service7Desc },
               { img: 'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=500&q=80', name: t.service8Name, desc: t.service8Desc },
               { img: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?w=500&q=80', name: t.service9Name, desc: t.service9Desc }

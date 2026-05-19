@@ -2,6 +2,7 @@ import { API_URL } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Trash2, Edit3, Stethoscope, X, AlertCircle, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
+import AdminShifts from './AdminShifts';
 
 const trans = {
   vi: {
@@ -120,6 +121,7 @@ export default function AdminDoctors() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState('doctors'); // 'doctors' or 'shifts'
 
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -398,19 +400,34 @@ export default function AdminDoctors() {
       )}
 
       <div className="flex justify-between items-center bg-white p-6 rounded-3xl border border-slate-200 shadow-sm animate-in fade-in">
-        <div>
-          <h2 className="text-2xl font-black text-slate-800">{t.headerTitle}</h2>
-          <p className="text-slate-500 font-medium mt-1">{t.headerSubtitle}</p>
+        <div className="flex-1">
+          <h2 className="text-2xl font-black text-slate-800">{activeTab === 'doctors' ? t.headerTitle : 'Quản lý Yêu cầu Ca trực'}</h2>
+          <p className="text-slate-500 font-medium mt-1">{activeTab === 'doctors' ? t.headerSubtitle : 'Duyệt yêu cầu thêm/hủy ca trực của bác sĩ'}</p>
         </div>
-        <button 
-          onClick={handleOpenAddModal}
-          className="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl flex items-center gap-2 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition-all"
-        >
-          <Plus size={18} /> {t.btnAddDoctor}
-        </button>
+        
+        <div className="flex bg-slate-100 p-1 rounded-xl mx-4">
+          <button onClick={() => setActiveTab('doctors')} className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === 'doctors' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+            Danh sách Bác sĩ
+          </button>
+          <button onClick={() => setActiveTab('shifts')} className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === 'shifts' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+            Yêu cầu ca trực
+          </button>
+        </div>
+
+        {activeTab === 'doctors' && (
+          <button 
+            onClick={handleOpenAddModal}
+            className="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl flex items-center gap-2 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition-all"
+          >
+            <Plus size={18} /> {t.btnAddDoctor}
+          </button>
+        )}
       </div>
 
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in">
+      {activeTab === 'shifts' ? (
+        <AdminShifts />
+      ) : (
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in">
         <div className="p-4 border-b border-slate-100 flex items-center bg-slate-50/50">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -477,6 +494,7 @@ export default function AdminDoctors() {
           </table>
         </div>
       </div>
+      )}
 
       {/* Add / Edit Modal */}
       {isModalOpen && (

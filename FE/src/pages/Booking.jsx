@@ -127,13 +127,48 @@ const Booking = () => {
   const [selectedSpecialty, setSelectedSpecialty] = useState(prefill.prefilledSpecialty || '');
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState(null);
+  const [availableTimes, setAvailableTimes] = useState([]);
+  const [loadingTimes, setLoadingTimes] = useState(false);
   const [symptoms, setSymptoms] = useState(prefill.symptomsText || '');
   const [appointmentResult, setAppointmentResult] = useState(null);
   const [billResult, setBillResult] = useState(null);
   const [paymentInfo, setPaymentInfo] = useState(null);
   const [isPaid, setIsPaid] = useState(false);
+
+  const getDayOfWeek = (dateString) => {
+    if (!dateString) return -1;
+    const [y, m, d] = dateString.split('-');
+    return new Date(y, m - 1, d).getDay();
+  };
+
+  // Fetch times when doctor or date changes
+  useEffect(() => {
+    const fetchAvailableTimes = async () => {
+      if (!selectedDoctor || !selectedDate) {
+        setAvailableTimes([]);
+        setSelectedTime(null);
+        return;
+      }
+      setLoadingTimes(true);
+      try {
+        const res = await fetch(`${API_URL}/api/appointments/doctors/${selectedDoctor._id}/availability?date=${selectedDate}`, {
+          headers: getAuthHeaders()
+        });
+        const data = await res.json();
+        if (data.success) {
+          setAvailableTimes(data.data);
+          setSelectedTime(null);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingTimes(false);
+      }
+    };
+    fetchAvailableTimes();
+  }, [selectedDoctor, selectedDate]);
 
   const getDoctorDisplayName = (name) => {
     if (!name) return '';
@@ -431,32 +466,38 @@ const Booking = () => {
               </h2>
               <div className="mb-8">
                 <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-4">{t.dateLabel}</p>
-                <div className="flex gap-3 overflow-x-auto pb-4 custom-scrollbar">
-                  {selectedDoctor.availableSlots.map((slot, idx) => (
-                    <button key={idx} onClick={() => { setSelectedDate(slot.date); setSelectedTime(null); }}
-                      className={`flex flex-col items-center min-w-[90px] p-4 rounded-2xl border-2 transition-all ${selectedDate === slot.date ? 'border-primary bg-primary text-white shadow-lg shadow-primary/20' : 'border-gray-50 hover:border-primary/20 text-gray-600'}`}
-                    >
-                      <span className="text-[10px] uppercase font-black mb-1">{new Date(slot.date).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US', { weekday: 'short' })}</span>
-                      <span className="text-xl font-black">{new Date(slot.date).getDate()}</span>
-                      <span className="text-[10px] font-bold">
-                        {lang === 'vi' ? `Tháng ${new Date(slot.date).getMonth() + 1}` : new Date(slot.date).toLocaleDateString('en-US', { month: 'short' })}
-                      </span>
-                    </button>
-                  ))}
-                </div>
+                <input 
+                  type="date" 
+                  min={new Date().toISOString().split('T')[0]}
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-gray-800 font-bold"
+                />
               </div>
               {selectedDate && (
                 <div>
                   <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-4">{t.timeLabel}</p>
-                  <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
-                    {selectedDoctor.availableSlots.find(s => s.date === selectedDate)?.times.map((t, idx) => (
-                      <button key={idx} onClick={() => setSelectedTime(t)}
-                        className={`py-3 rounded-xl text-xs font-black border-2 transition-all ${selectedTime === t ? 'border-primary bg-primary/10 text-primary' : 'border-gray-50 hover:border-primary/20 text-gray-600'}`}
-                      >
-                        {t}
-                      </button>
-                    ))}
-                  </div>
+                  {loadingTimes ? (
+                    <div className="text-center py-4"><div className="animate-spin h-6 w-6 border-b-2 border-primary rounded-full mx-auto"></div></div>
+                  ) : getDayOfWeek(selectedDate) === 0 ? (
+                    <div className="text-center py-4 text-red-500 text-sm font-medium bg-red-50 rounded-2xl border border-red-100 shadow-sm animate-in fade-in">
+                      Bệnh viện không làm việc Chủ Nhật. Vui lòng chọn ngày khác!
+                    </div>
+                  ) : availableTimes.length > 0 ? (
+                    <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+                      {availableTimes.map((t, idx) => (
+                        <button key={idx} onClick={() => setSelectedTime(t)}
+                          className={`py-3 rounded-xl text-xs font-black border-2 transition-all ${selectedTime === t ? 'border-primary bg-primary/10 text-primary' : 'border-gray-50 hover:border-primary/20 text-gray-600'}`}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-orange-600 text-sm font-medium bg-orange-50 rounded-2xl border border-orange-100 shadow-sm animate-in fade-in">
+                      Bác sĩ không có lịch trực vào ngày này hoặc đã kín lịch. Vui lòng chọn ngày khác!
+                    </div>
+                  )}
                 </div>
               )}
             </div>

@@ -241,3 +241,113 @@ exports.getMedicines = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// @desc    Create a shift request (add or cancel a slot)
+// @route   POST /api/doctors/shift-requests
+// @access  Private/Doctor
+exports.createShiftRequest = async (req, res) => {
+  try {
+    const { type, date, times } = req.body;
+    const doctorProfile = await Doctor.findOne({ userId: req.user._id });
+
+    if (!doctorProfile) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy hồ sơ bác sĩ' });
+    }
+
+    if (!date) {
+      return res.status(400).json({ success: false, message: 'Vui lòng chọn ngày' });
+    }
+
+    if (!times || times.length === 0) {
+      return res.status(400).json({ success: false, message: 'Vui lòng chọn ít nhất một khung giờ' });
+    }
+
+    // ---- Calculate current effective schedule for the requested date ----
+    const dateObj = new Date(date + 'T00:00:00');
+    const dayOfWeek = dateObj.getDay();
+
+    if (dayOfWeek === 0) {
+      return res.status(400).json({ success: false, message: 'Bệnh viện không làm việc Chủ Nhật' });
+    }
+
+    const pattern = doctorProfile.shiftPattern || 'Cả tuần';
+    const baseTimes = ['08:00', '09:00', '10:00', '14:00', '15:00', '16:00'];
+    let isWorkingDay = false;
+    if (pattern === 'Cả tuần') isWorkingDay = true;
+    else if (pattern === 'T2-T3-T4' && [1, 2, 3].includes(dayOfWeek)) isWorkingDay = true;
+    else if (pattern === 'T5-T6-T7' && [4, 5, 6].includes(dayOfWeek)) isWorkingDay = true;
+    else if (pattern === 'T2-T4-T6' && [1, 3, 5].includes(dayOfWeek)) isWorkingDay = true;
+    else if (pattern === 'T3-T5-T7' && [2, 4, 6].includes(dayOfWeek)) isWorkingDay = true;
+
+    let currentTimes = isWorkingDay ? [...baseTimes] : [];
+
+    // Apply already-approved shift requests for that date
+    const ShiftRequest = require('../models/ShiftRequest');
+    const approvedReqs = await ShiftRequest.find({
+      doctor: doctorProfile._id,
+      date,
+      status: 'approved'
+    });
+
+    for (const r of approvedReqs) {
+      for (const t of (r.times || [])) {
+        if (r.type === 'add' && !currentTimes.includes(t)) currentTimes.push(t);
+        else if (r.type === 'cancel') currentTimes = currentTimes.filter(x => x !== t);
+      }
+    }
+
+    // ---- Validate requested times ----
+    if (type === 'add') {
+      const conflicts = times.filter(t => currentTimes.includes(t));
+      if (conflicts.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Các khung giờ sau đã có trong lịch trực: ${conflicts.join(', ')}. Không thể thêm trùng.`
+        });
+      }
+    }
+
+    if (type === 'cancel') {
+      const notExist = times.filter(t => !currentTimes.includes(t));
+      if (notExist.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Các khung giờ sau không có trong lịch trực ngày này: ${notExist.join(', ')}. Không thể hủy.`
+        });
+      }
+    }
+
+    // ---- Create the request ----
+    const newRequest = await ShiftRequest.create({
+      doctor: doctorProfile._id,
+      type,
+      date,
+      times,
+      status: 'pending'
+    });
+
+    res.status(201).json({ success: true, data: newRequest });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+// @desc    Get logged in doctor's shift requests
+// @route   GET /api/doctors/shift-requests
+// @access  Private/Doctor
+exports.getMyShiftRequests = async (req, res) => {
+  try {
+    const doctorProfile = await Doctor.findOne({ userId: req.user._id });
+    if (!doctorProfile) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy hồ sơ bác sĩ' });
+    }
+
+    const ShiftRequest = require('../models/ShiftRequest');
+    const requests = await ShiftRequest.find({ doctor: doctorProfile._id }).sort({ createdAt: -1 });
+
+    res.status(200).json({ success: true, data: requests });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

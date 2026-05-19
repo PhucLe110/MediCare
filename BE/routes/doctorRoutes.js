@@ -5,7 +5,9 @@ const {
   getDoctorAppointments, 
   completeDiagnosis, 
   getPatientHistory,
-  getMedicines
+  getMedicines,
+  createShiftRequest,
+  getMyShiftRequests
 } = require('../controllers/doctorController');
 const { protect, authorize } = require('../middleware/auth');
 
@@ -23,5 +25,6 @@ router.route('/appointments').get(getDoctorAppointments);
 router.route('/diagnose/:appointmentId').post(completeDiagnosis);
 router.route('/patient-history/:patientId').get(getPatientHistory);
 router.route('/medicines').get(getMedicines);
+router.route('/shift-requests').post(createShiftRequest).get(getMyShiftRequests);
 
 module.exports = router;

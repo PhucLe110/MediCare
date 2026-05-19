@@ -544,3 +544,112 @@ exports.deleteMedicine = async (req, res) => {
   }
 };
 
+const ShiftRequest = require('../models/ShiftRequest');
+
+// @desc    Get all shift requests
+// @route   GET /api/admin/shift-requests
+// @access  Private/Admin
+exports.getAllShiftRequests = async (req, res) => {
+  try {
+    const requests = await ShiftRequest.find()
+      .populate({
+        path: 'doctor',
+        populate: { path: 'userId', select: 'fullName email' }
+      })
+      .sort({ createdAt: -1 });
+    res.status(200).json({ success: true, data: requests });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Get a doctor's working schedule for a given month
+// @route   GET /api/admin/doctors/:doctorId/schedule?year=YYYY&month=M
+// @access  Private/Admin
+exports.getDoctorSchedule = async (req, res) => {
+  try {
+    const { doctorId } = req.params;
+    const year = parseInt(req.query.year) || new Date().getFullYear();
+    const month = parseInt(req.query.month) || (new Date().getMonth() + 1); // 1-12
+
+    const Doctor = require('../models/Doctor');
+    const doctor = await Doctor.findById(doctorId).populate('userId', 'fullName');
+    if (!doctor) return res.status(404).json({ success: false, message: 'Không tìm thấy bác sĩ' });
+
+    const pattern = doctor.shiftPattern || 'Cả tuần';
+    const baseTimes = ['08:00', '09:00', '10:00', '14:00', '15:00', '16:00'];
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    // Get all approved shift requests for this doctor in the month
+    const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+    const endDate = `${year}-${String(month).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
+    const approvedRequests = await ShiftRequest.find({
+      doctor: doctorId,
+      status: 'approved',
+      date: { $gte: startDate, $lte: endDate }
+    });
+
+    const schedule = [];
+    for (let day = 1; day <= daysInMonth; day++) {
+      const d = new Date(year, month - 1, day);
+      const dayOfWeek = d.getDay();
+      if (dayOfWeek === 0) continue; // Skip Sunday
+
+      let isWorkingDay = false;
+      if (pattern === 'Cả tuần') isWorkingDay = true;
+      else if (pattern === 'T2-T3-T4' && [1, 2, 3].includes(dayOfWeek)) isWorkingDay = true;
+      else if (pattern === 'T5-T6-T7' && [4, 5, 6].includes(dayOfWeek)) isWorkingDay = true;
+      else if (pattern === 'T2-T4-T6' && [1, 3, 5].includes(dayOfWeek)) isWorkingDay = true;
+      else if (pattern === 'T3-T5-T7' && [2, 4, 6].includes(dayOfWeek)) isWorkingDay = true;
+
+      let times = isWorkingDay ? [...baseTimes] : [];
+      const dateString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+      const dayReqs = approvedRequests.filter(r => r.date === dateString);
+      for (const r of dayReqs) {
+        for (const t of (r.times || [])) {
+          if (r.type === 'add' && !times.includes(t)) times.push(t);
+          else if (r.type === 'cancel') times = times.filter(x => x !== t);
+        }
+      }
+
+      times.sort();
+      if (times.length > 0) {
+        schedule.push({ date: dateString, dayOfWeek, times });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        doctor: { name: doctor.userId?.fullName, department: doctor.department, shiftPattern: doctor.shiftPattern },
+        schedule
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Update shift request status
+// @route   PUT /api/admin/shift-requests/:id/status
+// @access  Private/Admin
+exports.updateShiftRequestStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const request = await ShiftRequest.findByIdAndUpdate(req.params.id, { status }, { new: true })
+      .populate({
+        path: 'doctor',
+        populate: { path: 'userId', select: 'fullName' }
+      });
+    
+    if (!request) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy yêu cầu' });
+    }
+    
+    res.status(200).json({ success: true, data: request });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+

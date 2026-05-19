@@ -252,6 +252,7 @@ const seed100DoctorsAndData = async () => {
 
     // 5. SEED 100 DOCTORS (50 MALE, 50 FEMALE)
     const departments = Object.keys(medicalDepartments);
+    const shiftPatterns = ['T2-T3-T4', 'T5-T6-T7', 'T2-T4-T6', 'T3-T5-T7', 'Cả tuần'];
     const doctorsData = [];
 
     for (let i = 1; i <= 100; i++) {
@@ -286,6 +287,7 @@ const seed100DoctorsAndData = async () => {
       // Pick avatar corresponding to gender
       const avatarList = isMale ? maleAvatars : femaleAvatars;
       const avatar = avatarList[(i - 1) % avatarList.length];
+      const pattern = shiftPatterns[Math.floor(Math.random() * shiftPatterns.length)];
 
       doctorsData.push({
         userId: docUser._id,
@@ -295,7 +297,8 @@ const seed100DoctorsAndData = async () => {
         rating: Number((4.5 + Math.random() * 0.5).toFixed(1)), // Beautiful rating between 4.5 and 5.0
         consultationFee: 150000, // Consultation fee set to exactly 150k
         availableSlots,
-        avatar
+        avatar,
+        shiftPattern: pattern
       });
     }
 

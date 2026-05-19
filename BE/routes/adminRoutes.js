@@ -16,7 +16,10 @@ const {
   getMedicines,
   createMedicine,
   updateMedicine,
-  deleteMedicine
+  deleteMedicine,
+  getAllShiftRequests,
+  updateShiftRequestStatus,
+  getDoctorSchedule
 } = require('../controllers/adminController');
 const { protect, authorize } = require('../middleware/auth');
 
@@ -66,5 +69,13 @@ router.route('/medicines')
 router.route('/medicines/:id')
   .put(updateMedicine)
   .delete(deleteMedicine);
+
+// Shift Requests
+router.route('/shift-requests')
+  .get(getAllShiftRequests);
+router.route('/shift-requests/:id/status')
+  .put(updateShiftRequestStatus);
+router.route('/doctors/:doctorId/schedule')
+  .get(getDoctorSchedule);
 
 module.exports = router;

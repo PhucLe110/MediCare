@@ -60,7 +60,7 @@ const trans = {
         specialties: ['Hóa trị', 'Xạ trị', 'Ung thư nội khoa', 'Chăm sóc giảm nhẹ']
       },
       {
-        img: 'https://images.unsplash.com/photo-1612538498456-e861df91d4d0?w=600&q=80',
+        img: 'https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=600&q=80',
         name: 'Khoa Chấn thương chỉnh hình',
         desc: 'Phẫu thuật thay khớp, chỉnh hình cột sống, can thiệp chấn thương thể thao và vật lý trị liệu phục hồi.',
         specialties: ['Chỉnh hình', 'Cột sống', 'Thay khớp', 'Phục hồi chấn thương']
@@ -159,7 +159,7 @@ const trans = {
         specialties: ['Chemotherapy', 'Radiotherapy', 'Medical Oncology', 'Palliative Care']
       },
       {
-        img: 'https://images.unsplash.com/photo-1612538498456-e861df91d4d0?w=600&q=80',
+        img: 'https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=600&q=80',
         name: 'Orthopedics & Joint Care',
         desc: 'Stellar joint arthroplasty, spinal deformity corrections, sports trauma interventions, and dedicated physical therapy.',
         specialties: ['Orthopedic Surgery', 'Spinal Interventions', 'Joint Arthroplasty', 'Trauma Rehabilitation']
