@@ -130,7 +130,13 @@ const DashboardLayout = () => {
     { name: t.labDesk, icon: FlaskConical, path: '/dashboard/lab-upload' },
   ];
 
-  const menuItems = user?.role === 'lab_staff' ? labStaffMenuItems : patientMenuItems;
+  const doctorMenuItems = [
+    { name: lang === 'vi' ? 'Bàn khám bác sĩ' : 'Doctor Workspace', icon: LayoutDashboard, path: '/dashboard/doctor' },
+  ];
+
+  const menuItems = user?.role === 'lab_staff' 
+    ? labStaffMenuItems 
+    : (user?.role === 'doctor' ? doctorMenuItems : patientMenuItems);
 
   if (!user) return <div className="min-h-screen flex items-center justify-center font-bold text-gray-500">{t.loading}</div>;
 
@@ -153,7 +159,11 @@ const DashboardLayout = () => {
               <p className="text-[11px] text-blue-200 font-bold mt-1 truncate leading-none">
                 {user?.role === 'patient' 
                   ? `${t.patientId}: ${user?.patientId}` 
-                  : (user?.role === 'lab_staff' ? t.roleLabStaff : t.roleAdmin)
+                  : (user?.role === 'lab_staff' 
+                      ? t.roleLabStaff 
+                      : (user?.role === 'doctor' 
+                          ? (lang === 'vi' ? 'Bác sĩ chuyên khoa' : 'Specialist Doctor') 
+                          : t.roleAdmin))
                 }
               </p>
             </div>
@@ -197,17 +207,17 @@ const DashboardLayout = () => {
             <div className="flex bg-white/5 p-0.5 rounded-lg border border-white/10 shadow-inner">
               <button 
                 onClick={() => setTheme('light')}
-                className={`p-1.5 rounded-md transition-all flex items-center justify-center ${theme === 'light' ? 'bg-white text-primary shadow-md scale-105' : 'text-blue-200 hover:text-white'}`}
+                className={`w-8 h-8 rounded-md transition-all flex items-center justify-center ${theme === 'light' ? 'bg-white text-primary shadow-md scale-105' : 'text-blue-200 hover:text-white'}`}
                 title={t.light}
               >
-                <Sun size={15} />
+                <Sun size={16} />
               </button>
               <button 
                 onClick={() => setTheme('dark')}
-                className={`p-1.5 rounded-md transition-all flex items-center justify-center ${theme === 'dark' ? 'bg-white text-primary shadow-md scale-105' : 'text-blue-200 hover:text-white'}`}
+                className={`w-8 h-8 rounded-md transition-all flex items-center justify-center ${theme === 'dark' ? 'bg-white text-primary shadow-md scale-105' : 'text-blue-200 hover:text-white'}`}
                 title={t.dark}
               >
-                <Moon size={15} />
+                <Moon size={16} />
               </button>
             </div>
           </div>
@@ -221,13 +231,13 @@ const DashboardLayout = () => {
             <div className="flex bg-white/5 p-0.5 rounded-lg border border-white/10 shadow-inner">
               <button 
                 onClick={() => setLang('vi')}
-                className={`px-3.5 py-1 rounded-md text-[10px] font-black tracking-wider transition-all ${lang === 'vi' ? 'bg-white text-primary shadow-md scale-105' : 'text-blue-200 hover:text-white'}`}
+                className={`w-8 h-8 flex items-center justify-center rounded-md text-[11px] font-black tracking-wider transition-all ${lang === 'vi' ? 'bg-white text-primary shadow-md scale-105' : 'text-blue-200 hover:text-white'}`}
               >
                 VI
               </button>
               <button 
                 onClick={() => setLang('en')}
-                className={`px-3.5 py-1 rounded-md text-[10px] font-black tracking-wider transition-all ${lang === 'en' ? 'bg-white text-primary shadow-md scale-105' : 'text-blue-200 hover:text-white'}`}
+                className={`w-8 h-8 flex items-center justify-center rounded-md text-[11px] font-black tracking-wider transition-all ${lang === 'en' ? 'bg-white text-primary shadow-md scale-105' : 'text-blue-200 hover:text-white'}`}
               >
                 EN
               </button>

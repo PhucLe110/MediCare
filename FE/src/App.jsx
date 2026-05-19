@@ -22,6 +22,7 @@ import Billing from './pages/Billing';
 import Notifications from './pages/Notifications';
 import AppointmentsHistory from './pages/AppointmentsHistory';
 import AppointmentDetail from './pages/AppointmentDetail';
+import DoctorDashboard from './pages/DoctorDashboard';
 
 // Public Pages
 import About from './pages/public/About';
@@ -69,6 +70,7 @@ function App() {
           <Route path="history" element={<AppointmentsHistory />} />
           <Route path="appointment/:id" element={<AppointmentDetail />} />
           <Route path="lab-results" element={<LabResults />} />
+          <Route path="doctor" element={<DoctorDashboard />} />
           <Route path="settings" element={<ComingSoon title="Cài đặt hệ thống" />} />
         </Route>
 

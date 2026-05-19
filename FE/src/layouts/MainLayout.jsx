@@ -143,17 +143,17 @@ const MainLayout = () => {
                 <div className="flex bg-gray-200/40 p-0.5 rounded-full">
                   <button 
                     onClick={() => setTheme('light')}
-                    className={`p-1.5 rounded-full transition-all flex items-center justify-center ${theme === 'light' ? 'bg-white text-primary shadow-sm scale-105' : 'text-gray-500 hover:text-gray-800'}`}
+                    className={`w-7 h-7 rounded-full transition-all flex items-center justify-center ${theme === 'light' ? 'bg-white text-primary shadow-sm scale-105' : 'text-gray-500 hover:text-gray-800'}`}
                     title={lang === 'vi' ? 'Chế độ Sáng' : 'Light Mode'}
                   >
-                    <Sun size={13} />
+                    <Sun size={14} />
                   </button>
                   <button 
                     onClick={() => setTheme('dark')}
-                    className={`p-1.5 rounded-full transition-all flex items-center justify-center ${theme === 'dark' ? 'bg-white text-primary shadow-sm scale-105' : 'text-gray-500 hover:text-gray-800'}`}
+                    className={`w-7 h-7 rounded-full transition-all flex items-center justify-center ${theme === 'dark' ? 'bg-white text-primary shadow-sm scale-105' : 'text-gray-500 hover:text-gray-800'}`}
                     title={lang === 'vi' ? 'Chế độ Tối' : 'Dark Mode'}
                   >
-                    <Moon size={13} />
+                    <Moon size={14} />
                   </button>
                 </div>
 
@@ -163,13 +163,13 @@ const MainLayout = () => {
                 <div className="flex bg-gray-200/40 p-0.5 rounded-full mr-1">
                   <button 
                     onClick={() => setLang('vi')}
-                    className={`px-2.5 py-0.5 rounded-full text-[9px] font-black tracking-wider transition-all ${lang === 'vi' ? 'bg-white text-primary shadow-sm scale-105' : 'text-gray-500 hover:text-gray-800'}`}
+                    className={`w-7 h-7 flex items-center justify-center rounded-full text-[10px] font-black tracking-wider transition-all ${lang === 'vi' ? 'bg-white text-primary shadow-sm scale-105' : 'text-gray-500 hover:text-gray-800'}`}
                   >
                     VI
                   </button>
                   <button 
                     onClick={() => setLang('en')}
-                    className={`px-2.5 py-0.5 rounded-full text-[9px] font-black tracking-wider transition-all ${lang === 'en' ? 'bg-white text-primary shadow-sm scale-105' : 'text-gray-500 hover:text-gray-800'}`}
+                    className={`w-7 h-7 flex items-center justify-center rounded-full text-[10px] font-black tracking-wider transition-all ${lang === 'en' ? 'bg-white text-primary shadow-sm scale-105' : 'text-gray-500 hover:text-gray-800'}`}
                   >
                     EN
                   </button>

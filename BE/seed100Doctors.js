@@ -292,6 +292,7 @@ const seed100DoctorsAndData = async () => {
         department,
         specialty,
         experience: Math.floor(Math.random() * 25) + 3, // 3 to 28 years
+        rating: Number((4.5 + Math.random() * 0.5).toFixed(1)), // Beautiful rating between 4.5 and 5.0
         consultationFee: 150000, // Consultation fee set to exactly 150k
         availableSlots,
         avatar

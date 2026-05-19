@@ -55,6 +55,8 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
           navigate('/admin');
         } else if (data.data.role === 'lab_staff') {
           navigate('/dashboard/lab-upload');
+        } else if (data.data.role === 'doctor') {
+          navigate('/dashboard/doctor');
         } else {
           navigate('/dashboard');
         }

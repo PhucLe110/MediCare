@@ -165,17 +165,17 @@ const AdminLayout = () => {
             <div className="flex bg-slate-800 p-0.5 rounded-lg border border-slate-700 shadow-inner">
               <button 
                 onClick={() => setTheme('light')}
-                className={`p-1.5 rounded-md transition-all flex items-center justify-center ${theme === 'light' ? 'bg-indigo-500 text-white shadow-md scale-105' : 'text-slate-400 hover:text-white'}`}
+                className={`w-8 h-8 rounded-md transition-all flex items-center justify-center ${theme === 'light' ? 'bg-indigo-500 text-white shadow-md scale-105' : 'text-slate-400 hover:text-white'}`}
                 title={t.light}
               >
-                <Sun size={15} />
+                <Sun size={16} />
               </button>
               <button 
                 onClick={() => setTheme('dark')}
-                className={`p-1.5 rounded-md transition-all flex items-center justify-center ${theme === 'dark' ? 'bg-indigo-500 text-white shadow-md scale-105' : 'text-slate-400 hover:text-white'}`}
+                className={`w-8 h-8 rounded-md transition-all flex items-center justify-center ${theme === 'dark' ? 'bg-indigo-500 text-white shadow-md scale-105' : 'text-slate-400 hover:text-white'}`}
                 title={t.dark}
               >
-                <Moon size={15} />
+                <Moon size={16} />
               </button>
             </div>
           </div>
@@ -189,13 +189,13 @@ const AdminLayout = () => {
             <div className="flex bg-slate-800 p-0.5 rounded-lg border border-slate-700 shadow-inner">
               <button 
                 onClick={() => setLang('vi')}
-                className={`px-3.5 py-1 rounded-md text-[10px] font-black tracking-wider transition-all ${lang === 'vi' ? 'bg-indigo-500 text-white shadow-md scale-105' : 'text-slate-400 hover:text-white'}`}
+                className={`w-8 h-8 flex items-center justify-center rounded-md text-[11px] font-black tracking-wider transition-all ${lang === 'vi' ? 'bg-indigo-500 text-white shadow-md scale-105' : 'text-slate-400 hover:text-white'}`}
               >
                 VI
               </button>
               <button 
                 onClick={() => setLang('en')}
-                className={`px-3.5 py-1 rounded-md text-[10px] font-black tracking-wider transition-all ${lang === 'en' ? 'bg-indigo-500 text-white shadow-md scale-105' : 'text-slate-400 hover:text-white'}`}
+                className={`w-8 h-8 flex items-center justify-center rounded-md text-[11px] font-black tracking-wider transition-all ${lang === 'en' ? 'bg-indigo-500 text-white shadow-md scale-105' : 'text-slate-400 hover:text-white'}`}
               >
                 EN
               </button>
