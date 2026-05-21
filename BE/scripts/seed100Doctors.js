@@ -1,13 +1,22 @@
+/**
+ * Reset toàn bộ DB + tạo admin, NV xét nghiệm, 100 bác sĩ (ảnh Unsplash), 100 thuốc
+ * Chạy: node scripts/seed100Doctors.js
+ */
+const path = require('path');
 const mongoose = require('mongoose');
-const User = require('./models/User');
-const Doctor = require('./models/Doctor');
-const Appointment = require('./models/Appointment');
-const Bill = require('./models/Bill');
-const Prescription = require('./models/Prescription');
-const LabRequest = require('./models/LabRequest');
-const LabResult = require('./models/LabResult');
-const Medicine = require('./models/Medicine');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
+
+const User = require('../models/User');
+const Doctor = require('../models/Doctor');
+const Appointment = require('../models/Appointment');
+const Bill = require('../models/Bill');
+const Prescription = require('../models/Prescription');
+const LabRequest = require('../models/LabRequest');
+const LabResult = require('../models/LabResult');
+const Medicine = require('../models/Medicine');
+const ShiftRequest = require('../models/ShiftRequest');
+
+const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 // 15 Departments & their specific specialties from Screenshot 1
 const medicalDepartments = {
@@ -210,30 +219,33 @@ const seed100DoctorsAndData = async () => {
     console.log('⚡ Connected to MongoDB. Initiating gender-inclusive full-day schedule seed...');
 
     // 1. CLEAR ALL PREVIOUS DATA
-    await Appointment.deleteMany({});
-    await Bill.deleteMany({});
-    await Prescription.deleteMany({});
-    await LabRequest.deleteMany({});
-    await LabResult.deleteMany({});
-    await Doctor.deleteMany({});
-    await User.deleteMany({});
-    await Medicine.deleteMany({});
+    await Promise.all([
+      Appointment.deleteMany({}),
+      Bill.deleteMany({}),
+      Prescription.deleteMany({}),
+      LabRequest.deleteMany({}),
+      LabResult.deleteMany({}),
+      ShiftRequest.deleteMany({}),
+      Doctor.deleteMany({}),
+      Medicine.deleteMany({}),
+      User.deleteMany({})
+    ]);
 
-    console.log('🗑️ Completely cleaned Users, Doctors, Appts, Bills, Prescriptions, LabRequests, LabResults & Medicines.');
+    console.log('🗑️ Đã xóa toàn bộ dữ liệu (users, doctors, lịch khám, hóa đơn, XN, thuốc, ca trực...).');
 
-    // 2. SEED ADMIN USER (MALE)
-    const admin = await User.create({
-      fullName: 'Quản trị viên',
+    // 2. ADMIN
+    await User.create({
+      fullName: 'Quản trị viên MediCare',
       email: 'admin@medicare.vn',
       password: 'admin123',
       phone: '0901234567',
       role: 'admin',
       gender: 'Nam'
     });
-    console.log('👑 Admin seeded successfully (admin@medicare.vn / admin123)');
+    console.log('👑 Admin: admin@medicare.vn / admin123');
 
-    // 3. SEED LAB STAFF (FEMALE)
-    const labStaff = await User.create({
+    // 3. NV XÉT NGHIỆM
+    await User.create({
       fullName: 'Nguyễn Thị Lan Anh',
       email: 'labstaff@medicare.vn',
       password: 'labstaff123',
@@ -241,7 +253,7 @@ const seed100DoctorsAndData = async () => {
       role: 'lab_staff',
       gender: 'Nữ'
     });
-    console.log('🧪 Lab Staff seeded successfully (labstaff@medicare.vn / labstaff123)');
+    console.log('🧪 NV XN: labstaff@medicare.vn / labstaff123');
 
     // 4. PREPARE 6 WORKING DAYS: MONDAY TO SATURDAY OF NEXT WEEK
     const workingDays = getNextWeekMonToSat();
@@ -284,9 +296,8 @@ const seed100DoctorsAndData = async () => {
         times: [...fullDayTimeSlots] // full-day working hours
       }));
 
-      // Pick avatar corresponding to gender
       const avatarList = isMale ? maleAvatars : femaleAvatars;
-      const avatar = avatarList[(i - 1) % avatarList.length];
+      const avatar = pickRandom(avatarList);
       const pattern = shiftPatterns[Math.floor(Math.random() * shiftPatterns.length)];
 
       doctorsData.push({
@@ -328,7 +339,12 @@ const seed100DoctorsAndData = async () => {
     await Medicine.insertMany(medicinesData);
     console.log('💊 Seeded exactly 100 master Medicines into hospital inventory!');
 
-    console.log('\n🌟 SUCCESS: Database reset, gender division and full-day schedules successfully implemented! 🌟\n');
+    console.log('\n🌟 HOÀN TẤT RESET & SEED 🌟');
+    console.log('   • 100 bác sĩ (doctor1..doctor100@medicare.vn / password123) — mỗi BS có ảnh đại diện');
+    console.log('   • Admin: admin@medicare.vn / admin123');
+    console.log('   • NV XN: labstaff@medicare.vn / labstaff123');
+    console.log('   • 100 thuốc trong kho\n');
+    await mongoose.disconnect();
     process.exit(0);
   } catch (error) {
     console.error('❌ Error during database seed:', error);

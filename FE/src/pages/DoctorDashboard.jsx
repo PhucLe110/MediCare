@@ -1,14 +1,29 @@
-import { API_URL } from '../config';
-import React, { useState, useEffect } from 'react';
+import { API_URL, authFetch } from '../config';
+import { isAppointmentTimeReached } from '../utils/dateTime';
+import { getLocale, getDefaultLabTests, formatDate } from '../utils/i18nHelpers';
+import { doctorDashboardTrans } from '../i18n/doctorDashboardI18n';
+import { useTranslation } from '../hooks/useTranslation';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
-  Users, Award, DollarSign, Calendar, Clipboard, 
+  Users, Award, Calendar, Clipboard, 
   Search, Pill, FileText, CheckCircle2, ChevronRight, 
   Trash2, Plus, RefreshCw, UserCheck, AlertCircle, 
-  Printer, X, Activity, Info
+  Printer, X, Activity, Info, Clock, Send, FlaskConical
 } from 'lucide-react';
 
+const getTomorrowString = () => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const y = tomorrow.getFullYear();
+  const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
+  const d = String(tomorrow.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
 const DoctorDashboard = () => {
-  const [lang, setLang] = useState(localStorage.getItem('lang') || 'vi');
+  const { lang, t } = useTranslation(doctorDashboardTrans);
+  const labNames = getDefaultLabTests(lang);
+  const locale = getLocale(lang);
   const [activeTab, setActiveTab] = useState('confirmed'); // 'confirmed', 'completed', 'cancelled'
   const [appointments, setAppointments] = useState([]);
   const [medicinesList, setMedicinesList] = useState([]);
@@ -16,40 +31,75 @@ const DoctorDashboard = () => {
   const [selectedAppt, setSelectedAppt] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [waitingFilter, setWaitingFilter] = useState('today'); // 'today' | 'bydate'
+  const [filterDate, setFilterDate] = useState(() => {
+    const now = new Date();
+    const vn = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+    return vn.toISOString().split('T')[0];
+  });
   
   // Clinical Session Form State
   const [diagnosis, setDiagnosis] = useState('');
   const [doctorNotes, setDoctorNotes] = useState('');
   const [prescribedMedicines, setPrescribedMedicines] = useState([]);
-  const [selectedMedId, setSelectedMedId] = useState('');
-  const [medDosage, setMedDosage] = useState('500mg');
+  const [medNameInput, setMedNameInput] = useState('');
+  const [medUnit, setMedUnit] = useState('');
   const [medFrequency, setMedFrequency] = useState('2 lần/ngày (Sáng/Tối)');
   const [medDuration, setMedDuration] = useState('7 ngày');
-  const [medQuantity, setMedQuantity] = useState(14);
+  const [medQuantity, setMedQuantity] = useState(1);
   
   // Lab Tests State
   const [labTests, setLabTests] = useState([]);
+  const [sentRequests, setSentRequests] = useState([]);
+  const [loadingRequests, setLoadingRequests] = useState(false);
   const [newTestName, setNewTestName] = useState('');
   const [newTestType, setNewTestType] = useState('blood');
   const [testNotes, setTestNotes] = useState('');
 
+  // Follow-up State
+  const [requireFollowUp, setRequireFollowUp] = useState(false);
+  const [followUpDate, setFollowUpDate] = useState('');
+  const [followUpTime, setFollowUpTime] = useState('');
+  const [followUpNotes, setFollowUpNotes] = useState('');
+  const [availableFollowUpTimes, setAvailableFollowUpTimes] = useState([]);
+  const [loadingFollowUpTimes, setLoadingFollowUpTimes] = useState(false);
+
   // History state
   const [patientHistory, setPatientHistory] = useState([]);
+  const [patientProfile, setPatientProfile] = useState(null);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [cancelLabConfirm, setCancelLabConfirm] = useState({ show: false, requestId: null, label: '' });
 
   // Notifications/Errors
   const [toast, setToast] = useState(null);
 
-  // const API_URL = API_URL;
-  const user = JSON.parse(localStorage.getItem('userInfo') || '{}');
-  const authHeader = { Authorization: `Bearer ${user.token}` };
+  const jsonHeaders = () => ({ 'Content-Type': 'application/json' });
 
   useEffect(() => {
-    const handleLangChange = () => setLang(localStorage.getItem('lang') || 'vi');
-    window.addEventListener('language-change', handleLangChange);
-    return () => window.removeEventListener('language-change', handleLangChange);
-  }, []);
+    const fetchFollowUpAvailability = async () => {
+      if (!profileData?.profile?._id || !followUpDate) {
+        setAvailableFollowUpTimes([]);
+        return;
+      }
+      setLoadingFollowUpTimes(true);
+      try {
+        const res = await authFetch(`${API_URL}/api/appointments/doctors/${profileData.profile._id}/availability?date=${followUpDate}`);
+        const data = await res.json();
+        if (data.success) {
+          setAvailableFollowUpTimes(data.data);
+          if (!data.data.includes(followUpTime)) {
+            setFollowUpTime('');
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingFollowUpTimes(false);
+      }
+    };
+    fetchFollowUpAvailability();
+  }, [followUpDate, profileData?.profile?._id, followUpTime]);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -60,28 +110,28 @@ const DoctorDashboard = () => {
     setLoading(true);
     try {
       // 1. Fetch Profile
-      const profRes = await fetch(`${API_URL}/api/doctors/profile`, { headers: authHeader });
+      const profRes = await authFetch(`${API_URL}/api/doctors/profile`);
       const profData = await profRes.json();
       if (profData.success) {
         setProfileData(profData.data);
       }
 
       // 2. Fetch Appointments
-      const apptRes = await fetch(`${API_URL}/api/doctors/appointments`, { headers: authHeader });
+      const apptRes = await authFetch(`${API_URL}/api/doctors/appointments`);
       const apptData = await apptRes.json();
       if (apptData.success) {
         setAppointments(apptData.data);
       }
 
       // 3. Fetch Medicines
-      const medRes = await fetch(`${API_URL}/api/doctors/medicines`, { headers: authHeader });
+      const medRes = await authFetch(`${API_URL}/api/doctors/medicines`);
       const medData = await medRes.json();
       if (medData.success) {
         setMedicinesList(medData.data);
       }
     } catch (error) {
       console.error(error);
-      showToast(lang === 'vi' ? 'Lỗi đồng bộ dữ liệu hệ thống!' : 'Failed to synchronize system data!', 'error');
+      showToast(t.toastSyncError, 'error');
     } finally {
       setLoading(false);
     }
@@ -95,10 +145,11 @@ const DoctorDashboard = () => {
   const loadPatientHistory = async (patientId) => {
     setLoadingHistory(true);
     try {
-      const res = await fetch(`${API_URL}/api/doctors/patient-history/${patientId}`, { headers: authHeader });
+      const res = await authFetch(`${API_URL}/api/doctors/patient-history/${patientId}`);
       const data = await res.json();
       if (data.success) {
-        setPatientHistory(data.data);
+        setPatientHistory(data.data.history || []);
+        setPatientProfile(data.data.patient || null);
       }
     } catch (error) {
       console.error(error);
@@ -109,71 +160,184 @@ const DoctorDashboard = () => {
 
   const handleSelectAppt = (appt) => {
     setSelectedAppt(appt);
-    setDiagnosis('');
-    setDoctorNotes('');
-    setPrescribedMedicines([]);
-    setLabTests([]);
+    if (appt.status === 'examining' && appt.draft) {
+      // Load draft from DB (already returned in appointment data)
+      const d = appt.draft;
+      setDiagnosis(d.diagnosis || '');
+      setDoctorNotes(d.doctorNotes || '');
+      setPrescribedMedicines(d.medicines || []);
+      setLabTests(d.labTests || []);
+      setRequireFollowUp(d.requireFollowUp || false);
+      setFollowUpDate(d.followUpDate || '');
+      setFollowUpTime(d.followUpTime || '');
+      setFollowUpNotes(d.followUpNotes || '');
+    } else {
+      setDiagnosis('');
+      setDoctorNotes('');
+      setPrescribedMedicines([]);
+      setLabTests([]);
+      setRequireFollowUp(false);
+      setFollowUpDate('');
+      setFollowUpTime('');
+      setFollowUpNotes('');
+    }
     loadPatientHistory(appt.patient._id);
+    fetchSentRequests(appt._id);
   };
+
+  const fetchSentRequests = async (apptId) => {
+    setLoadingRequests(true);
+    try {
+      const res = await authFetch(`${API_URL}/api/lab-requests?appointmentId=${apptId}`);
+      const data = await res.json();
+      if (data.success) setSentRequests(data.data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingRequests(false);
+    }
+  };
+
+  const openCancelLabConfirm = (req) => {
+    const label = req.tests?.map(x => x.testName).join(', ') || '';
+    setCancelLabConfirm({ show: true, requestId: req._id, label });
+  };
+
+  const closeCancelLabConfirm = () => {
+    setCancelLabConfirm({ show: false, requestId: null, label: '' });
+  };
+
+  const confirmCancelLabRequest = async () => {
+    const requestId = cancelLabConfirm.requestId;
+    if (!requestId) return;
+    closeCancelLabConfirm();
+
+    try {
+      const res = await authFetch(`${API_URL}/api/lab-requests/${requestId}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(t.toastLabCancelled);
+        fetchSentRequests(selectedAppt._id);
+      } else {
+        showToast(data.message, 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      showToast(t.toastConnError, 'error');
+    }
+  };
+
+  const handleSendLabRequest = async () => {
+    if (labTests.length === 0) {
+      showToast(t.toastAddLab, 'error');
+      return;
+    }
+
+    try {
+      const payload = {
+        patientId: selectedAppt.patient._id,
+        appointmentId: selectedAppt._id,
+        tests: labTests
+      };
+
+      const res = await authFetch(`${API_URL}/api/lab-requests`, {
+        method: 'POST',
+        headers: jsonHeaders(),
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(t.toastLabSent);
+        setLabTests([]);
+        fetchSentRequests(selectedAppt._id);
+      } else {
+        showToast(data.message, 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      showToast(t.toastConnError, 'error');
+    }
+  };
+
+  // Debounced save draft to server
+  const draftTimerRef = useRef(null);
+  const saveDraftToServer = useCallback(async (apptId, draftData) => {
+    try {
+      await authFetch(`${API_URL}/api/doctors/diagnose/${apptId}/draft`, {
+        method: 'PUT',
+        headers: jsonHeaders(),
+        body: JSON.stringify(draftData)
+      });
+    } catch (err) {
+      console.error('Draft save error:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!selectedAppt || selectedAppt.status !== 'examining') return;
+    // Debounce: wait 1.5s after last change before saving
+    clearTimeout(draftTimerRef.current);
+    draftTimerRef.current = setTimeout(() => {
+      saveDraftToServer(selectedAppt._id, {
+        diagnosis, doctorNotes, medicines: prescribedMedicines, labTests,
+        requireFollowUp, followUpDate, followUpTime, followUpNotes
+      });
+    }, 1500);
+    return () => clearTimeout(draftTimerRef.current);
+  }, [diagnosis, doctorNotes, prescribedMedicines, labTests, requireFollowUp, followUpDate, followUpTime, followUpNotes, selectedAppt]);
 
   // Prescribing Medicines Handlers
   const handleAddMedicine = () => {
-    if (!selectedMedId) {
-      showToast(lang === 'vi' ? 'Vui lòng chọn loại thuốc!' : 'Please select a medicine!', 'error');
+    if (!medNameInput.trim()) {
+      showToast(t.toastAddMed, 'error');
       return;
     }
-    const medObj = medicinesList.find(m => m._id === selectedMedId);
-    if (!medObj) return;
-
-    // Check duplicate
-    if (prescribedMedicines.some(m => m.medicineId === selectedMedId)) {
-      showToast(lang === 'vi' ? 'Thuốc này đã được thêm vào đơn!' : 'This medicine is already added!', 'error');
+    
+    // Check duplicate by name
+    if (prescribedMedicines.some(m => m.name.toLowerCase() === medNameInput.toLowerCase())) {
+      showToast(t.toastMedDup, 'error');
       return;
     }
 
+    const medObj = medicinesList.find(m => m.name.toLowerCase() === medNameInput.trim().toLowerCase());
+    
     setPrescribedMedicines([
       ...prescribedMedicines,
       {
-        medicineId: medObj._id,
-        name: medObj.name,
-        dosage: medDosage,
+        medicineId: medObj ? medObj._id : null,
+        name: medObj ? medObj.name : medNameInput.trim(),
+        dosage: medUnit,
         frequency: medFrequency,
         duration: medDuration,
         quantity: Number(medQuantity),
-        unitPrice: medObj.price || 0
+        unitPrice: medObj ? (medObj.unitPrice || 0) : 0
       }
     ]);
-
-    // reset fields
-    setSelectedMedId('');
-    setMedQuantity(14);
+    
+    // Reset form
+    setMedNameInput('');
+    setMedUnit('');
+    setMedFrequency('2 lần/ngày (Sáng/Tối)');
+    setMedDuration('7 ngày');
+    setMedQuantity(1);
   };
 
-  const handleRemoveMedicine = (medId) => {
-    setPrescribedMedicines(prescribedMedicines.filter(m => m.medicineId !== medId));
+  const handleRemoveMedicine = (medName) => {
+    setPrescribedMedicines(prescribedMedicines.filter(m => m.name !== medName));
   };
 
   // Lab Request Handlers
   const handleAddLabTest = () => {
-    const defaultTestNames = {
-      blood: lang === 'vi' ? 'Xét nghiệm công thức máu toàn phần' : 'Complete Blood Count (CBC)',
-      urine: lang === 'vi' ? 'Xét nghiệm phân tích nước tiểu' : 'Urinalysis (UA)',
-      xray: lang === 'vi' ? 'Chụp X-quang Ngực thẳng' : 'Chest X-Ray',
-      mri: lang === 'vi' ? 'Chụp cộng hưởng từ khớp/não' : 'MRI Scan',
-      ct: lang === 'vi' ? 'Chụp cắt lớp vi tính' : 'CT Scan',
-      ultrasound: lang === 'vi' ? 'Siêu âm tổng quát ổ bụng' : 'Abdominal Ultrasound',
-      ecg: lang === 'vi' ? 'Đo điện tâm đồ (ECG)' : 'Electrocardiogram (ECG)',
-      other: lang === 'vi' ? 'Chỉ định lâm sàng khác' : 'Other Diagnostic Test'
-    };
-
-    const name = newTestName.trim() || defaultTestNames[newTestType];
+    const name = newTestName.trim() || labNames[newTestType];
 
     setLabTests([
       ...labTests,
       {
         testName: name,
         testType: newTestType,
-        clinicalNotes: testNotes || (lang === 'vi' ? 'Đánh giá lâm sàng' : 'Clinical evaluation'),
+        clinicalNotes: testNotes || labNames.clinicalEval,
         urgency: 'normal'
       }
     ]);
@@ -187,32 +351,81 @@ const DoctorDashboard = () => {
   };
 
   // Submit Consultation / Diagnosis
+  const hasOpenLabRequests = sentRequests.some(
+    r => r.status !== 'completed' && r.status !== 'cancelled'
+  );
+
   const handleSubmitDiagnosis = async () => {
     if (!diagnosis.trim()) {
-      showToast(lang === 'vi' ? 'Vui lòng điền kết luận chẩn đoán!' : 'Please fill in the diagnosis conclusion!', 'error');
+      showToast(t.toastNeedDiagnosis, 'error');
       return;
+    }
+
+    if (hasOpenLabRequests) {
+      showToast(t.toastLabPending, 'error');
+      return;
+    }
+
+    if (requireFollowUp && (!followUpDate || !followUpTime)) {
+      showToast(t.toastNeedFollowUp, 'error');
+      return;
+    }
+
+    // Auto-append un-added lab tests
+    let finalLabTests = [...labTests];
+    if (newTestName.trim() || testNotes.trim()) {
+      const name = newTestName.trim() || labNames[newTestType];
+      finalLabTests.push({
+        testName: name,
+        testType: newTestType,
+        clinicalNotes: testNotes || labNames.clinicalEval,
+        urgency: 'normal'
+      });
+      setNewTestName('');
+      setTestNotes('');
+      setLabTests(finalLabTests);
+    }
+    
+    // Auto-append un-added medicines
+    let finalMedicines = [...prescribedMedicines];
+    if (medNameInput.trim()) {
+      if (!finalMedicines.some(m => m.name.toLowerCase() === medNameInput.trim().toLowerCase())) {
+        const medObj = medicinesList.find(m => m.name.toLowerCase() === medNameInput.trim().toLowerCase());
+        finalMedicines.push({
+          medicineId: medObj ? medObj._id : null,
+          name: medObj ? medObj.name : medNameInput.trim(),
+          dosage: medUnit,
+          frequency: medFrequency,
+          duration: medDuration,
+          quantity: Number(medQuantity) || 1,
+          unitPrice: medObj ? (medObj.unitPrice || 0) : 0
+        });
+        setMedNameInput('');
+      }
+      setPrescribedMedicines(finalMedicines);
     }
 
     try {
       const payload = {
         diagnosis,
         doctorNotes,
-        medicines: prescribedMedicines,
-        labTests
+        medicines: finalMedicines,
+        followUp: requireFollowUp ? {
+          date: followUpDate,
+          time: followUpTime,
+          notes: followUpNotes
+        } : null
       };
 
-      const res = await fetch(`${API_URL}/api/doctors/diagnose/${selectedAppt._id}`, {
+      const res = await authFetch(`${API_URL}/api/doctors/diagnose/${selectedAppt._id}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        },
+        headers: jsonHeaders(),
         body: JSON.stringify(payload)
       });
 
       const data = await res.json();
       if (data.success) {
-        showToast(lang === 'vi' ? 'Kê đơn và hoàn tất ca khám thành công!' : 'Prescription completed and consultation saved!');
+        showToast(t.toastComplete);
         setSelectedAppt(null);
         fetchData();
       } else {
@@ -220,141 +433,77 @@ const DoctorDashboard = () => {
       }
     } catch (error) {
       console.error(error);
-      showToast(lang === 'vi' ? 'Không thể lưu chẩn đoán!' : 'Could not save diagnosis!', 'error');
+      showToast(t.toastSaveFail, 'error');
     }
   };
 
-  // Dictionary Translations
-  const t = {
-    vi: {
-      doctorDesk: 'Bàn Làm Việc Bác Sĩ chuyên khoa',
-      subtitle: 'Hệ thống quản lý chẩn đoán, kê đơn & chỉ định cận lâm sàng',
-      totalAppts: 'Tổng ca phụ trách',
-      patientsCured: 'Đã hoàn tất khám',
-      clinicalExp: 'Kinh nghiệm lâm sàng',
-      experienceSub: 'Thâm niên hoạt động bác sĩ',
-      earnings: 'Doanh thu hôm nay',
-      patientList: 'Danh sách bệnh nhân đăng ký',
-      searchPatient: 'Tìm bệnh nhân...',
-      noPatient: 'Không tìm thấy bệnh nhân nào',
-      detailsTitle: 'Chi tiết ca khám & Bệnh án',
-      selectToStart: 'Vui lòng chọn một ca khám để tiến hành chẩn đoán',
-      symptoms: 'Triệu chứng khai báo:',
-      aiSuspect: 'AI chẩn đoán nghi ngờ:',
-      diagnoseTitle: 'KẾT LUẬN & CHỈ ĐỊNH ĐIỀU TRỊ',
-      diagnosisLabel: 'Kết luận chẩn đoán bệnh:',
-      diagnosisPlaceholder: 'Nhập chẩn đoán chính xác (VD: Viêm họng cấp, Gout cấp...)',
-      adviceLabel: 'Lời dặn điều trị / Chế độ ăn uống:',
-      advicePlaceholder: 'Uống thuốc đúng giờ, hạn chế bia rượu, tái khám sau 7 ngày...',
-      prescribeTitle: 'Kê Đơn Thuốc Điều Trị',
-      selectMed: 'Chọn thuốc...',
-      qty: 'SL',
-      dosage: 'Liều lượng',
-      frequency: 'Tần suất uống',
-      duration: 'Thời gian uống',
-      btnAddMed: 'Thêm thuốc',
-      medTableMed: 'Tên thuốc',
-      medTableDosage: 'Liều dùng',
-      medTableFreq: 'Cách dùng',
-      medTableQty: 'Số lượng',
-      medTableCost: 'Đơn giá',
-      labRequestTitle: 'Chỉ Định Xét Nghiệm Cận Lâm Sàng',
-      labTestName: 'Tên xét nghiệm (để trống lấy mặc định)',
-      labTestType: 'Phân loại cận lâm sàng',
-      labTestNotes: 'Ghi chú lâm sàng cho kỹ thuật viên',
-      btnAddTest: 'Chỉ định XN',
-      testTableType: 'Phân loại',
-      testTableName: 'Tên xét nghiệm',
-      btnSubmitConsult: 'Hoàn Tất Khám & Gửi Hóa Đơn',
-      historyTitle: 'Lịch sử bệnh án cũ của bệnh nhân',
-      viewHistory: 'Xem lịch sử đầy đủ',
-      noHistory: 'Chưa có bệnh án cũ nào',
-      date: 'Ngày khám',
-      doctor: 'Bác sĩ phụ trách',
-      treatment: 'Chẩn đoán điều trị',
-      medicines: 'Đơn thuốc',
-      labResults: 'Kết quả cận lâm sàng',
-      close: 'Đóng',
-      waitingList: 'Chờ khám',
-      completedList: 'Đã khám xong',
-      cancelledList: 'Đã hủy ca',
-      refresh: 'Làm mới',
-      phone: 'Điện thoại',
-      gender: 'Giới tính',
-      dob: 'Ngày sinh',
-    },
-    en: {
-      doctorDesk: 'Specialist Physician Workspace',
-      subtitle: 'Intelligent clinical diagnoses, prescriptions & lab test request center',
-      totalAppts: 'Assigned Appointments',
-      patientsCured: 'Completed Consultations',
-      clinicalExp: 'Clinical Experience',
-      experienceSub: 'Years of clinical practice',
-      earnings: 'Earnings Today',
-      patientList: 'Patient Consultation Registry',
-      searchPatient: 'Search patient...',
-      noPatient: 'No patients found',
-      detailsTitle: 'Clinical Consultation Workspace',
-      selectToStart: 'Please select a patient appointment card to start diagnosis',
-      symptoms: 'Patient-declared Symptoms:',
-      aiSuspect: 'Suspected AI Triage:',
-      diagnoseTitle: 'CLINICAL CONSTRUCTS & DIAGNOSES',
-      diagnosisLabel: 'Diagnostic Conclusion / Disease:',
-      diagnosisPlaceholder: 'Enter precise medical conclusion (e.g. Acute Pharyngitis)',
-      adviceLabel: 'Doctor Advice & Recommendations:',
-      advicePlaceholder: 'Take pills on time, rest well, avoid drinking, follow-up in 7 days...',
-      prescribeTitle: 'Pharmacological Prescription',
-      selectMed: 'Select medicine...',
-      qty: 'Qty',
-      dosage: 'Dosage',
-      frequency: 'Frequency',
-      duration: 'Duration',
-      btnAddMed: 'Prescribe',
-      medTableMed: 'Medicine Name',
-      medTableDosage: 'Dosage',
-      medTableFreq: 'Frequency',
-      medTableQty: 'Qty',
-      medTableCost: 'Price',
-      labRequestTitle: 'Diagnostic Lab Test Orders',
-      labTestName: 'Test Name (leave empty for default)',
-      labTestType: 'Test Category',
-      labTestNotes: 'Clinical indications/notes for lab technicians',
-      btnAddTest: 'Order Test',
-      testTableType: 'Category',
-      testTableName: 'Diagnostic Test',
-      btnSubmitConsult: 'Submit Diagnoses & Issue Invoice',
-      historyTitle: 'Patient Past Medical Records',
-      viewHistory: 'Full Clinical History',
-      noHistory: 'No past medical records',
-      date: 'Date',
-      doctor: 'Physician',
-      treatment: 'Diagnosis',
-      medicines: 'Prescription',
-      labResults: 'Lab Results',
-      close: 'Close',
-      waitingList: 'Queueing',
-      completedList: 'Diagnosed',
-      cancelledList: 'Cancelled',
-      refresh: 'Refresh',
-      phone: 'Phone',
-      gender: 'Gender',
-      dob: 'DOB',
+  const handleStartExamination = async () => {
+    try {
+      const res = await authFetch(`${API_URL}/api/doctors/diagnose/${selectedAppt._id}/start`, {
+        method: 'PUT',
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(t.toastStartExam);
+        setSelectedAppt({ ...selectedAppt, status: 'examining' });
+        fetchData();
+      } else {
+        showToast(data.message, 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      showToast(t.toastStartFail, 'error');
     }
-  }[lang];
+  };
 
-  // Filtering appointments based on tab and search
+  const isTimeReached = (appt) => isAppointmentTimeReached(appt);
+
+  // Vietnam timezone helpers (GMT+7)
+  const getVNToday = () => {
+    const now = new Date();
+    const vn = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+    return vn.toISOString().split('T')[0];
+  };
+
+  const vnToday = getVNToday();
+  const vnMonth = vnToday.substring(0, 7);
+
+  const todayApptsCount = appointments.filter(a => {
+    const d = a.date ? String(a.date).substring(0, 10) : '';
+    return d === vnToday;
+  }).length;
+
+  const monthApptsCount = appointments.filter(a => {
+    const d = a.date ? String(a.date).substring(0, 10) : '';
+    return d.substring(0, 7) === vnMonth;
+  }).length;
+
+  const monthFollowUpCount = appointments.filter(a => {
+    const d = a.date ? String(a.date).substring(0, 10) : '';
+    return a.parentAppointment && d.substring(0, 7) === vnMonth;
+  }).length;
+
   const filteredAppointments = appointments.filter(a => {
     // Status check
-    const statusMatches = 
-      activeTab === 'confirmed' ? (a.status === 'confirmed' || a.status === 'pending') :
+    const statusMatches =
+      activeTab === 'confirmed' ? (a.status === 'confirmed' || a.status === 'pending' || a.status === 'examining') :
       activeTab === 'completed' ? (a.status === 'completed') :
       a.status === 'cancelled';
 
     // Search query check
-    const nameMatches = a.patient?.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const nameMatches = a.patient?.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         a.ticketNumber?.toLowerCase().includes(searchQuery.toLowerCase());
 
-    return statusMatches && nameMatches;
+    // Date filter
+    const apptDate = a.date ? String(a.date).substring(0, 10) : '';
+    let dateMatches = true;
+    if (activeTab === 'confirmed') {
+      dateMatches = waitingFilter === 'today' ? apptDate === vnToday : apptDate === filterDate;
+    } else {
+      dateMatches = apptDate === filterDate;
+    }
+
+    return statusMatches && nameMatches && dateMatches;
   });
 
   return (
@@ -389,48 +538,54 @@ const DoctorDashboard = () => {
 
       {/* Profile Metrics Deck */}
       {profileData && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Card 1: Doctor profile */}
           <div className="bg-gradient-to-br from-blue-900 to-indigo-950 text-white p-6 rounded-3xl shadow-lg shadow-indigo-900/10 border border-white/10 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full transform translate-x-8 -translate-y-8" />
-            <p className="text-[11px] font-black text-blue-200 uppercase tracking-widest">{lang === 'vi' ? 'Bác sĩ phụ trách' : 'Physician'}</p>
+            <p className="text-[11px] font-black text-blue-200 uppercase tracking-widest">{t.physicianLabel}</p>
             <h3 className="text-2xl font-black mt-2">{profileData.profile?.userId?.fullName}</h3>
             <p className="text-xs text-blue-300 font-bold mt-1">
               {profileData.profile?.specialty} • {profileData.profile?.department}
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-primary flex items-center justify-center border border-blue-100">
-              <Calendar size={22} />
-            </div>
-            <div>
+          {/* Card 2: Tổng ca — split Hôm nay / Trong tháng */}
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-blue-50 text-primary flex items-center justify-center border border-blue-100">
+                <Calendar size={20} />
+              </div>
               <p className="text-xs text-gray-500 font-extrabold uppercase tracking-wide">{t.totalAppts}</p>
-              <h3 className="text-2xl font-black text-gray-900 mt-1">{appointments.length}</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-blue-50/70 rounded-2xl p-3 text-center border border-blue-100">
+                <h3 className="text-2xl font-black text-gray-900">{todayApptsCount}</h3>
+                <p className="text-[10px] font-black text-blue-500 uppercase tracking-wider mt-0.5">
+                  {t.today}
+                </p>
+              </div>
+              <div className="bg-indigo-50/70 rounded-2xl p-3 text-center border border-indigo-100">
+                <h3 className="text-2xl font-black text-gray-900">{monthApptsCount}</h3>
+                <p className="text-[10px] font-black text-indigo-500 uppercase tracking-wider mt-0.5">
+                  {t.thisMonth}
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
-              <Award size={22} />
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 font-extrabold uppercase tracking-wide">{t.clinicalExp}</p>
-              <h3 className="text-2xl font-black text-gray-900 mt-1">
-                {profileData.profile?.experience || '0'} {lang === 'vi' ? 'năm' : 'years'}
-              </h3>
-              <p className="text-[10px] text-gray-400 font-bold mt-0.5">{t.experienceSub}</p>
-            </div>
-          </div>
-
+          {/* Card 3: Tái khám trong tháng */}
           <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
             <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100">
-              <DollarSign size={22} />
+              <RefreshCw size={22} />
             </div>
             <div>
-              <p className="text-xs text-gray-500 font-extrabold uppercase tracking-wide">{t.earnings}</p>
-              <h3 className="text-2xl font-black text-gray-900 mt-1">
-                {(profileData.stats?.totalEarnings || 0).toLocaleString('vi-VN')} VNĐ
-              </h3>
+              <p className="text-xs text-gray-500 font-extrabold uppercase tracking-wide">
+                {t.followUpMonthTitle}
+              </p>
+              <h3 className="text-2xl font-black text-gray-900 mt-1">{monthFollowUpCount}</h3>
+              <p className="text-[10px] text-gray-400 font-bold mt-0.5">
+                {t.followUpMonthSub}
+              </p>
             </div>
           </div>
         </div>
@@ -456,7 +611,7 @@ const DoctorDashboard = () => {
               ].map(tab => (
                 <button
                   key={tab.id}
-                  onClick={() => { setActiveTab(tab.id); setSelectedAppt(null); }}
+                  onClick={() => { setActiveTab(tab.id); setSelectedAppt(null); setWaitingFilter('today'); }}
                   className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
                     activeTab === tab.id ? tab.color : 'text-gray-500 hover:text-gray-800'
                   }`}
@@ -465,6 +620,47 @@ const DoctorDashboard = () => {
                 </button>
               ))}
             </div>
+
+            {/* Sub-filter: Chờ khám → Hôm nay / Chọn ngày; Đã khám / Đã hủy → Chọn ngày */}
+            {activeTab === 'confirmed' && (
+              <div className="flex items-center gap-2 mt-3 flex-wrap">
+                <button
+                  onClick={() => setWaitingFilter('today')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    waitingFilter === 'today' ? 'bg-primary text-white shadow-sm' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                  }`}
+                >
+                  {t.filterToday}
+                </button>
+                <button
+                  onClick={() => setWaitingFilter('bydate')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    waitingFilter === 'bydate' ? 'bg-primary text-white shadow-sm' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                  }`}
+                >
+                  {t.filterByDate}
+                </button>
+                {waitingFilter === 'bydate' && (
+                  <input
+                    type="date"
+                    value={filterDate}
+                    onChange={e => setFilterDate(e.target.value)}
+                    className="px-2 py-1 rounded-lg border border-gray-200 text-xs focus:ring-primary focus:border-primary outline-none"
+                  />
+                )}
+              </div>
+            )}
+            {(activeTab === 'completed' || activeTab === 'cancelled') && (
+              <div className="flex items-center gap-2 mt-3">
+                <span className="text-xs font-bold text-gray-400">{t.viewDate}</span>
+                <input
+                  type="date"
+                  value={filterDate}
+                  onChange={e => setFilterDate(e.target.value)}
+                  className="px-2 py-1.5 rounded-lg border border-gray-200 text-xs focus:ring-primary focus:border-primary outline-none"
+                />
+              </div>
+            )}
 
             {/* Search Box */}
             <div className="relative mt-4">
@@ -509,8 +705,14 @@ const DoctorDashboard = () => {
                         </span>
                       </div>
                       <h4 className="font-extrabold text-sm text-gray-800 truncate">{appt.patient?.fullName}</h4>
+                      {appt.parentAppointment && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200 w-fit">
+                          <RefreshCw size={9} />
+                          {t.followUpBadge}
+                        </span>
+                      )}
                       <p className="text-xs text-gray-500 font-medium">
-                        {appt.time} • {new Date(appt.date).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')}
+                        {appt.time} • {new Date(appt.date).toLocaleDateString(locale)}
                       </p>
                       {appt.symptoms && (
                         <p className="text-xs text-gray-400 truncate italic">
@@ -543,14 +745,20 @@ const DoctorDashboard = () => {
               <div className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100 space-y-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-lg font-extrabold text-gray-800 flex items-center gap-2">
+                    <h3 className="text-lg font-extrabold text-gray-800 flex items-center gap-2 flex-wrap">
                       <UserCheck className="text-emerald-500" size={20} />
                       {selectedAppt.patient?.fullName}
+                      {selectedAppt.parentAppointment && (
+                        <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider bg-amber-100 text-amber-700 px-3 py-1 rounded-full border border-amber-200">
+                          <RefreshCw size={11} />
+                          {t.followUpPatient}
+                        </span>
+                      )}
                     </h3>
                     <div className="flex gap-4 text-xs text-gray-500 font-bold mt-2">
                       <span>{t.gender}: <strong className="text-gray-700">{selectedAppt.patient?.gender || 'Nam'}</strong></span>
                       {selectedAppt.patient?.dateOfBirth && (
-                        <span>{t.dob}: <strong className="text-gray-700">{new Date(selectedAppt.patient?.dateOfBirth).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')}</strong></span>
+                        <span>{t.dob}: <strong className="text-gray-700">{new Date(selectedAppt.patient?.dateOfBirth).toLocaleDateString(locale)}</strong></span>
                       )}
                       <span>{t.phone}: <strong className="text-gray-700">{selectedAppt.patient?.phone}</strong></span>
                     </div>
@@ -574,6 +782,7 @@ const DoctorDashboard = () => {
               </div>
 
               {activeTab === 'confirmed' ? (
+                selectedAppt.status === 'examining' ? (
                 // Diagnosis form when in confirmed queue list
                 <div className="space-y-6">
                   <div className="border-t border-gray-100 pt-6">
@@ -621,27 +830,34 @@ const DoctorDashboard = () => {
                         {/* Select Medicine */}
                         <div className="md:col-span-5">
                           <label className="block text-[10px] font-black text-gray-500 uppercase mb-1">{t.medTableMed}</label>
-                          <select
-                            value={selectedMedId}
-                            onChange={e => setSelectedMedId(e.target.value)}
-                            className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:ring-primary focus:border-primary outline-none bg-white font-bold"
-                          >
-                            <option value="">{t.selectMed}</option>
-                            {medicinesList.map(med => (
-                              <option key={med._id} value={med._id}>
-                                {med.name} ({(med.price || 0).toLocaleString('vi-VN')}đ)
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        {/* Dosage */}
-                        <div className="md:col-span-3">
-                          <label className="block text-[10px] font-black text-gray-500 uppercase mb-1">{t.dosage}</label>
                           <input
                             type="text"
-                            value={medDosage}
-                            onChange={e => setMedDosage(e.target.value)}
+                            list="medicine-list"
+                            value={medNameInput}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setMedNameInput(val);
+                              const found = medicinesList.find(m => m.name.toLowerCase() === val.toLowerCase());
+                              if (found && found.unit) setMedUnit(found.unit);
+                            }}
+                            placeholder={t.medPlaceholder}
+                            className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:ring-primary focus:border-primary outline-none bg-white font-bold"
+                          />
+                          <datalist id="medicine-list">
+                            {medicinesList.map(med => (
+                              <option key={med._id} value={med.name} />
+                            ))}
+                          </datalist>
+                        </div>
+
+                        {/* Unit */}
+                        <div className="md:col-span-3">
+                          <label className="block text-[10px] font-black text-gray-500 uppercase mb-1">{t.unitLabel}</label>
+                          <input
+                            type="text"
+                            value={medUnit}
+                            onChange={e => setMedUnit(e.target.value)}
+                            placeholder={t.unitPlaceholder}
                             className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:ring-primary focus:border-primary outline-none bg-white font-bold"
                           />
                         </div>
@@ -701,15 +917,15 @@ const DoctorDashboard = () => {
                             <thead>
                               <tr className="bg-gray-100 border-b border-gray-200 text-gray-600 font-extrabold">
                                 <th className="p-3">{t.medTableMed}</th>
-                                <th className="p-3">{t.medTableDosage}</th>
+                                <th className="p-3">{t.unitLabel}</th>
                                 <th className="p-3">{t.medTableQty}</th>
                                 <th className="p-3 text-right">{t.medTableCost}</th>
                                 <th className="p-3 text-center"></th>
                               </tr>
                             </thead>
                             <tbody>
-                              {prescribedMedicines.map(med => (
-                                <tr key={med.medicineId} className="border-b border-gray-100 text-gray-700 font-bold hover:bg-gray-50/50">
+                              {prescribedMedicines.map((med, index) => (
+                                <tr key={med.name || index} className="border-b border-gray-100 text-gray-700 font-bold hover:bg-gray-50/50">
                                   <td className="p-3">
                                     <p className="font-extrabold">{med.name}</p>
                                     <p className="text-[10px] text-gray-400 font-medium">{med.frequency} • {med.duration}</p>
@@ -719,7 +935,7 @@ const DoctorDashboard = () => {
                                   <td className="p-3 text-right">{(med.unitPrice * med.quantity).toLocaleString('vi-VN')}đ</td>
                                   <td className="p-3 text-center">
                                     <button
-                                      onClick={() => handleRemoveMedicine(med.medicineId)}
+                                      onClick={() => handleRemoveMedicine(med.name)}
                                       className="text-rose-500 hover:text-rose-700 p-1"
                                     >
                                       <Trash2 size={14} />
@@ -750,14 +966,14 @@ const DoctorDashboard = () => {
                             onChange={e => setNewTestType(e.target.value)}
                             className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:ring-primary focus:border-primary outline-none bg-white font-bold"
                           >
-                            <option value="blood">{lang === 'vi' ? 'Xét nghiệm máu (Blood)' : 'Blood Test'}</option>
-                            <option value="urine">{lang === 'vi' ? 'Xét nghiệm nước tiểu (Urine)' : 'Urine Analysis'}</option>
-                            <option value="xray">{lang === 'vi' ? 'Chụp X-quang (X-Ray)' : 'X-Ray'}</option>
-                            <option value="ultrasound">{lang === 'vi' ? 'Siêu âm (Ultrasound)' : 'Ultrasound'}</option>
-                            <option value="ct">{lang === 'vi' ? 'Chụp CT-Scan' : 'CT Scan'}</option>
-                            <option value="mri">{lang === 'vi' ? 'Chụp cộng hưởng từ MRI' : 'MRI Scan'}</option>
-                            <option value="ecg">{lang === 'vi' ? 'Đo điện tâm đồ (ECG)' : 'ECG'}</option>
-                            <option value="other">{lang === 'vi' ? 'Khác (Other)' : 'Other'}</option>
+                            <option value="blood">{t.optBlood}</option>
+                            <option value="urine">{t.optUrine}</option>
+                            <option value="xray">{t.optXray}</option>
+                            <option value="ultrasound">{t.optUltrasound}</option>
+                            <option value="ct">{t.optCt}</option>
+                            <option value="mri">{t.optMri}</option>
+                            <option value="ecg">{t.optEcg}</option>
+                            <option value="other">{t.optOther}</option>
                           </select>
                         </div>
 
@@ -767,7 +983,7 @@ const DoctorDashboard = () => {
                             type="text"
                             value={newTestName}
                             onChange={e => setNewTestName(e.target.value)}
-                            placeholder={lang === 'vi' ? 'Nhập tên xét nghiệm cụ thể' : 'Enter test name'}
+                            placeholder={t.testNamePh}
                             className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:ring-primary focus:border-primary outline-none bg-white font-bold"
                           />
                         </div>
@@ -780,7 +996,7 @@ const DoctorDashboard = () => {
                             type="text"
                             value={testNotes}
                             onChange={e => setTestNotes(e.target.value)}
-                            placeholder={lang === 'vi' ? 'Ghi chú kỹ thuật hoặc triệu chứng lâm sàng' : 'Indications'}
+                            placeholder={t.testNotesPh}
                             className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:ring-primary focus:border-primary outline-none bg-white font-bold"
                           />
                         </div>
@@ -805,7 +1021,7 @@ const DoctorDashboard = () => {
                               <tr className="bg-gray-100 border-b border-gray-200 text-gray-600 font-extrabold">
                                 <th className="p-3">{t.testTableType}</th>
                                 <th className="p-3">{t.testTableName}</th>
-                                <th className="p-3">Ghi chú lâm sàng</th>
+                                <th className="p-3">{t.clinicalNotesCol}</th>
                                 <th className="p-3 text-center"></th>
                               </tr>
                             </thead>
@@ -829,7 +1045,157 @@ const DoctorDashboard = () => {
                           </table>
                         </div>
                       )}
+
+                      {labTests.length > 0 && (
+                        <div className="mt-4 flex justify-end">
+                          <button
+                            type="button"
+                            onClick={handleSendLabRequest}
+                            className="px-6 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold rounded-xl text-sm hover:from-teal-600 hover:to-emerald-600 shadow-md shadow-emerald-500/20 flex items-center gap-2 transition-all"
+                          >
+                            <Send size={16} /> 
+                            {t.sendLabNow}
+                          </button>
+                        </div>
+                      )}
+                      
+                      {sentRequests.length > 0 && (
+                        <div className="mt-6 border-t border-gray-100 pt-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <h5 className="text-xs font-bold text-gray-700 uppercase">{t.sentLabRequests}</h5>
+                            <button onClick={() => fetchSentRequests(selectedAppt._id)} className="text-blue-500 hover:text-blue-700 p-1 flex items-center gap-1 text-xs font-bold bg-blue-50 rounded-lg px-2">
+                              <RefreshCw size={12} className={loadingRequests ? 'animate-spin' : ''} /> {t.refresh}
+                            </button>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            {sentRequests.map(req => (
+                              <div key={req._id} className="border border-gray-200 rounded-xl p-4 bg-white shadow-sm flex items-start justify-between">
+                                <div>
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md uppercase ${req.status === 'completed' ? 'bg-green-100 text-green-700' : req.status === 'in_progress' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                      {req.status === 'completed' ? t.labCompleted : req.status === 'in_progress' ? t.labInProgress : t.labPending}
+                                    </span>
+                                    {req.paymentStatus === 'unpaid' && (
+                                      <span className="px-2 py-0.5 text-[10px] font-bold rounded-md uppercase bg-orange-100 text-orange-700">
+                                        {t.awaitingLabPay}
+                                      </span>
+                                    )}
+                                    <span className="text-xs text-gray-500 font-mono flex items-center gap-1">
+                                      <Clock size={10} /> {new Date(req.createdAt).toLocaleTimeString(locale)}
+                                    </span>
+                                  </div>
+                                  <ul className="list-disc pl-4 text-xs text-gray-700 font-medium space-y-1">
+                                    {req.tests?.map((t, i) => (
+                                      <li key={i}>{t.testName} <span className="text-gray-400">({t.testType})</span></li>
+                                    ))}
+                                  </ul>
+                                </div>
+                                
+                                <div className="flex flex-col gap-2 items-end shrink-0">
+                                {req.status === 'completed' && req.result && req.result.files && req.result.files.length > 0 && (
+                                  <>
+                                    {req.result.files.map((f, idx) => (
+                                      <a key={idx} href={`${API_URL}${f.fileUrl}`} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 bg-green-50 text-green-700 border border-green-200 rounded-lg text-xs font-bold hover:bg-green-100 flex items-center gap-1.5 transition-colors" title={f.fileName}>
+                                        <FileText size={14} />
+                                        {t.viewResult} {req.result.files.length > 1 ? idx + 1 : ''}
+                                      </a>
+                                    ))}
+                                  </>
+                                )}
+                                {req.status !== 'completed' && (
+                                  <button
+                                    type="button"
+                                    onClick={() => openCancelLabConfirm(req)}
+                                    className="px-3 py-1.5 bg-rose-50 text-rose-600 border border-rose-200 rounded-lg text-xs font-bold hover:bg-rose-100 flex items-center gap-1.5 transition-colors"
+                                    title={t.cancelLabTitleShort}
+                                  >
+                                    <Trash2 size={14} />
+                                    {t.cancelLabBtn}
+                                  </button>
+                                )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
+                  </div>
+
+                  {/* Follow-up Section */}
+                  <div className="border-t border-gray-100 pt-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <input 
+                        type="checkbox" 
+                        id="requireFollowUp" 
+                        checked={requireFollowUp} 
+                        onChange={e => setRequireFollowUp(e.target.checked)}
+                        className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary cursor-pointer"
+                      />
+                      <label htmlFor="requireFollowUp" className="text-sm font-black text-gray-800 uppercase tracking-wider cursor-pointer">
+                        {t.followUpRequire}
+                      </label>
+                    </div>
+
+                    {requireFollowUp && (
+                      <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 space-y-4 animate-in fade-in slide-in-from-top-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-[10px] font-black text-gray-500 uppercase mb-1">{t.followUpDate}</label>
+                            <input
+                              type="date"
+                              required={requireFollowUp}
+                              min={getTomorrowString()}
+                              value={followUpDate}
+                              onChange={e => setFollowUpDate(e.target.value)}
+                              className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:ring-primary focus:border-primary outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-black text-gray-500 uppercase mb-1">{t.followUpTimeLabel}</label>
+                            <select
+                              required={requireFollowUp}
+                              value={followUpTime}
+                              onChange={e => setFollowUpTime(e.target.value)}
+                              disabled={!followUpDate || loadingFollowUpTimes}
+                              className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:ring-primary focus:border-primary outline-none bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            >
+                              {!followUpDate ? (
+                                <option value="">
+                                  {t.selectDateFirst}
+                                </option>
+                              ) : loadingFollowUpTimes ? (
+                                <option value="">
+                                  {t.loadingDutyHours}
+                                </option>
+                              ) : availableFollowUpTimes.length === 0 ? (
+                                <option value="">
+                                  {t.noShiftsDate}
+                                </option>
+                              ) : (
+                                <>
+                                  <option value="">{t.selectTime}</option>
+                                  {availableFollowUpTimes.map(t => (
+                                    <option key={t} value={t}>{t}</option>
+                                  ))}
+                                </>
+                              )}
+                            </select>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-500 uppercase mb-1">{t.followUpNotes}</label>
+                          <textarea
+                            rows={2}
+                            value={followUpNotes}
+                            onChange={e => setFollowUpNotes(e.target.value)}
+                            placeholder={t.followUpNotesPh}
+                            className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:ring-primary focus:border-primary outline-none resize-none"
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Submission deck */}
@@ -840,28 +1206,69 @@ const DoctorDashboard = () => {
                     >
                       {t.close}
                     </button>
+                    {hasOpenLabRequests && (
+                      <p className="text-xs text-amber-700 font-bold mr-auto max-w-md text-left">
+                        {t.labPendingBlock}
+                      </p>
+                    )}
                     <button
                       onClick={handleSubmitDiagnosis}
-                      className="px-6 py-3 rounded-2xl bg-primary text-white font-extrabold text-sm hover:bg-blue-800 transition-all shadow-lg shadow-blue-500/25 flex items-center gap-2"
+                      disabled={hasOpenLabRequests}
+                      className={`px-6 py-3 rounded-2xl font-extrabold text-sm transition-all shadow-lg flex items-center gap-2 ${
+                        hasOpenLabRequests
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
+                          : 'bg-primary text-white hover:bg-blue-800 shadow-blue-500/25'
+                      }`}
                     >
                       <CheckCircle2 size={16} />
                       {t.btnSubmitConsult}
                     </button>
                   </div>
                 </div>
+                ) : (
+                  // Waiting view
+                  <div className="space-y-6 flex flex-col items-center justify-center py-12 text-center">
+                    <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-primary mb-4">
+                      <Clock size={32} />
+                    </div>
+                    <h4 className="text-lg font-black text-gray-800 uppercase tracking-wider mb-2">
+                      {t.waitingExamTitle}
+                    </h4>
+                    <p className="text-sm text-gray-500 mb-6 max-w-md">
+                      {t.waitingExamDesc}
+                    </p>
+                    {isTimeReached(selectedAppt) ? (
+                      <button
+                        onClick={handleStartExamination}
+                        className="px-8 py-3 rounded-2xl bg-primary text-white font-extrabold text-sm hover:bg-blue-800 transition-all shadow-lg shadow-blue-500/25 flex items-center gap-2"
+                      >
+                        <Activity size={18} />
+                        {t.startExam}
+                      </button>
+                    ) : (
+                      <button
+                        disabled
+                        className="px-8 py-3 rounded-2xl bg-gray-100 text-gray-400 font-extrabold text-sm flex items-center gap-2 cursor-not-allowed border border-gray-200"
+                      >
+                        <Clock size={18} />
+                        {t.notTimeYet}
+                      </button>
+                    )}
+                  </div>
+                )
               ) : (
                 // Diagnosis summary view when looking at Completed/Cancelled list
                 <div className="space-y-6">
                   <div className="p-4 bg-emerald-50 text-emerald-700 rounded-2xl border border-emerald-100 font-bold text-sm flex items-center gap-2">
                     <CheckCircle2 size={18} />
                     {activeTab === 'completed' 
-                      ? (lang === 'vi' ? 'Ca khám này đã được hoàn tất thăm khám thành công!' : 'This consultation has been completed successfully!')
-                      : (lang === 'vi' ? 'Ca khám này đã bị hủy bỏ.' : 'This appointment was cancelled.')
+                      ? t.completedVisit
+                      : t.cancelledVisitShort
                     }
                   </div>
 
                   {loadingHistory ? (
-                    <div className="text-center py-6 text-gray-400 font-medium">{lang === 'vi' ? 'Đang truy xuất hồ sơ khám...' : 'Retrieving record...'}</div>
+                    <div className="text-center py-6 text-gray-400 font-medium">{t.loadingRecord}</div>
                   ) : (
                     patientHistory.filter(h => h.appointment._id === selectedAppt._id).map((hist, idx) => (
                       <div key={idx} className="space-y-6">
@@ -923,9 +1330,9 @@ const DoctorDashboard = () => {
                             <div className="space-y-3">
                               {hist.labRequests.map((req, rIdx) => (
                                 <div key={rIdx} className="p-4 bg-white rounded-xl border border-gray-100 space-y-2">
-                                  <div className="flex justify-between items-center">
+                                  <div className="flex justify-between items-center mb-2">
                                     <span className="text-[10px] font-black uppercase tracking-wider bg-blue-50 text-primary px-2 py-0.5 rounded">
-                                      {req.testType}
+                                      {req.tests?.length ? `${req.tests.length} Chỉ định` : 'Chỉ định cận lâm sàng'}
                                     </span>
                                     <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
                                       req.status === 'completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
@@ -933,26 +1340,46 @@ const DoctorDashboard = () => {
                                       {req.status === 'completed' ? 'Đã có kết quả' : 'Đang chờ xử lý'}
                                     </span>
                                   </div>
-                                  <h5 className="font-extrabold text-sm text-gray-800">{req.testName}</h5>
-                                  <p className="text-xs text-gray-400 font-medium">Ghi chú: {req.clinicalNotes}</p>
+                                  
+                                  {/* List of tests in this request */}
+                                  <div className="space-y-2">
+                                    {req.tests && req.tests.map((test, tIdx) => (
+                                      <div key={tIdx} className="pl-2 border-l-2 border-gray-200">
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-[9px] font-bold bg-gray-100 px-1.5 py-0.5 rounded uppercase text-gray-500">{test.testType}</span>
+                                          <h5 className="font-extrabold text-sm text-gray-800">{test.testName}</h5>
+                                        </div>
+                                        {test.clinicalNotes && (
+                                          <p className="text-xs text-gray-400 font-medium mt-1">Ghi chú: {test.clinicalNotes}</p>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
 
                                   {req.result && (
                                     <div className="mt-3 pt-3 border-t border-gray-100 bg-gray-50 p-3 rounded-lg space-y-2">
                                       <p className="text-xs font-black text-gray-500 uppercase tracking-wider flex items-center gap-1">
                                         <Info size={12} className="text-primary" />
-                                        Kết luận kết quả xét nghiệm
+                                        Kết luận / Kết quả xét nghiệm
                                       </p>
-                                      <p className="text-sm text-gray-800 font-bold">{req.result.conclusion || 'Bình thường'}</p>
-                                      {req.result.fileUrl && (
-                                        <a
-                                          href={`${API_URL}${req.result.fileUrl}`}
-                                          target="_blank"
-                                          rel="noreferrer"
-                                          className="text-xs text-primary font-bold hover:underline inline-flex items-center gap-1 mt-1"
-                                        >
-                                          <Printer size={12} />
-                                          Tải File Kết Quả / Phiếu Xét Nghiệm
-                                        </a>
+                                      <p className="text-sm text-gray-800 font-bold whitespace-pre-wrap">{req.result.notes || 'Bình thường'}</p>
+                                      
+                                      {/* Files */}
+                                      {req.result.files && req.result.files.length > 0 && (
+                                        <div className="mt-2 flex flex-wrap gap-2">
+                                          {req.result.files.map((file, fIdx) => (
+                                            <a
+                                              key={fIdx}
+                                              href={`${API_URL}${file.fileUrl}`}
+                                              target="_blank"
+                                              rel="noreferrer"
+                                              className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs text-primary font-bold hover:border-primary/50 flex items-center gap-1.5 transition-all shadow-sm"
+                                            >
+                                              <Printer size={12} />
+                                              {file.fileName || `Tải File Kết Quả ${fIdx + 1}`}
+                                            </a>
+                                          ))}
+                                        </div>
                                       )}
                                     </div>
                                   )}
@@ -980,6 +1407,40 @@ const DoctorDashboard = () => {
         </div>
       </div>
 
+      {/* Cancel lab request confirmation */}
+      {cancelLabConfirm.show && (
+        <div className="fixed inset-0 w-screen h-screen bg-gray-900/50 backdrop-blur-sm z-[10000] flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-gray-100 space-y-4 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center gap-3 text-rose-600">
+              <AlertCircle size={28} className="shrink-0" />
+              <h3 className="font-black text-lg text-gray-800">{t.cancelLabTitle}</h3>
+            </div>
+            <p className="text-sm font-semibold text-gray-500 leading-relaxed">{t.cancelLabMessage}</p>
+            {cancelLabConfirm.label && (
+              <p className="text-xs font-bold text-gray-700 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2">
+                {cancelLabConfirm.label}
+              </p>
+            )}
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={closeCancelLabConfirm}
+                className="px-4 py-2.5 border border-gray-200 hover:bg-gray-50 rounded-xl text-sm font-bold text-gray-700 transition-all"
+              >
+                {t.btnKeepLab}
+              </button>
+              <button
+                type="button"
+                onClick={confirmCancelLabRequest}
+                className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-rose-600/20 transition-all"
+              >
+                {t.btnConfirmCancelLab}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Full Patient Past Medical History Modal */}
       {showHistoryModal && selectedAppt && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
@@ -1002,19 +1463,63 @@ const DoctorDashboard = () => {
             {/* Modal Body */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               {loadingHistory ? (
-                <div className="text-center py-12 text-gray-400 font-medium">{lang === 'vi' ? 'Đang truy xuất lịch sử y khoa...' : 'Loading history...'}</div>
-              ) : patientHistory.length === 0 ? (
-                <div className="text-center py-12">
-                  <AlertCircle className="mx-auto text-gray-300 mb-2" size={36} />
-                  <p className="text-sm font-bold text-gray-400">{t.noHistory}</p>
-                </div>
+                <div className="text-center py-12 text-gray-400 font-medium">{t.loadingHistory}</div>
               ) : (
-                patientHistory.map((hist, idx) => (
-                  <div key={idx} className="border border-gray-200 rounded-2xl p-5 space-y-4 hover:border-gray-300 transition-colors bg-white">
+                <>
+                  {patientProfile && patientProfile.healthProfile && (
+                    <div className="bg-blue-50/50 rounded-2xl border border-blue-100 p-5 space-y-4">
+                      <h4 className="text-sm font-black text-blue-900 uppercase tracking-wider flex items-center gap-2">
+                        <UserCheck size={16} className="text-blue-500" />
+                        {t.healthBasic}
+                      </h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                        <div className="bg-white p-3 rounded-xl border border-blue-50 shadow-sm">
+                          <span className="text-gray-400 uppercase tracking-wider font-bold block mb-1">{t.bloodType}</span>
+                          <span className="text-gray-900 font-black text-sm">{patientProfile.healthProfile.bloodType || '--'}</span>
+                        </div>
+                        <div className="bg-white p-3 rounded-xl border border-blue-50 shadow-sm">
+                          <span className="text-gray-400 uppercase tracking-wider font-bold block mb-1">{t.bloodPressure}</span>
+                          <span className="text-gray-900 font-black text-sm">{patientProfile.healthProfile.bloodPressure || '--'}</span>
+                        </div>
+                        <div className="bg-white p-3 rounded-xl border border-blue-50 shadow-sm">
+                          <span className="text-gray-400 uppercase tracking-wider font-bold block mb-1">{t.height}</span>
+                          <span className="text-gray-900 font-black text-sm">{patientProfile.healthProfile.height ? patientProfile.healthProfile.height + ' cm' : '--'}</span>
+                        </div>
+                        <div className="bg-white p-3 rounded-xl border border-blue-50 shadow-sm">
+                          <span className="text-gray-400 uppercase tracking-wider font-bold block mb-1">{t.weight}</span>
+                          <span className="text-gray-900 font-black text-sm">{patientProfile.healthProfile.weight ? patientProfile.healthProfile.weight + ' kg' : '--'}</span>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div className="bg-white p-3 rounded-xl border border-blue-50 shadow-sm">
+                          <span className="text-gray-400 uppercase tracking-wider font-bold block mb-1">{t.allergies}</span>
+                          <span className="text-gray-800 font-bold">{patientProfile.healthProfile.allergies || t.none}</span>
+                        </div>
+                        <div className="bg-white p-3 rounded-xl border border-blue-50 shadow-sm">
+                          <span className="text-gray-400 uppercase tracking-wider font-bold block mb-1">{t.medHistory}</span>
+                          <span className="text-gray-800 font-bold">{patientProfile.healthProfile.medicalHistory || t.none}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <h4 className="text-sm font-black text-gray-800 uppercase tracking-wider flex items-center gap-2 pt-2">
+                    <Clipboard size={16} className="text-primary" />
+                    {t.consultHistory}
+                  </h4>
+
+                  {patientHistory.length === 0 ? (
+                    <div className="text-center py-8 border border-dashed border-gray-200 rounded-2xl">
+                      <AlertCircle className="mx-auto text-gray-300 mb-2" size={32} />
+                      <p className="text-sm font-bold text-gray-400">{t.noHistory}</p>
+                    </div>
+                  ) : (
+                    patientHistory.map((hist, idx) => (
+                      <div key={idx} className="border border-gray-200 rounded-2xl p-5 space-y-4 hover:border-gray-300 transition-colors bg-white">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-100 pb-3 gap-2">
                       <div>
                         <span className="text-[10px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded">
-                          {t.date}: {new Date(hist.appointment.date).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')}
+                          {t.date}: {new Date(hist.appointment.date).toLocaleDateString(locale)}
                         </span>
                         <p className="text-xs text-gray-500 font-bold mt-1">
                           {t.doctor}: <strong className="text-gray-800">{hist.appointment.doctor?.userId?.fullName}</strong>
@@ -1067,8 +1572,23 @@ const DoctorDashboard = () => {
                         </div>
                       </div>
                     )}
+
+                    {hist.followUpAppointment && (
+                      <div className="pt-3 border-t border-gray-100 space-y-2">
+                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t.followUpAppt}:</span>
+                        <div className="p-3 bg-indigo-50/50 rounded-xl border border-indigo-100 text-xs font-bold space-y-1">
+                          <p className="text-indigo-900 font-extrabold flex items-center gap-1">
+                            <Calendar size={12} className="text-indigo-500" />
+                            {new Date(hist.followUpAppointment.date).toLocaleDateString(locale)} - {hist.followUpAppointment.time}
+                          </p>
+                          <p className="text-indigo-700 font-medium">{hist.followUpAppointment.symptoms}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))
+              )}
+              </>
               )}
             </div>
 

@@ -30,13 +30,28 @@ const appointmentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'completed', 'cancelled'],
-    default: 'confirmed'
+    enum: ['pending_payment', 'pending', 'confirmed', 'examining', 'completed', 'cancelled'],
+    default: 'pending_payment'
   },
   paymentStatus: {
     type: String,
     enum: ['unpaid', 'paid'],
     default: 'unpaid'
+  },
+  parentAppointment: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Appointment'
+  },
+  draft: {
+    diagnosis: { type: String, default: '' },
+    doctorNotes: { type: String, default: '' },
+    medicines: { type: Array, default: [] },
+    labTests: { type: Array, default: [] },
+    requireFollowUp: { type: Boolean, default: false },
+    followUpDate: { type: String, default: '' },
+    followUpTime: { type: String, default: '' },
+    followUpNotes: { type: String, default: '' },
+    savedAt: { type: Date }
   }
 }, {
   timestamps: true

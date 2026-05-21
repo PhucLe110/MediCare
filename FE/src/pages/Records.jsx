@@ -1,18 +1,13 @@
-import { API_URL } from '../config';
+import { API_URL, authFetch, getStoredUser } from '../config';
 import React, { useState, useEffect } from 'react';
 import { FolderHeart, Calendar, FileText, Download, HeartPulse, Activity, UserCircle, Edit3, Save, Info, CheckCircle2, Droplet, Ruler, Scale, Loader2, ChevronRight } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
+import { formatDoctorName, formatDate } from '../utils/i18nHelpers';
 
 // const API_URL = API_URL;
 
-const getAuthHeaders = () => {
-  const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-  return {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${userInfo.token}`
-  };
-};
+const jsonAuthHeaders = () => ({ 'Content-Type': 'application/json' });
 
 const trans = {
   vi: {
@@ -84,6 +79,9 @@ const trans = {
     pdfTableSymptoms: 'Triệu chứng lâm sàng',
     pdfTableStatus: 'Trạng thái',
     pdfFooterMsg: 'Báo cáo sức khỏe toàn diện tự động từ hệ thống quản lý MediCare Hospital • Ngày lập:',
+    notUpdated: 'Chưa cập nhật',
+    errorOccurred: 'Đã có lỗi xảy ra',
+    routineCheckup: 'Khám định kỳ',
   },
   en: {
     title: 'Health Profile',
@@ -154,6 +152,9 @@ const trans = {
     pdfTableSymptoms: 'Clinical Symptoms',
     pdfTableStatus: 'Status',
     pdfFooterMsg: 'Automated health report generated from MediCare Hospital Administration • Issued on:',
+    notUpdated: 'Not updated',
+    errorOccurred: 'Error occurred',
+    routineCheckup: 'Routine check-up',
   }
 };
 
@@ -180,12 +181,7 @@ const Records = () => {
     isFilled: false
   });
 
-  const getDoctorDisplayName = (name) => {
-    if (!name) return t.doctorTitle;
-    const trimmed = name.trim();
-    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
-    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
-  };
+  const getDoctorDisplayName = (name) => formatDoctorName(lang, name) || t.doctorTitle;
 
   const showToast = (message, type = 'success') => {
     setToast({ show: true, type, message });
@@ -197,10 +193,10 @@ const Records = () => {
     const fetchData = async () => {
       try {
         const [profileRes, apptRes, rxRes, labRes] = await Promise.all([
-          fetch(`${API_URL}/api/users/health-profile`, { headers: getAuthHeaders() }),
-          fetch(`${API_URL}/api/appointments`, { headers: getAuthHeaders() }),
-          fetch(`${API_URL}/api/prescriptions/my`, { headers: getAuthHeaders() }),
-          fetch(`${API_URL}/api/lab-results/my`, { headers: getAuthHeaders() }),
+          authFetch(`${API_URL}/api/users/health-profile`),
+          authFetch(`${API_URL}/api/appointments`),
+          authFetch(`${API_URL}/api/prescriptions/my`),
+          authFetch(`${API_URL}/api/lab-results/my`),
         ]);
         const profileData = await profileRes.json();
         const apptData = await apptRes.json();
@@ -237,9 +233,9 @@ const Records = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await fetch(`${API_URL}/api/users/health-profile`, {
+      const res = await authFetch(`${API_URL}/api/users/health-profile`, {
         method: 'PUT',
-        headers: getAuthHeaders(),
+        headers: jsonAuthHeaders(),
         body: JSON.stringify(personalInfo)
       });
       const data = await res.json();
@@ -259,7 +255,7 @@ const Records = () => {
 
   const handleExportPDF = () => {
     const printWindow = window.open('', '_blank');
-    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+    const userInfo = getStoredUser() || {};
     
     printWindow.document.write(`
       <html>
@@ -363,11 +359,11 @@ const Records = () => {
             <div class="grid">
               <div class="info-item">
                 <div class="info-label">${t.pdfPatientName}</div>
-                <div class="info-value">${userInfo.fullName || (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</div>
+                <div class="info-value">${userInfo.fullName || (t.notUpdated)}</div>
               </div>
               <div class="info-item">
                 <div class="info-label">${t.pdfPhone}</div>
-                <div class="info-value">${userInfo.phone || (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</div>
+                <div class="info-value">${userInfo.phone || (t.notUpdated)}</div>
               </div>
             </div>
           </div>
@@ -377,19 +373,19 @@ const Records = () => {
             <div class="grid">
               <div class="info-item">
                 <div class="info-label">${t.pdfBloodType}</div>
-                <div class="info-value">${personalInfo.bloodType || (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</div>
+                <div class="info-value">${personalInfo.bloodType || (t.notUpdated)}</div>
               </div>
               <div class="info-item">
                 <div class="info-label">${t.pdfBloodPressure}</div>
-                <div class="info-value">${personalInfo.bloodPressure || (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</div>
+                <div class="info-value">${personalInfo.bloodPressure || (t.notUpdated)}</div>
               </div>
               <div class="info-item">
                 <div class="info-label">${t.pdfHeight}</div>
-                <div class="info-value">${personalInfo.height ? personalInfo.height + ' cm' : (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</div>
+                <div class="info-value">${personalInfo.height ? personalInfo.height + ' cm' : (t.notUpdated)}</div>
               </div>
               <div class="info-item">
                 <div class="info-label">${t.pdfWeight}</div>
-                <div class="info-value">${personalInfo.weight ? personalInfo.weight + ' kg' : (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</div>
+                <div class="info-value">${personalInfo.weight ? personalInfo.weight + ' kg' : (t.notUpdated)}</div>
               </div>
             </div>
           </div>
@@ -426,9 +422,7 @@ const Records = () => {
                 </thead>
                 <tbody>
                   ${[...appointments].reverse().map(appt => {
-                    const dateStr = lang === 'vi' 
-                      ? new Date(appt.date).toLocaleDateString('vi-VN')
-                      : new Date(appt.date).toLocaleDateString('en-US');
+                    const dateStr = formatDate(lang, appt.date);
                     const statusText = appt.status === 'completed' ? t.completed : appt.status === 'confirmed' ? t.confirmed : t.cancelled;
                     const statusColor = appt.status === 'completed' ? '#16a34a' : appt.status === 'confirmed' ? '#2563eb' : '#94a3b8';
                     const docName = getDoctorDisplayName(appt.doctor?.userId?.fullName);
@@ -443,7 +437,7 @@ const Records = () => {
                           <span style="font-size: 10px; color: #64748b; font-weight: 500;">${appt.doctor?.department || ''}</span>
                         </td>
                         <td style="padding: 12px 10px; font-weight: 600; color: #334155;">${docName}</td>
-                        <td style="padding: 12px 10px; color: #64748b; font-style: italic;">${appt.symptoms || (lang === 'vi' ? 'Khám định kỳ' : 'Routine check-up')}</td>
+                        <td style="padding: 12px 10px; color: #64748b; font-style: italic;">${appt.symptoms || (t.routineCheckup)}</td>
                         <td style="padding: 12px 10px; text-align: right; font-weight: 700; color: ${statusColor};">${statusText}</td>
                       </tr>
                     `;
@@ -454,7 +448,7 @@ const Records = () => {
           </div>
 
           <div class="footer">
-            ${t.pdfFooterMsg} ${lang === 'vi' ? new Date().toLocaleDateString('vi-VN') : new Date().toLocaleDateString('en-US')}
+            ${t.pdfFooterMsg} ${formatDate(lang, new Date())}
           </div>
           
           <script>
@@ -489,7 +483,7 @@ const Records = () => {
             <CheckCircle2 size={18} />
           </div>
           <div>
-            <h4 className="font-bold text-gray-800 text-sm">{toast.type === 'error' ? (lang === 'vi' ? 'Đã có lỗi xảy ra' : 'Error occurred') : t.toastSaveSuccess}</h4>
+            <h4 className="font-bold text-gray-800 text-sm">{toast.type === 'error' ? (t.errorOccurred) : t.toastSaveSuccess}</h4>
             <p className="text-xs text-gray-500">{toast.message}</p>
           </div>
         </div>
@@ -604,7 +598,7 @@ const Records = () => {
                     </select>
                   ) : (
                     <div className="p-4 bg-gray-50/80 rounded-xl border border-gray-100 flex items-center">
-                      <span className="text-lg font-bold text-gray-800">{personalInfo.bloodType || (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</span>
+                      <span className="text-lg font-bold text-gray-800">{personalInfo.bloodType || (t.notUpdated)}</span>
                     </div>
                   )}
                 </div>
@@ -638,7 +632,7 @@ const Records = () => {
                     <input type="text" className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all" value={personalInfo.bloodPressure} onChange={(e) => setPersonalInfo({...personalInfo, bloodPressure: e.target.value})} placeholder="VD: 110/70" />
                   ) : (
                     <div className="p-4 bg-gray-50/80 rounded-xl border border-gray-100 flex items-center">
-                      <span className="text-lg font-bold text-gray-800">{personalInfo.bloodPressure || (lang === 'vi' ? 'Chưa cập nhật' : 'Not updated')}</span>
+                      <span className="text-lg font-bold text-gray-800">{personalInfo.bloodPressure || (t.notUpdated)}</span>
                     </div>
                   )}
                 </div>
@@ -718,7 +712,7 @@ const Records = () => {
                               <span className={`px-3 py-1 text-xs font-bold text-white rounded-full ${statusColor}`}>{statusLabel}</span>
                               <span className="px-4 py-2 bg-white border border-gray-200 text-gray-600 text-sm font-bold rounded-xl flex items-center gap-2 shadow-sm">
                                 <Calendar size={14} className="text-primary" />
-                                {lang === 'vi' ? new Date(appt.date).toLocaleDateString('vi-VN') : new Date(appt.date).toLocaleDateString('en-US')} • {appt.time}
+                                {formatDate(lang, appt.date)} • {appt.time}
                               </span>
                             </div>
                           </div>

@@ -1,14 +1,8 @@
-import { API_URL } from '../config';
+import { API_URL, authFetch } from '../config';
 import React, { useState, useEffect } from 'react';
-import { FlaskConical, FileText, Download, Eye, Clock, CheckCircle, Search } from 'lucide-react';
+import { FlaskConical, FileText, Download, Eye, Clock, CheckCircle, Search, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
-
-// const API_URL = API_URL;
-
-const getAuthHeaders = () => {
-  const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-  return { 'Authorization': `Bearer ${userInfo.token}` };
-};
+import { formatDate, formatDateTime } from '../utils/i18nHelpers';
 
 const trans = {
   vi: {
@@ -27,7 +21,8 @@ const trans = {
     staffNote: 'Ghi chú từ nhân viên xét nghiệm:',
     viewResult: 'Xem kết quả',
     download: 'Tải xuống',
-    
+    tests: 'Các chỉ định xét nghiệm',
+    files: 'File kết quả',
     typeBlood: 'Xét nghiệm máu',
     typeUrine: 'Xét nghiệm nước tiểu',
     typeXray: 'Chụp X-Quang',
@@ -36,6 +31,8 @@ const trans = {
     typeUltrasound: 'Siêu âm',
     typeEcg: 'Điện tâm đồ (ECG)',
     typeOther: 'Xét nghiệm khác',
+    hideDetails: 'Ẩn chi tiết',
+    viewTests: (n) => `Xem ${n} chỉ định xét nghiệm`,
   },
   en: {
     title: 'Laboratory Results',
@@ -51,9 +48,10 @@ const trans = {
     labStaff: 'Lab Technician',
     linkedAppt: 'Linked with consultation on',
     staffNote: 'Notes from lab technician:',
-    viewResult: 'View PDF',
+    viewResult: 'View Result',
     download: 'Download',
-
+    tests: 'Requested Tests',
+    files: 'Result Files',
     typeBlood: 'Blood Test',
     typeUrine: 'Urinalysis',
     typeXray: 'X-Ray Imaging',
@@ -62,7 +60,146 @@ const trans = {
     typeUltrasound: 'Ultrasound',
     typeEcg: 'Electrocardiogram (ECG)',
     typeOther: 'Other Test',
+    hideDetails: 'Hide details',
+    viewTests: (n) => `View ${n} tests`,
   }
+};
+
+const TYPE_COLOR = {
+  blood:     'text-red-600 bg-red-50 border-red-100',
+  urine:     'text-yellow-600 bg-yellow-50 border-yellow-100',
+  xray:      'text-blue-600 bg-blue-50 border-blue-100',
+  mri:       'text-purple-600 bg-purple-50 border-purple-100',
+  ct:        'text-indigo-600 bg-indigo-50 border-indigo-100',
+  ultrasound:'text-teal-600 bg-teal-50 border-teal-100',
+  ecg:       'text-green-600 bg-green-50 border-green-100',
+  other:     'text-gray-600 bg-gray-50 border-gray-100',
+};
+
+const ResultCard = ({ result, idx, t, lang }) => {
+  const [expanded, setExpanded] = useState(false);
+  const isNew = idx === 0;
+  const createdDateStr = formatDateTime(lang, result.createdAt);
+  const apptDateStr = result.appointment ? formatDate(lang, result.appointment?.date) : '';
+
+  // Collect all unique test types for badge display
+  const uniqueTypes = [...new Set((result.tests || []).map(t => t.testType))];
+
+  const handleDownload = async (fileUrl, fileName) => {
+    const res = await authFetch(`${API_URL}${fileUrl}`);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className={`bg-white rounded-3xl border shadow-sm transition-all hover:shadow-md group overflow-hidden ${isNew ? 'border-teal-200 ring-1 ring-teal-100' : 'border-gray-100'}`}>
+      {isNew && (
+        <div className="bg-gradient-to-r from-teal-500 to-blue-500 text-white text-xs font-bold px-4 py-1.5 flex items-center gap-2">
+          <CheckCircle size={12} /> {t.latestResult}
+        </div>
+      )}
+      <div className="p-6">
+        {/* Header Row */}
+        <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+          <div className="flex-1">
+            {/* Type badges */}
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
+              {uniqueTypes.map((type, i) => (
+                <span key={i} className={`px-3 py-1 text-xs font-bold rounded-xl border ${TYPE_COLOR[type] || TYPE_COLOR.other}`}>
+                  {t[`type${type.charAt(0).toUpperCase() + type.slice(1)}`] || type}
+                </span>
+              ))}
+              <span className="flex items-center gap-1 text-xs text-gray-400 font-medium">
+                <Clock size={12} /> {createdDateStr}
+              </span>
+            </div>
+
+            {/* Test count summary */}
+            <h3 className="text-lg font-bold text-gray-800 group-hover:text-teal-700 transition-colors mb-1">
+              {result.tests?.length === 1
+                ? result.tests[0].testName
+                : `${result.tests?.length || 0} ${t.tests}`}
+            </h3>
+
+            {/* Performer & appointment */}
+            <p className="text-sm text-gray-500 mb-3">
+              {t.performedBy}: <span className="font-semibold text-gray-700">{result.uploadedBy?.fullName || t.labStaff}</span>
+              {result.appointment && (
+                <span className="ml-3 text-gray-400">• {t.linkedAppt} {apptDateStr}</span>
+              )}
+            </p>
+
+            {/* Notes */}
+            {result.notes && (
+              <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100 text-sm text-gray-700 mb-3">
+                <strong className="text-gray-800 block mb-1">{t.staffNote}</strong>
+                <p className="leading-relaxed italic">{result.notes}</p>
+              </div>
+            )}
+
+            {/* Toggle details button */}
+            {result.tests?.length > 1 && (
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="flex items-center gap-1.5 text-xs font-bold text-teal-600 hover:text-teal-800 transition-colors"
+              >
+                {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                {expanded ? t.hideDetails : t.viewTests(result.tests.length)}
+              </button>
+            )}
+
+            {/* Expanded test list */}
+            {(expanded || result.tests?.length === 1) && result.tests?.length > 0 && (
+              <ul className="mt-3 space-y-2">
+                {result.tests.map((test, i) => (
+                  <li key={i} className="flex items-start gap-2 p-2 bg-gray-50 rounded-xl border border-gray-100 text-sm">
+                    <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md border shrink-0 mt-0.5 ${TYPE_COLOR[test.testType] || TYPE_COLOR.other}`}>
+                      {test.testType?.toUpperCase()}
+                    </span>
+                    <span className="font-semibold text-gray-800">{test.testName}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Files panel */}
+          <div className="flex flex-col gap-2 shrink-0 w-full md:w-auto md:min-w-[180px]">
+            {(result.files || []).map((file, fi) => (
+              <div key={fi} className="flex flex-col gap-1.5 p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                <div className="flex items-center gap-2">
+                  <FileText size={16} className="text-red-500 shrink-0" />
+                  <p className="text-xs font-bold text-gray-700 truncate max-w-[120px]" title={file.fileName}>
+                    {file.fileName}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => window.open(`${API_URL}${file.fileUrl}`, '_blank')}
+                    className="flex-1 px-3 py-2 bg-teal-600 text-white text-xs font-bold rounded-xl hover:bg-teal-700 transition-all shadow-sm flex items-center justify-center gap-1.5"
+                  >
+                    <Eye size={13} /> {t.viewResult} {result.files.length > 1 ? fi + 1 : ''}
+                  </button>
+                  <button
+                    onClick={() => handleDownload(file.fileUrl, file.fileName)}
+                    className="px-3 py-2 bg-white border border-gray-200 text-gray-600 text-xs font-bold rounded-xl hover:border-teal-400 hover:text-teal-600 transition-all flex items-center justify-center"
+                    title={t.download}
+                  >
+                    <Download size={13} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const LabResults = () => {
@@ -71,23 +208,10 @@ const LabResults = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
-  const TEST_TYPE_MAP = {
-    blood: { label: t.typeBlood, color: 'text-red-600 bg-red-50 border-red-100' },
-    urine: { label: t.typeUrine, color: 'text-yellow-600 bg-yellow-50 border-yellow-100' },
-    xray: { label: t.typeXray, color: 'text-blue-600 bg-blue-50 border-blue-100' },
-    mri: { label: t.typeMri, color: 'text-purple-600 bg-purple-50 border-purple-100' },
-    ct: { label: t.typeCt, color: 'text-indigo-600 bg-indigo-50 border-indigo-100' },
-    ultrasound: { label: t.typeUltrasound, color: 'text-teal-600 bg-teal-50 border-teal-100' },
-    ecg: { label: t.typeEcg, color: 'text-green-600 bg-green-50 border-green-100' },
-    other: { label: t.typeOther, color: 'text-gray-600 bg-gray-50 border-gray-100' }
-  };
-
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/lab-results/my`, {
-          headers: getAuthHeaders()
-        });
+        const res = await authFetch(`${API_URL}/api/lab-results/my`);
         const data = await res.json();
         if (data.success) setResults(data.data);
       } catch (err) {
@@ -99,24 +223,13 @@ const LabResults = () => {
     fetchResults();
   }, []);
 
+  // Search across all test names in the tests array
   const filtered = results.filter(r =>
-    r.testName.toLowerCase().includes(search.toLowerCase())
+    !search.trim() ||
+    (r.tests || []).some(test =>
+      (test.testName || '').toLowerCase().includes(search.toLowerCase())
+    )
   );
-
-  const handleViewPDF = (fileUrl) => {
-    window.open(`${API_URL}${fileUrl}`, '_blank');
-  };
-
-  const handleDownload = async (fileUrl, fileName) => {
-    const res = await fetch(`${API_URL}${fileUrl}`, { headers: getAuthHeaders() });
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -136,7 +249,7 @@ const LabResults = () => {
           <input
             type="text"
             placeholder={t.searchPlaceholder}
-            className="pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 w-full sm:w-64"
+            className="pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 w-full sm:w-64"
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -161,92 +274,9 @@ const LabResults = () => {
         </div>
       ) : (
         <div className="space-y-5">
-          {filtered.map((result, idx) => {
-            const typeInfo = TEST_TYPE_MAP[result.testType] || TEST_TYPE_MAP.other;
-            const isNew = idx === 0;
-            const createdDateStr = lang === 'vi'
-              ? new Date(result.createdAt).toLocaleString('vi-VN')
-              : new Date(result.createdAt).toLocaleString('en-US');
-            const apptDateStr = result.appointment
-              ? (lang === 'vi'
-                  ? new Date(result.appointment?.date).toLocaleDateString('vi-VN')
-                  : new Date(result.appointment?.date).toLocaleDateString('en-US'))
-              : '';
-
-            return (
-              <div
-                key={result._id}
-                className={`bg-white rounded-3xl border shadow-sm transition-all hover:shadow-md group overflow-hidden ${isNew ? 'border-teal-200 ring-1 ring-teal-100' : 'border-gray-100'}`}
-              >
-                {isNew && (
-                  <div className="bg-gradient-to-r from-teal-500 to-blue-500 text-white text-xs font-bold px-4 py-1.5 flex items-center gap-2">
-                    <CheckCircle size={12} /> {t.latestResult}
-                  </div>
-                )}
-                <div className="p-6">
-                  <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3 flex-wrap">
-                        <span className={`px-3 py-1.5 text-xs font-bold rounded-xl border ${typeInfo.color}`}>
-                          {typeInfo.label}
-                        </span>
-                        <span className="flex items-center gap-1 text-xs text-gray-400 font-medium">
-                          <Clock size={12} />
-                          {createdDateStr}
-                        </span>
-                      </div>
-                      <h3 className="text-xl font-bold text-gray-800 group-hover:text-teal-700 transition-colors mb-2">
-                        {result.testName}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {t.performedBy}: <span className="font-semibold text-gray-700">
-                          {result.uploadedBy?.fullName === 'Nguyễn Thị Lan Anh' && lang === 'en' 
-                            ? 'Nguyen Thi Lan Anh' 
-                            : (result.uploadedBy?.fullName || t.labStaff)}
-                        </span>
-                        {result.appointment && (
-                          <span className="ml-3 text-gray-400">
-                            • {t.linkedAppt} {apptDateStr}
-                          </span>
-                        )}
-                      </p>
-                      {result.notes && (
-                        <div className="mt-4 p-4 bg-blue-50/50 rounded-2xl border border-blue-100 text-sm text-gray-700">
-                          <strong className="text-gray-800 block mb-1">{t.staffNote}</strong>
-                          <p className="leading-relaxed italic">{result.notes}</p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* File Actions */}
-                    <div className="flex flex-col gap-3 shrink-0 w-full md:w-auto md:min-w-[160px]">
-                      <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 rounded-2xl border border-gray-100">
-                        <FileText size={18} className="text-red-500 shrink-0" />
-                        <div className="overflow-hidden">
-                          <p className="text-xs font-bold text-gray-700 truncate max-w-[120px]">{result.fileName}</p>
-                          <p className="text-[10px] text-gray-400 uppercase font-bold">
-                            {result.fileName?.split('.').pop()}
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleViewPDF(result.fileUrl)}
-                        className="px-4 py-2.5 bg-teal-600 text-white text-sm font-bold rounded-xl hover:bg-teal-700 transition-all shadow-md shadow-teal-500/20 flex items-center justify-center gap-2 w-full"
-                      >
-                        <Eye size={16} /> {t.viewResult}
-                      </button>
-                      <button
-                        onClick={() => handleDownload(result.fileUrl, result.fileName)}
-                        className="px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-bold rounded-xl hover:border-teal-400 hover:text-teal-600 transition-all flex items-center justify-center gap-2 w-full"
-                      >
-                        <Download size={16} /> {t.download}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {filtered.map((result, idx) => (
+            <ResultCard key={result._id} result={result} idx={idx} t={t} lang={lang} />
+          ))}
         </div>
       )}
     </div>

@@ -1,13 +1,14 @@
-import { API_URL } from '../config';
+import { API_URL, authFetch, getStoredUser } from '../config';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Stethoscope, TestTube2, Pill, FileCheck2, Calendar, Clock, CreditCard, Activity, Printer } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
+import { ticketTrans, mergeTrans } from '../i18n/ticketI18n';
+import { formatDoctorName, getLocalizedDept, formatDate, getLocale } from '../utils/i18nHelpers';
 
 // const API_URL = API_URL;
-const authH = () => ({ Authorization: `Bearer ${JSON.parse(localStorage.getItem('userInfo') || '{}').token}` });
 
-const trans = {
+const trans = mergeTrans({
   vi: {
     backBtn: 'Quay lại Hồ sơ',
     backSimple: 'Quay lại',
@@ -35,6 +36,8 @@ const trans = {
     usageLabel: 'Cách dùng:',
     qtyLabel: 'Số lượng',
     deptLabel: 'Khoa:',
+    labResultsAvailable: 'Đã có kết quả xét nghiệm cận lâm sàng',
+    viewDetailedResults: 'Xem kết quả chi tiết',
   },
   en: {
     backBtn: 'Back to Profile',
@@ -63,8 +66,10 @@ const trans = {
     usageLabel: 'Directions:',
     qtyLabel: 'Qty',
     deptLabel: 'Dept:',
+    labResultsAvailable: 'Laboratory results are available',
+    viewDetailedResults: 'View Detailed Results',
   }
-};
+}, ticketTrans);
 
 export default function AppointmentDetail() {
   const { lang, t } = useTranslation(trans);
@@ -80,9 +85,9 @@ export default function AppointmentDetail() {
     const fetchDetails = async () => {
       try {
         const [apptRes, rxRes, labRes] = await Promise.all([
-          fetch(`${API_URL}/api/appointments`, { headers: authH() }),
-          fetch(`${API_URL}/api/prescriptions/my`, { headers: authH() }),
-          fetch(`${API_URL}/api/lab-results/my`, { headers: authH() })
+          authFetch(`${API_URL}/api/appointments`),
+          authFetch(`${API_URL}/api/prescriptions/my`),
+          authFetch(`${API_URL}/api/lab-results/my`)
         ]);
         
         const apptData = await apptRes.json();
@@ -110,36 +115,8 @@ export default function AppointmentDetail() {
     fetchDetails();
   }, [id]);
 
-  const getDoctorDisplayName = (name) => {
-    if (!name) return '';
-    const trimmed = name.trim();
-    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
-    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
-  };
-
-  const getLocalizedDept = (dept) => {
-    if (!dept) return '';
-    if (lang === 'vi') return dept;
-    const deptsMap = {
-      'Khoa Nội': 'Internal Medicine',
-      'Khoa Ngoại': 'Surgery',
-      'Khoa Nhi': 'Pediatrics',
-      'Khoa Sản': 'Obstetrics & Gynecology',
-      'Khoa Da liễu': 'Dermatology',
-      'Khoa Tai Mũi Họng': 'Otorhinolaryngology (ENT)',
-      'Khoa Mắt': 'Ophthalmology',
-      'Khoa Răng Hàm Mặt': 'Odonto-Stomatology',
-      'Khoa Tim mạch': 'Cardiology',
-      'Khoa Thần kinh': 'Neurology',
-      'Khoa Cơ xương khớp': 'Orthopedics & Rheumatology',
-      'Khoa Cấp cứu': 'Emergency Department',
-      'Khoa Xét nghiệm': 'Laboratory Medicine',
-      'Khoa Chẩn đoán hình ảnh': 'Diagnostic Imaging',
-      'Ngoại tổng quát': 'General Surgery',
-      'Nội tổng quát': 'General Internal Medicine',
-    };
-    return deptsMap[dept] || dept;
-  };
+  const locale = getLocale(lang);
+  const getDoctorDisplayName = (name) => formatDoctorName(lang, name);
 
   if (loading) {
     return (
@@ -161,7 +138,7 @@ export default function AppointmentDetail() {
   const getNotOccurredSub = () => {
     return t.notOccurredSub
       .replace('{time}', appt.time)
-      .replace('{date}', new Date(appt.date).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US'))
+      .replace('{date}', formatDate(lang, appt.date))
       .replace('{queue}', appt.queueNumber || '--');
   };
 
@@ -205,7 +182,7 @@ export default function AppointmentDetail() {
           <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
             <Calendar size={20} className="text-gray-400 mb-2" />
             <p className="text-xs font-bold text-gray-500 uppercase">{t.dateLabel}</p>
-            <p className="font-black text-gray-900">{new Date(appt.date).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')}</p>
+            <p className="font-black text-gray-900">{formatDate(lang, appt.date)}</p>
           </div>
           <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
             <Clock size={20} className="text-gray-400 mb-2" />
@@ -252,23 +229,20 @@ export default function AppointmentDetail() {
                 </div>
                 {t.labDiag}
               </h2>
-              <div className="bg-purple-50/50 border border-purple-100 p-6 rounded-2xl space-y-3">
-                {labs.map(l => (
-                  <div key={l._id} className="bg-white p-4 rounded-xl border border-purple-100 shadow-sm flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
-                        <FileCheck2 size={18}/>
-                      </div>
-                      <div>
-                        <p className="font-bold text-gray-900">{l.testName}</p>
-                        <p className="text-xs text-gray-500 mt-1">{t.labUpdated} {new Date(l.updatedAt || l.createdAt).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')}</p>
-                      </div>
-                    </div>
-                    <span className={`px-4 py-2 rounded-xl text-sm font-bold ${l.status === 'normal' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                      {l.status === 'normal' ? t.labNormal : t.labAbnormal}
-                    </span>
-                  </div>
-                ))}
+              <div className="bg-purple-50/50 border border-purple-100 p-6 rounded-2xl flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 mb-3">
+                  <FileCheck2 size={24}/>
+                </div>
+                <p className="font-bold text-gray-900 mb-1">{t.labResultsAvailable}</p>
+                <p className="text-sm text-gray-500 mb-4">
+                  {labs.map(l => l.testName).join(', ')}
+                </p>
+                <button 
+                  onClick={() => navigate('/dashboard/lab-results')}
+                  className="px-6 py-2.5 bg-purple-600 text-white text-sm font-bold rounded-xl hover:bg-purple-700 transition-colors shadow-md shadow-purple-200"
+                >
+                  {t.viewDetailedResults}
+                </button>
               </div>
             </div>
           )}
@@ -282,24 +256,22 @@ export default function AppointmentDetail() {
                 </div>
                 {t.prescribedMedicines}
               </h2>
-              <div className="bg-emerald-50/50 border border-emerald-100 p-6 rounded-2xl">
-                <div className="space-y-3">
+              <div className="bg-emerald-50/50 border border-emerald-100 p-5 rounded-2xl">
+                <ul className="space-y-2">
                   {rx.medicines.map((m, i) => (
-                    <div key={i} className="bg-white p-5 rounded-xl border border-emerald-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <li key={i} className="flex justify-between items-center py-2 border-b border-emerald-100/50 last:border-0">
                       <div>
-                        <p className="font-bold text-gray-900 text-lg mb-1">{m.name}</p>
-                        <div className="flex gap-4 text-sm font-medium text-gray-600">
-                          <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {t.dosageLabel} {m.dosage}</span>
-                          <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {t.usageLabel} {m.frequency}</span>
-                        </div>
+                        <p className="font-bold text-gray-900">{m.name}</p>
+                        <p className="text-xs font-medium text-gray-600 mt-0.5">
+                          {t.dosageLabel} {m.dosage} • {t.usageLabel} {m.frequency}
+                        </p>
                       </div>
-                      <div className="bg-emerald-50 px-4 py-3 rounded-xl border border-emerald-100 text-center md:text-right shrink-0">
-                        <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider block mb-1">{t.qtyLabel}</span>
-                        <span className="font-black text-2xl text-emerald-900">{m.quantity}</span>
-                      </div>
-                    </div>
+                      <span className="font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-lg text-sm">
+                        x{m.quantity}
+                      </span>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
             </div>
           )}
@@ -317,45 +289,45 @@ export default function AppointmentDetail() {
               <div className="flex justify-between items-center mb-4">
                 <img src="/LOGO.png" alt="MediCare" className="h-8 w-auto object-contain no-invert" />
                 <span className="text-[10px] font-black tracking-widest bg-white/20 px-2.5 py-1 rounded-full uppercase">
-                  {lang === 'vi' ? 'Phiếu Khám Bệnh' : 'Medical Ticket'}
+                  {t.medicalTicket}
                 </span>
               </div>
-              <h3 className="text-xl font-black tracking-tight">{lang === 'vi' ? 'PHIẾU HẸN & SỐ THỨ TỰ' : 'QUEUE TICKET'}</h3>
-              <p className="text-xs text-blue-200 mt-1 font-medium">{lang === 'vi' ? 'Hệ thống Y tế thông minh MediCare' : 'MediCare Smart Hospital System'}</p>
+              <h3 className="text-xl font-black tracking-tight">{t.ticketTitle}</h3>
+              <p className="text-xs text-blue-200 mt-1 font-medium">{t.ticketSubtitle}</p>
             </div>
 
             {/* Ticket Body */}
             <div className="p-6 space-y-6 relative">
               {/* Big Queue Number */}
               <div className="text-center py-4 bg-blue-50/50 rounded-2xl border border-blue-100/50 relative">
-                <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">{lang === 'vi' ? 'Số Thứ Tự Của Bạn' : 'Your Queue Number'}</p>
+                <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">{t.yourQueue}</p>
                 <div className="inline-flex w-24 h-24 rounded-full bg-gradient-to-br from-primary to-blue-600 text-white items-center justify-center font-black text-4xl shadow-lg shadow-blue-500/20 my-2">
                   #{appt.queueNumber || '01'}
                 </div>
-                <p className="text-[10px] text-gray-500 font-bold px-4">{lang === 'vi' ? 'Vui lòng theo dõi bảng điện tử tại sảnh chờ' : 'Please watch the monitor in the waiting hall'}</p>
+                <p className="text-[10px] text-gray-500 font-bold px-4">{t.watchMonitor}</p>
               </div>
 
               {/* Ticket Details */}
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between border-b border-gray-100 pb-2">
-                  <span className="text-gray-400 font-bold">{lang === 'vi' ? 'Mã ca khám:' : 'Ticket ID:'}</span>
+                  <span className="text-gray-400 font-bold">{t.ticketId}</span>
                   <span className="font-mono font-black text-gray-800">{appt.ticketNumber}</span>
                 </div>
                 <div className="flex justify-between border-b border-gray-100 pb-2">
-                  <span className="text-gray-400 font-bold">{lang === 'vi' ? 'Bệnh nhân:' : 'Patient:'}</span>
-                  <span className="font-black text-gray-800">{JSON.parse(localStorage.getItem('userInfo') || '{}').fullName}</span>
+                  <span className="text-gray-400 font-bold">{t.patient}</span>
+                  <span className="font-black text-gray-800">{getStoredUser()?.fullName}</span>
                 </div>
                 <div className="flex justify-between border-b border-gray-100 pb-2">
-                  <span className="text-gray-400 font-bold">{lang === 'vi' ? 'Bác sĩ khám:' : 'Physician:'}</span>
+                  <span className="text-gray-400 font-bold">{t.physician}</span>
                   <span className="font-bold text-primary">{getDoctorDisplayName(appt.doctor?.userId?.fullName)}</span>
                 </div>
                 <div className="flex justify-between border-b border-gray-100 pb-2">
-                  <span className="text-gray-400 font-bold">{lang === 'vi' ? 'Chuyên khoa:' : 'Department:'}</span>
+                  <span className="text-gray-400 font-bold">{t.department}</span>
                   <span className="font-bold text-gray-800">{getLocalizedDept(appt.doctor?.department)}</span>
                 </div>
                 <div className="flex justify-between border-b border-gray-100 pb-2">
-                  <span className="text-gray-400 font-bold">{lang === 'vi' ? 'Thời gian:' : 'Schedule:'}</span>
-                  <span className="font-bold text-gray-800">{appt.time} • {new Date(appt.date).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')}</span>
+                  <span className="text-gray-400 font-bold">{t.schedule}</span>
+                  <span className="font-bold text-gray-800">{appt.time} • {formatDate(lang, appt.date)}</span>
                 </div>
               </div>
 
@@ -384,13 +356,13 @@ export default function AppointmentDetail() {
                 className="flex-1 py-2.5 bg-primary text-white text-xs font-bold rounded-xl hover:bg-blue-900 transition-all flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/10"
               >
                 <Printer size={14} />
-                {lang === 'vi' ? 'In phiếu' : 'Print Ticket'}
+                {t.printTicket}
               </button>
               <button 
                 onClick={() => setShowTicket(false)}
                 className="px-4 py-2.5 bg-gray-200 text-gray-700 text-xs font-bold rounded-xl hover:bg-gray-300 transition-all font-bold"
               >
-                {lang === 'vi' ? 'Đóng' : 'Close'}
+                {t.close}
               </button>
             </div>
           </div>

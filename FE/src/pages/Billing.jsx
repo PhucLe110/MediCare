@@ -1,10 +1,10 @@
-import { API_URL } from '../config';
+import { API_URL, authFetch, getStoredUser } from '../config';
 import React, { useState, useEffect } from 'react';
 import { Receipt, CheckCircle2, AlertCircle, ChevronRight, QrCode, FileText, X, User, Stethoscope, FlaskConical, Pill, Clock, Calendar, CreditCard } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
+import { formatMoney, formatDoctorName, formatDate, formatDateTime, formatApptMonth } from '../utils/i18nHelpers';
 
 // const API_URL = API_URL;
-const getAuthHeaders = () => ({ Authorization: `Bearer ${JSON.parse(localStorage.getItem('userInfo') || '{}').token}` });
 
 const trans = {
   vi: {
@@ -35,6 +35,11 @@ const trans = {
     typeLab: 'Xét nghiệm / Siêu âm',
     typeMedication: 'Đơn thuốc',
     typeOther: 'Phí dịch vụ khác',
+    billConsultation: 'Hóa đơn phí khám',
+    billLab: 'Hóa đơn xét nghiệm',
+    billMedicine: 'Hóa đơn thuốc',
+    payLabHint: 'Thanh toán để được tiến hành xét nghiệm',
+    payMedicineHint: 'Thanh toán để nhận thuốc theo đơn',
   },
   en: {
     title: 'Billing & Invoices',
@@ -64,7 +69,18 @@ const trans = {
     typeLab: 'Laboratory & Diagnostic Fee',
     typeMedication: 'Prescription & Medicine Fee',
     typeOther: 'Other Services Fee',
+    billConsultation: 'Consultation invoice',
+    billLab: 'Lab test invoice',
+    billMedicine: 'Medicine invoice',
+    payLabHint: 'Pay to proceed with laboratory tests',
+    payMedicineHint: 'Pay to receive prescribed medicine',
   }
+};
+
+const BILL_TYPE_META = {
+  consultation: { labelKey: 'billConsultation', color: '#3b82f6' },
+  lab: { labelKey: 'billLab', color: '#8b5cf6' },
+  medicine: { labelKey: 'billMedicine', color: '#10b981' },
 };
 
 export default function Billing() {
@@ -76,33 +92,31 @@ export default function Billing() {
   const [user, setUser]         = useState(null);
   const [modal, setModal]       = useState(null);
 
-  const fmt = (n) => {
-    const locale = lang === 'vi' ? 'vi-VN' : 'en-US';
-    const currency = lang === 'vi' ? 'VND' : 'USD';
-    const finalPrice = lang === 'vi' ? n : Math.round(n / 25000);
-    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(finalPrice || 0);
+  const amountDue = (bill) => {
+    const total = bill?.totalAmount || 0;
+    const paid = bill?.paidAmount || 0;
+    return Math.max(0, total - paid);
   };
+
+  const fmt = (n) => formatMoney(lang, n);
 
   const TYPE_META = {
     consultation: { label: t.typeConsultation, icon: Stethoscope, color: '#3b82f6' },
     lab:          { label: t.typeLab, icon: FlaskConical, color: '#8b5cf6' },
+    lab_test:     { label: t.typeLab, icon: FlaskConical, color: '#8b5cf6' },
+    medicine:     { label: t.typeMedication, icon: Pill, color: '#10b981' },
     medication:   { label: t.typeMedication, icon: Pill, color: '#10b981' },
   };
   const getMeta = (typeKey) => TYPE_META[typeKey] || { label: t.typeOther, icon: Receipt, color: '#6b7280' };
 
-  const getDoctorDisplayName = (name) => {
-    if (!name) return t.doctorTitle;
-    const trimmed = name.trim();
-    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
-    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
-  };
+  const getDoctorDisplayName = (name) => formatDoctorName(lang, name) || t.doctorTitle;
 
   useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem('userInfo') || '{}'));
+    setUser(getStoredUser() || {});
     (async () => {
       try {
         const [br, pr] = await Promise.all([
-          fetch(`${API_URL}/api/bills/my`, { headers: getAuthHeaders() }),
+          authFetch(`${API_URL}/api/bills/my`),
           fetch(`${API_URL}/api/payment-info`),
         ]);
         const [bd, pd] = await Promise.all([br.json(), pr.json()]);
@@ -117,7 +131,7 @@ export default function Billing() {
     const hasUnpaid = bills.some(b => (b.appointment?._id || 'other') === selId && b.status === 'unpaid');
     if (!hasUnpaid) return;
     const iv = setInterval(async () => {
-      const r = await fetch(`${API_URL}/api/bills/my`, { headers: getAuthHeaders() });
+      const r = await authFetch(`${API_URL}/api/bills/my`);
       const d = await r.json();
       if (d.success) {
         setBills(d.data);
@@ -167,7 +181,7 @@ export default function Billing() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {[
               { label: t.paid, value: fmt(bills.filter(b=>b.status==='paid').reduce((s,b)=>s+b.totalAmount,0)), color: '#059669', bg: '#ecfdf5' },
-              { label: t.unpaid, value: fmt(bills.filter(b=>b.status==='unpaid').reduce((s,b)=>s+b.totalAmount,0)), color: '#d97706', bg: '#fffbeb' },
+              { label: t.unpaid, value: fmt(bills.filter(b=>b.status==='unpaid').reduce((s,b)=>s+amountDue(b),0)), color: '#d97706', bg: '#fffbeb' },
             ].map(s => (
               <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '10px 12px', border: '1px solid #e2e8f0' }}>
                 <p style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94a3b8', marginBottom: 3 }}>{s.label}</p>
@@ -186,7 +200,7 @@ export default function Billing() {
             const active = selId === app.id;
             const d = new Date(app.date);
             const hasUnpaid = app.unpaid.length > 0;
-            const appMonth = lang === 'vi' ? `Th${d.getMonth()+1}` : d.toLocaleDateString('en-US', { month: 'short' });
+            const appMonth = formatApptMonth(lang, d);
             return (
               <button key={app.id} onClick={() => setSelId(app.id)}
                 style={{
@@ -220,7 +234,7 @@ export default function Billing() {
                     {getDoctorDisplayName(app.doctor)}
                   </p>
                   <p style={{ fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>
-                    {lang === 'vi' ? d.toLocaleDateString('vi-VN') : d.toLocaleDateString('en-US')}
+                    {formatDate(lang, d)}
                   </p>
                 </div>
                 {active && <ChevronRight size={14} style={{ color: '#94a3b8', flexShrink: 0 }} />}
@@ -246,7 +260,7 @@ export default function Billing() {
                 <h1 style={{ fontSize: 28, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.02em', marginBottom: 12, lineHeight: 1.2 }}>{sel.department}</h1>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#475569', fontWeight: 700, background: '#fff', padding: '5px 12px', borderRadius: 999, border: '1px solid #e2e8f0' }}>
-                    <Calendar size={13} color="#94a3b8" />{lang === 'vi' ? new Date(sel.date).toLocaleDateString('vi-VN') : new Date(sel.date).toLocaleDateString('en-US')}
+                    <Calendar size={13} color="#94a3b8" />{formatDate(lang, sel.date)}
                   </span>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#0369a1', fontWeight: 700, background: '#e0f2fe', padding: '5px 12px', borderRadius: 999 }}>
                     <User size={13} />{getDoctorDisplayName(sel.doctor)}
@@ -256,57 +270,51 @@ export default function Billing() {
               <img src="/LOGO.png" alt="Logo" style={{ height: 36, opacity: 0.15, flexShrink: 0 }} />
             </div>
 
-            {/* UNPAID */}
-            {sel.unpaid.length > 0 && (
-              <div style={{ marginBottom: 28, background: '#fff', borderRadius: 28, overflow: 'hidden', border: '2px solid #fed7aa', boxShadow: '0 8px 40px rgba(251,146,60,0.12)' }}>
-                {/* Top bar */}
-                <div style={{ background: 'linear-gradient(135deg,#fff7ed,#ffedd5)', padding: '18px 24px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid #fed7aa' }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 10, background: '#fb923c', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <AlertCircle size={18} color="#fff" />
+            {/* UNPAID — mỗi hóa đơn thanh toán riêng */}
+            {sel.unpaid.map(bill => {
+              const meta = BILL_TYPE_META[bill.billType] || { labelKey: 'needPay', color: '#fb923c' };
+              const billTitle = t[meta.labelKey] || t.needPay;
+              const hint = bill.billType === 'lab' ? t.payLabHint : bill.billType === 'medicine' ? t.payMedicineHint : t.paySub;
+              return (
+                <div key={bill._id} style={{ marginBottom: 20, background: '#fff', borderRadius: 28, overflow: 'hidden', border: '2px solid #fed7aa', boxShadow: '0 8px 40px rgba(251,146,60,0.12)' }}>
+                  <div style={{ background: 'linear-gradient(135deg,#fff7ed,#ffedd5)', padding: '18px 24px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid #fed7aa' }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 10, background: meta.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <AlertCircle size={18} color="#fff" />
+                    </div>
+                    <div>
+                      <p style={{ fontWeight: 900, fontSize: 14, color: '#c2410c', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{billTitle}</p>
+                      <p style={{ fontSize: 11, color: '#ea580c', fontWeight: 600 }}>{hint}</p>
+                    </div>
+                    <p style={{ marginLeft: 'auto', fontSize: 22, fontWeight: 900, color: '#c2410c' }}>{fmt(amountDue(bill))}</p>
                   </div>
-                  <div>
-                    <p style={{ fontWeight: 900, fontSize: 14, color: '#c2410c', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t.needPay}</p>
-                    <p style={{ fontSize: 11, color: '#ea580c', fontWeight: 600 }}>{t.paySub}</p>
-                  </div>
-                  <p style={{ marginLeft: 'auto', fontSize: 22, fontWeight: 900, color: '#c2410c', letterSpacing: '-0.02em' }}>
-                    {fmt(sel.unpaid.reduce((s, b) => s + b.totalAmount, 0))}
-                  </p>
-                </div>
-
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 0 }}>
-                  {/* Items */}
-                  <div style={{ flex: 1, minWidth: 280, padding: '20px 24px', borderRight: '1px dashed #fed7aa' }}>
-                    {sel.unpaid.flatMap(bill => (bill.items||[]).map((item, i) => {
-                      const m = getMeta(item.type); const Icon = m.icon;
-                      return (
-                        <div key={`${bill._id}-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', background: '#fafafa', borderRadius: 16, marginBottom: 10, border: '1px solid #f1f5f9' }}>
-                          <div style={{ width: 40, height: 40, borderRadius: 12, background: `${m.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <Icon size={18} color={m.color} />
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 0 }}>
+                    <div style={{ flex: 1, minWidth: 280, padding: '20px 24px', borderRight: '1px dashed #fed7aa' }}>
+                      {(bill.items || []).map((item, i) => {
+                        const m = getMeta(item.type); const Icon = m.icon;
+                        return (
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', background: '#fafafa', borderRadius: 16, marginBottom: 10, border: '1px solid #f1f5f9' }}>
+                            <div style={{ width: 40, height: 40, borderRadius: 12, background: `${m.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <Icon size={18} color={m.color} />
+                            </div>
+                            <div style={{ flex: 1 }}>
+                              <p style={{ fontWeight: 700, fontSize: 14, color: '#1e293b' }}>{item.description}</p>
+                              <p style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>{m.label}</p>
+                            </div>
+                            <p style={{ fontWeight: 900, fontSize: 15, color: '#0f172a' }}>{fmt(item.amount)}</p>
                           </div>
-                          <div style={{ flex: 1 }}>
-                            <p style={{ fontWeight: 700, fontSize: 14, color: '#1e293b' }}>{item.description}</p>
-                            <p style={{ fontSize: 10, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{m.label}</p>
-                          </div>
-                          <p style={{ fontWeight: 900, fontSize: 15, color: '#0f172a', letterSpacing: '-0.02em' }}>{fmt(item.amount)}</p>
-                        </div>
-                      );
-                    }))}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
-                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#6366f1', animation: 'pulse 1.5s infinite' }}></div>
-                      <p style={{ fontSize: 11, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.waitingBank}</p>
+                        );
+                      })}
+                    </div>
+                    <div style={{ width: '100%', maxWidth: 180, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 20, background: '#fffbf5' }}>
+                      <div style={{ background: '#fff', borderRadius: 20, padding: 14, boxShadow: '0 8px 30px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9', marginBottom: 10 }}>
+                        <img src={qrUrl(amountDue(bill), [bill._id])} alt="QR" style={{ width: 120, height: 120, objectFit: 'contain' }} />
+                      </div>
+                      <p style={{ fontSize: 9, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', textAlign: 'center' }}>{t.scanQr}</p>
                     </div>
                   </div>
-
-                  {/* QR */}
-                  <div style={{ width: '100%', maxWidth: 180, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 20, background: '#fffbf5', margin: '0 auto' }}>
-                    <div style={{ background: '#fff', borderRadius: 20, padding: 14, boxShadow: '0 8px 30px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9', marginBottom: 10 }}>
-                      <img src={qrUrl(sel.unpaid.reduce((s,b)=>s+b.totalAmount,0), sel.unpaid.map(b=>b._id))} alt="QR" style={{ width: 120, height: 120, objectFit: 'contain' }} />
-                    </div>
-                    <p style={{ fontSize: 9, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.12em', textAlign: 'center', lineHeight: 1.3 }}>{t.scanQr}</p>
-                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })}
 
             {/* PAID HISTORY */}
             <div>
@@ -338,9 +346,7 @@ export default function Billing() {
                         <div style={{ flex: 1 }}>
                           <p style={{ fontSize: 10, fontWeight: 800, color: '#6ee7b7', textTransform: 'uppercase', letterSpacing: '0.12em', lineHeight: 1 }}>{t.successPaid}</p>
                           <p style={{ fontSize: 12, fontWeight: 600, color: '#64748b', marginTop: 2 }}>
-                            {lang === 'vi'
-                              ? new Date(bill.paidAt || bill.updatedAt).toLocaleString('vi-VN')
-                              : new Date(bill.paidAt || bill.updatedAt).toLocaleString('en-US')}
+                            {formatDateTime(lang, bill.paidAt || bill.updatedAt)}
                           </p>
                         </div>
                         <p style={{ fontSize: 20, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.02em' }}>{fmt(bill.totalAmount)}</p>
@@ -404,7 +410,7 @@ export default function Billing() {
                   [t.patient, user?.fullName],
                   [t.department, sel?.department],
                   [t.doctorLabel, getDoctorDisplayName(sel?.doctor)],
-                  [t.time, lang === 'vi' ? new Date(modal.paidAt||modal.updatedAt).toLocaleString('vi-VN') : new Date(modal.paidAt||modal.updatedAt).toLocaleString('en-US')]
+                  [t.time, formatDateTime(lang, modal.paidAt || modal.updatedAt)]
                 ].map(([k,v]) => (
                   <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
                     <span style={{ color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 10 }}>{k}</span>

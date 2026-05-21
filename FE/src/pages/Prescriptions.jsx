@@ -1,14 +1,8 @@
-import { API_URL } from '../config';
+import { API_URL, authFetch } from '../config';
 import React, { useState, useEffect } from 'react';
 import { Pill, User, Clock, FileText, ChevronRight, Download, Activity } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
-
-// const API_URL = API_URL;
-
-const getAuthHeaders = () => {
-  const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-  return { 'Authorization': `Bearer ${userInfo.token}` };
-};
+import { formatMoney, formatDoctorName, formatDate, formatDateTime } from '../utils/i18nHelpers';
 
 const trans = {
   vi: {
@@ -72,9 +66,7 @@ const Prescriptions = () => {
   useEffect(() => {
     const fetchPrescriptions = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/prescriptions/my`, {
-          headers: getAuthHeaders()
-        });
+        const res = await authFetch(`${API_URL}/api/prescriptions/my`);
         const data = await res.json();
         if (data.success) {
           setPrescriptions(data.data);
@@ -89,19 +81,8 @@ const Prescriptions = () => {
     fetchPrescriptions();
   }, []);
 
-  const formatPrice = (price) => {
-    const locale = lang === 'vi' ? 'vi-VN' : 'en-US';
-    const currency = lang === 'vi' ? 'VND' : 'USD';
-    const finalPrice = lang === 'vi' ? price : Math.round(price / 25000);
-    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(finalPrice || 0);
-  };
-
-  const getDoctorDisplayName = (name) => {
-    if (!name) return t.doctorTitle;
-    const trimmed = name.trim();
-    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
-    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
-  };
+  const formatPrice = (price) => formatMoney(lang, price);
+  const getDoctorDisplayName = (name) => formatDoctorName(lang, name) || t.doctorTitle;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -146,9 +127,7 @@ const Prescriptions = () => {
                 >
                   <div className="flex justify-between items-start mb-2">
                     <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-lg">
-                      {lang === 'vi' 
-                        ? new Date(prescription.createdAt).toLocaleDateString('vi-VN')
-                        : new Date(prescription.createdAt).toLocaleDateString('en-US')}
+                      {formatDate(lang, prescription.createdAt)}
                     </span>
                     <ChevronRight size={16} className={selectedPrescription?._id === prescription._id ? 'text-primary' : 'text-gray-300'} />
                   </div>
@@ -170,9 +149,7 @@ const Prescriptions = () => {
                     <div>
                       <div className="flex items-center gap-2 text-white/80 text-sm mb-2">
                         <Clock size={14} />
-                        {t.datePrescribed} {lang === 'vi'
-                          ? new Date(selectedPrescription.createdAt).toLocaleString('vi-VN')
-                          : new Date(selectedPrescription.createdAt).toLocaleString('en-US')}
+                        {t.datePrescribed} {formatDateTime(lang, selectedPrescription.createdAt)}
                       </div>
                       <h2 className="text-2xl font-bold uppercase">{t.title}</h2>
                       <p className="text-white/90 mt-1">{t.code} {selectedPrescription._id.substring(18).toUpperCase()}</p>

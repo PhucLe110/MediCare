@@ -73,7 +73,7 @@ function App() {
           <Route path="lab-results" element={<LabResults />} />
           <Route path="doctor" element={<DoctorDashboard />} />
           <Route path="doctor-shifts" element={<DoctorShifts />} />
-          <Route path="settings" element={<ComingSoon title="Cài đặt hệ thống" />} />
+          <Route path="settings" element={<ComingSoon titleKey="settingsTitle" />} />
         </Route>
 
         <Route path="/admin" element={<AdminLayout />}>

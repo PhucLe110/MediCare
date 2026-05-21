@@ -1,4 +1,5 @@
 import { API_URL } from '../config';
+import { authFetch, ensureValidSession, logoutAuth } from '../utils/auth';
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -16,27 +17,29 @@ const DashboardLayout = () => {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
   useEffect(() => {
-    const userInfo = localStorage.getItem('userInfo');
-    if (userInfo) {
-      const u = JSON.parse(userInfo);
-      if (u.role === 'admin') {
-        navigate('/admin');
-        return;
-      }
-      setUser(u);
-      // Fetch notification count (unpaid bills + pending appointments)
-      const h = { Authorization: `Bearer ${u.token}` };
-      Promise.all([
-        fetch(`${API_URL}/api/bills/my`, { headers: h }).then(r => r.json()),
-        fetch(`${API_URL}/api/appointments`, { headers: h }).then(r => r.json()),
-      ]).then(([bd, ad]) => {
-        const unpaid = bd.success ? bd.data.filter(b => b.status === 'unpaid').length : 0;
-        const pending = ad.success ? ad.data.filter(a => a.status === 'pending').length : 0;
+    (async () => {
+      try {
+        const u = await ensureValidSession();
+        if (!u) {
+          navigate('/');
+          return;
+        }
+        if (u.role === 'admin') {
+          navigate('/admin');
+          return;
+        }
+        setUser(u);
+        const [br, ar] = await Promise.all([
+          authFetch(`${API_URL}/api/bills/my`).then((r) => r.json()),
+          authFetch(`${API_URL}/api/appointments`).then((r) => r.json()),
+        ]);
+        const unpaid = br.success ? br.data.filter((b) => b.status === 'unpaid').length : 0;
+        const pending = ar.success ? ar.data.filter((a) => a.status === 'pending').length : 0;
         setNotifCount(unpaid + pending);
-      }).catch(() => {});
-    } else {
-      navigate('/');
-    }
+      } catch {
+        navigate('/');
+      }
+    })();
   }, [navigate]);
 
   useEffect(() => {
@@ -64,8 +67,8 @@ const DashboardLayout = () => {
     return () => window.removeEventListener('language-change', handleLangChange);
   }, [lang]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('userInfo');
+  const handleLogout = async () => {
+    await logoutAuth();
     navigate('/');
   };
 
@@ -91,6 +94,8 @@ const DashboardLayout = () => {
       roleAdmin: 'Admin',
       labDesk: 'Bàn làm việc XN',
       shiftDesk: 'Lịch trực khám',
+      doctorDesk: 'Bàn khám bác sĩ',
+      roleDoctor: 'Bác sĩ chuyên khoa',
     },
     en: {
       dashboard: 'Overview',
@@ -113,6 +118,8 @@ const DashboardLayout = () => {
       roleAdmin: 'System Admin',
       labDesk: 'Lab Workspace',
       shiftDesk: 'Shift Management',
+      doctorDesk: 'Doctor Workspace',
+      roleDoctor: 'Specialist Doctor',
     }
   };
 
@@ -134,7 +141,7 @@ const DashboardLayout = () => {
   ];
 
   const doctorMenuItems = [
-    { name: lang === 'vi' ? 'Bàn khám bác sĩ' : 'Doctor Workspace', icon: LayoutDashboard, path: '/dashboard/doctor' },
+    { name: t.doctorDesk, icon: LayoutDashboard, path: '/dashboard/doctor' },
     { name: t.shiftDesk, icon: CalendarPlus, path: '/dashboard/doctor-shifts' },
   ];
 
@@ -166,7 +173,7 @@ const DashboardLayout = () => {
                   : (user?.role === 'lab_staff' 
                       ? t.roleLabStaff 
                       : (user?.role === 'doctor' 
-                          ? (lang === 'vi' ? 'Bác sĩ chuyên khoa' : 'Specialist Doctor') 
+                          ? t.roleDoctor
                           : t.roleAdmin))
                 }
               </p>

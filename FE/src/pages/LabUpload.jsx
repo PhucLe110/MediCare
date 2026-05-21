@@ -1,4 +1,4 @@
-import { API_URL } from '../config';
+import { API_URL, authFetch } from '../config';
 import React, { useState, useRef } from 'react';
 import { Upload, FlaskConical, User, FileText, CheckCircle2, AlertCircle, Loader2, X } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
@@ -114,7 +114,6 @@ const LabUpload = () => {
 
     setLoading(true);
     try {
-      const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
       const formData = new FormData();
       formData.append('file', file);
       formData.append('patientId', form.patientId.trim());
@@ -122,15 +121,14 @@ const LabUpload = () => {
       formData.append('testType', form.testType);
       formData.append('notes', form.notes);
 
-      const res = await fetch(`${API_URL}/api/lab-results`, {
+      const res = await authFetch(`${API_URL}/api/lab-results`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${userInfo.token}` },
         body: formData
       });
       const data = await res.json();
 
       if (data.success) {
-        showToast(lang === 'vi' ? 'Gửi kết quả thành công!' : 'Test results successfully sent!', 'success');
+        showToast(t.toastSendSuccess, 'success');
         setForm({ patientId: '', testName: '', testType: 'blood', notes: '' });
         setFile(null);
       } else {

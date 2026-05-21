@@ -1,7 +1,8 @@
-import { API_URL } from '../../config';
+import { API_URL, authFetch } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Database, FileText, Activity, Search, RefreshCw } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
+import { formatDoctorName, formatDate } from '../../utils/i18nHelpers';
 
 const trans = {
   vi: {
@@ -70,15 +71,7 @@ export default function AdminRecords() {
 
   const fetchRecords = async () => {
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
-      const res = await fetch(`${API_URL}/api/admin/records`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const res = await authFetch(`${API_URL}/api/admin/records`);
       const json = await res.json();
       if (json.success) {
         setRecords(json.data);
@@ -100,12 +93,7 @@ export default function AdminRecords() {
     alert(t.backupAlert + new Date().toISOString().slice(0, 10) + '.json');
   };
 
-  const getDoctorDisplayName = (name) => {
-    if (!name) return t.doctorAnonymous;
-    const trimmed = name.trim();
-    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
-    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
-  };
+  const getDoctorDisplayName = (name) => formatDoctorName(lang, name) || t.doctorAnonymous;
 
   const filteredPrescriptions = records.prescriptions.filter(p => {
     const pName = p.patient?.fullName?.toLowerCase() || '';
@@ -219,7 +207,7 @@ export default function AdminRecords() {
                         </div>
                       </td>
                       <td className="p-4 text-xs font-bold text-slate-500 font-mono">
-                        {lang === 'vi' ? new Date(p.createdAt).toLocaleDateString('vi-VN') : new Date(p.createdAt).toLocaleDateString('en-US')}
+                        {formatDate(lang, p.createdAt)}
                       </td>
                     </tr>
                   ))
@@ -270,7 +258,7 @@ export default function AdminRecords() {
                         )}
                       </td>
                       <td className="p-4 text-xs font-bold text-slate-500 font-mono">
-                        {lang === 'vi' ? new Date(l.createdAt).toLocaleDateString('vi-VN') : new Date(l.createdAt).toLocaleDateString('en-US')}
+                        {formatDate(lang, l.createdAt)}
                       </td>
                     </tr>
                   ))

@@ -1,17 +1,15 @@
-import { API_URL } from '../config';
+import { API_URL, authFetch } from '../config';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   FlaskConical, Clock, CheckCircle2, AlertTriangle, User,
-  Upload, FileText, X, Loader2, ChevronDown, ChevronUp, Send
+  Upload, FileText, X, Loader2, ChevronDown, ChevronUp, Send, RefreshCw
 } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
+import { formatDoctorName, formatDate, formatDateTime, getLocale } from '../utils/i18nHelpers';
 
 // const API_URL = API_URL;
 
-const getAuthHeaders = () => {
-  const u = JSON.parse(localStorage.getItem('userInfo') || '{}');
-  return { 'Authorization': `Bearer ${u.token}` };
-};
+const jsonHeaders = () => ({ 'Content-Type': 'application/json' });
 
 const trans = {
   vi: {
@@ -46,9 +44,23 @@ const trans = {
     loadError: 'Không thể tải danh sách yêu cầu.',
     startSuccess: 'Đã bắt đầu tiến hành xét nghiệm!',
     connError: 'Lỗi kết nối.',
+    unpaidLab: 'Chưa thanh toán phí XN',
+    unpaidLabHint: 'Bệnh nhân cần thanh toán phí xét nghiệm trước khi bạn có thể bắt đầu.',
+    btnStartDisabled: 'Chờ thanh toán XN',
     
     noRequestsTitle: 'Không có yêu cầu nào đang chờ',
-    noRequestsDesc: 'Tất cả yêu cầu xét nghiệm đã được xử lý xong!'
+    noRequestsDesc: 'Tất cả yêu cầu xét nghiệm đã được xử lý xong!',
+    requestedTests: 'Chỉ định xét nghiệm',
+    addFilesHint: 'Nhấn để thêm file kết quả (tối đa 5)',
+    refreshTitle: 'Làm mới danh sách',
+    refresh: 'Làm mới',
+    pendingTab: 'Đang xử lý',
+    historyTab: 'Lịch sử xét nghiệm',
+    noHistory: 'Chưa có lịch sử',
+    noHistorySub: 'Các xét nghiệm đã hoàn thành sẽ hiển thị ở đây',
+    labDone: 'Đã hoàn thành',
+    viewResult: 'Xem kết quả',
+    doctorShort: 'Bác sĩ',
   },
   en: {
     blood: 'Blood Panel Test',
@@ -82,9 +94,23 @@ const trans = {
     loadError: 'Unable to fetch pending diagnostics queues.',
     startSuccess: 'Diagnostics pipeline successfully commenced!',
     connError: 'Connection lost.',
+    unpaidLab: 'Lab fee unpaid',
+    unpaidLabHint: 'Patient must pay the lab fee before you can start processing.',
+    btnStartDisabled: 'Awaiting lab payment',
 
     noRequestsTitle: 'Queue Fully Dispatched',
-    noRequestsDesc: 'All diagnostic requests have been processed and dispatched successfully!'
+    noRequestsDesc: 'All diagnostic requests have been processed and dispatched successfully!',
+    requestedTests: 'Requested Tests',
+    addFilesHint: 'Click to add files (max 5)',
+    refreshTitle: 'Refresh list',
+    refresh: 'Refresh',
+    pendingTab: 'Pending Requests',
+    historyTab: 'Lab History',
+    noHistory: 'No history yet',
+    noHistorySub: 'Completed lab requests will appear here',
+    labDone: 'Completed',
+    viewResult: 'View Result',
+    doctorShort: 'Dr.',
   }
 };
 
@@ -103,7 +129,7 @@ const Toast = ({ toast }) => (
 const RequestCard = ({ req, onStart, onComplete }) => {
   const { lang, t } = useTranslation(trans);
   const [expanded, setExpanded] = useState(false);
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
   const [notes, setNotes] = useState('');
   const [uploading, setUploading] = useState(false);
   const [starting, setStarting] = useState(false);
@@ -116,20 +142,17 @@ const RequestCard = ({ req, onStart, onComplete }) => {
   };
 
   const handleComplete = async () => {
-    if (!file) return;
+    if (files.length === 0) return;
     setUploading(true);
-    await onComplete(req._id, file, notes);
+    await onComplete(req._id, files, notes);
     setUploading(false);
   };
 
-  const getDoctorDisplayName = (name) => {
-    if (!name) return '';
-    const trimmed = name.trim();
-    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
-    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
-  };
+  const getDoctorDisplayName = (name) => formatDoctorName(lang, name);
+  const locale = getLocale(lang);
 
-  const isUrgent = req.urgency === 'urgent';
+  const isUrgent = req.tests?.some(t => t.urgency === 'urgent');
+  const labPaid = req.paymentStatus === 'paid' || (!req.paymentStatus && req.bill?.status === 'paid');
 
   return (
     <div className={`bg-white rounded-3xl border shadow-sm transition-all ${isUrgent ? 'border-red-200 ring-1 ring-red-100' : 'border-gray-100'}`}>
@@ -155,24 +178,24 @@ const RequestCard = ({ req, onStart, onComplete }) => {
             </div>
 
             {/* Test Info */}
-            <div className="grid grid-cols-2 gap-3 text-sm mb-4">
-              <div className="bg-blue-50/50 p-3 rounded-xl border border-blue-100">
-                <p className="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1">{t.testNameLabel}</p>
-                <p className="font-bold text-gray-800">{req.testName}</p>
-              </div>
-              <div className="bg-teal-50/50 p-3 rounded-xl border border-teal-100">
-                <p className="text-[10px] font-bold text-teal-400 uppercase tracking-wider mb-1">{t.typeLabel}</p>
-                <p className="font-bold text-gray-800">{t[req.testType] || req.testType}</p>
+            <div className="text-sm mb-4">
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">{t.requestedTests} ({req.tests?.length || 0})</p>
+              <div className="space-y-2">
+                {req.tests?.map((test, idx) => (
+                  <div key={idx} className="bg-blue-50/50 p-3 rounded-xl border border-blue-100 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1">{t[test.testType] || test.testType}</p>
+                      <p className="font-bold text-gray-800">{test.testName}</p>
+                    </div>
+                    {test.clinicalNotes && (
+                      <div className="text-xs text-gray-500 italic max-w-xs text-right">
+                        "{test.clinicalNotes}"
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
-
-            {/* Clinical notes */}
-            {req.clinicalNotes && (
-              <div className="bg-orange-50/50 p-3 rounded-xl border border-orange-100 text-sm mb-4">
-                <p className="text-[10px] font-bold text-orange-400 uppercase tracking-wider mb-1">{t.clinicalNotesLabel}</p>
-                <p className="text-gray-700 italic">{req.clinicalNotes}</p>
-              </div>
-            )}
 
             {/* Doctor & Time */}
             <div className="flex items-center gap-4 text-xs text-gray-400 font-medium animate-in fade-in duration-300">
@@ -181,11 +204,11 @@ const RequestCard = ({ req, onStart, onComplete }) => {
               </span>
               {req.appointment && (
                 <span className="flex items-center gap-1">
-                  {t.consultationSession} {new Date(req.appointment?.date).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')} {req.appointment?.time}
+                  {t.consultationSession} {formatDate(lang, req.appointment?.date)} {req.appointment?.time}
                 </span>
               )}
               <span className="flex items-center gap-1">
-                <Clock size={12} /> {new Date(req.createdAt).toLocaleString(lang === 'vi' ? 'vi-VN' : 'en-US')}
+                <Clock size={12} /> {formatDateTime(lang, req.createdAt)}
               </span>
             </div>
           </div>
@@ -198,7 +221,13 @@ const RequestCard = ({ req, onStart, onComplete }) => {
               {req.status === 'pending' ? t.statusPending : t.statusInProgress}
             </span>
 
-            {req.status === 'pending' && (
+            {req.status === 'pending' && !labPaid && (
+              <div className="text-right max-w-[200px]">
+                <span className="px-3 py-1 text-xs font-bold rounded-full bg-orange-100 text-orange-700 block mb-2">{t.unpaidLab}</span>
+                <p className="text-[10px] text-orange-600 leading-snug">{t.unpaidLabHint}</p>
+              </div>
+            )}
+            {req.status === 'pending' && labPaid && (
               <button
                 onClick={handleStart}
                 disabled={starting}
@@ -237,33 +266,45 @@ const RequestCard = ({ req, onStart, onComplete }) => {
               onChange={e => setNotes(e.target.value)}
             />
 
-            <div
-              className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all ${
-                file ? 'border-green-400 bg-green-50' : 'border-gray-200 hover:border-teal-300 hover:bg-teal-50/30'
-              }`}
-              onClick={() => fileRef.current.click()}
-            >
-              <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={e => setFile(e.target.files[0])} />
-              {file ? (
-                <div className="flex items-center justify-center gap-3">
-                  <FileText size={20} className="text-green-600" />
-                  <span className="font-bold text-gray-700 text-sm">{file.name}</span>
-                  <button type="button" onClick={e => { e.stopPropagation(); setFile(null); }}
-                    className="p-1 hover:bg-red-100 rounded-full text-gray-400 hover:text-red-500">
-                    <X size={16} />
-                  </button>
-                </div>
-              ) : (
+            {files.length > 0 && (
+              <div className="flex flex-col gap-2 mb-2">
+                {files.map((f, i) => (
+                  <div key={i} className="flex items-center justify-between gap-3 bg-white p-2 rounded-lg shadow-sm border border-green-100">
+                    <div className="flex items-center gap-2">
+                      <FileText size={20} className="text-green-600" />
+                      <span className="font-bold text-gray-700 text-xs truncate max-w-[200px]" title={f.name}>{f.name}</span>
+                    </div>
+                    <button type="button" onClick={e => { 
+                        e.stopPropagation(); 
+                        setFiles(prev => prev.filter((_, idx) => idx !== i)); 
+                      }}
+                      className="p-1 hover:bg-red-100 rounded-full text-gray-400 hover:text-red-500">
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {files.length < 5 && (
+              <div
+                className="border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all border-gray-200 hover:border-teal-300 hover:bg-teal-50/30"
+                onClick={() => fileRef.current.click()}
+              >
+                <input ref={fileRef} type="file" multiple accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={e => {
+                  const selectedFiles = Array.from(e.target.files);
+                  setFiles(prev => [...prev, ...selectedFiles].slice(0, 5)); // max 5 files
+                }} />
                 <div className="flex items-center justify-center gap-2 text-gray-400">
                   <Upload size={20} />
-                  <span className="text-sm font-medium">{t.fileUploadGreen}</span>
+                  <span className="text-sm font-medium">{t.addFilesHint}</span>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             <button
               onClick={handleComplete}
-              disabled={!file || uploading}
+              disabled={files.length === 0 || uploading}
               className="w-full py-3 bg-gradient-to-r from-teal-600 to-blue-600 text-white font-bold rounded-xl hover:from-teal-700 hover:to-blue-700 transition-all shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed text-sm"
             >
               {uploading ? <><Loader2 size={18} className="animate-spin" /> {t.sendingBtn}</> : <><Send size={18} /> {t.btnSendResult}</>}
@@ -279,8 +320,9 @@ const RequestCard = ({ req, onStart, onComplete }) => {
 // Main Lab Staff Dashboard
 // ============================================================
 const LabStaffDashboard = () => {
-  const { t } = useTranslation(trans);
+  const { lang, t } = useTranslation(trans);
   const [requests, setRequests] = useState([]);
+  const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'history'
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState({ show: false, type: 'success', message: '' });
 
@@ -290,10 +332,18 @@ const LabStaffDashboard = () => {
   };
 
   const fetchRequests = async () => {
+    setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/lab-requests/pending`, { headers: getAuthHeaders() });
+      const endpoint = activeTab === 'pending' ? '/api/lab-requests/pending' : '/api/lab-requests';
+      const res = await authFetch(`${API_URL}${endpoint}`);
       const data = await res.json();
-      if (data.success) setRequests(data.data);
+      if (data.success) {
+        if (activeTab === 'history') {
+          setRequests(data.data.filter(r => r.status === 'completed'));
+        } else {
+          setRequests(data.data);
+        }
+      }
     } catch (err) {
       showToast(t.loadError, 'error');
     } finally {
@@ -301,31 +351,33 @@ const LabStaffDashboard = () => {
     }
   };
 
-  useEffect(() => { fetchRequests(); }, []);
+  useEffect(() => { fetchRequests(); }, [activeTab]);
 
   const handleStart = async (id) => {
     try {
-      const res = await fetch(`${API_URL}/api/lab-requests/${id}/start`, {
+      const res = await authFetch(`${API_URL}/api/lab-requests/${id}/start`, {
         method: 'PATCH',
-        headers: getAuthHeaders()
+        headers: jsonHeaders()
       });
       const data = await res.json();
       if (data.success) {
         setRequests(prev => prev.map(r => r._id === id ? data.data : r));
         showToast(t.startSuccess);
+      } else {
+        showToast(data.message || t.connError, 'error');
       }
     } catch { showToast(t.connError, 'error'); }
   };
 
-  const handleComplete = async (id, file, notes) => {
+  const handleComplete = async (id, files, notes) => {
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      files.forEach(file => formData.append('files', file));
       formData.append('notes', notes);
 
-      const res = await fetch(`${API_URL}/api/lab-requests/${id}/complete`, {
+      const res = await authFetch(`${API_URL}/api/lab-requests/${id}/complete`, {
         method: 'POST',
-        headers: getAuthHeaders(),
+        headers: jsonHeaders(),
         body: formData
       });
       const data = await res.json();
@@ -338,8 +390,9 @@ const LabStaffDashboard = () => {
     } catch { showToast(t.connError, 'error'); }
   };
 
-  const pending = requests.filter(r => r.status === 'pending');
-  const inProgress = requests.filter(r => r.status === 'in_progress');
+  const pending = activeTab === 'pending' ? requests.filter(r => r.status === 'pending') : [];
+  const inProgress = activeTab === 'pending' ? requests.filter(r => r.status === 'in_progress') : [];
+  const completed = activeTab === 'history' ? requests : [];
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -354,7 +407,18 @@ const LabStaffDashboard = () => {
           <h1 className="text-2xl font-bold text-gray-800">{t.dashboardTitle}</h1>
           <p className="text-gray-500 mt-1">{t.dashboardSubtitle}</p>
         </div>
-        <div className="flex gap-4 text-center">
+        <div className="flex gap-4 text-center items-center">
+          <button 
+            onClick={fetchRequests} 
+            disabled={loading}
+            className="p-3 bg-teal-50 border border-teal-100 rounded-2xl hover:bg-teal-100 hover:border-teal-200 transition-all flex flex-col items-center justify-center h-full min-h-[72px] shadow-sm"
+            title={t.refreshTitle}
+          >
+            <RefreshCw size={20} className={loading ? "animate-spin text-teal-400" : "text-teal-600"} />
+            <span className="text-[10px] font-black text-teal-700 mt-1 uppercase">
+              {t.refresh}
+            </span>
+          </button>
           <div className="px-5 py-3 bg-yellow-50 border border-yellow-100 rounded-2xl">
             <p className="text-2xl font-black text-yellow-600">{pending.length}</p>
             <p className="text-xs text-yellow-500 font-bold mt-1">{t.statusPending}</p>
@@ -366,48 +430,119 @@ const LabStaffDashboard = () => {
         </div>
       </div>
 
+      {/* Tabs */}
+      <div className="flex gap-4 mb-6">
+        <button
+          onClick={() => setActiveTab('pending')}
+          className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all ${activeTab === 'pending' ? 'bg-teal-600 text-white shadow-md shadow-teal-500/20' : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-200'}`}
+        >
+          {t.pendingTab}
+        </button>
+        <button
+          onClick={() => setActiveTab('history')}
+          className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all ${activeTab === 'history' ? 'bg-teal-600 text-white shadow-md shadow-teal-500/20' : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-200'}`}
+        >
+          {t.historyTab}
+        </button>
+      </div>
+
       {loading ? (
         <div className="space-y-4 animate-pulse">
           {[1, 2, 3].map(i => <div key={i} className="h-52 bg-gray-100 rounded-3xl"></div>)}
         </div>
-      ) : requests.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border border-gray-100 shadow-sm text-center">
-          <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mb-6">
-            <CheckCircle2 size={40} className="text-green-400" />
+      ) : activeTab === 'pending' ? (
+        requests.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border border-gray-100 shadow-sm text-center">
+            <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mb-6">
+              <CheckCircle2 size={40} className="text-green-400" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-600 mb-2">{t.noRequestsTitle}</h3>
+            <p className="text-gray-400 text-sm">{t.noRequestsDesc}</p>
           </div>
-          <h3 className="text-xl font-bold text-gray-600 mb-2">{t.noRequestsTitle}</h3>
-          <p className="text-gray-400 text-sm">{t.noRequestsDesc}</p>
-        </div>
+        ) : (
+          <div className="space-y-6">
+            {inProgress.length > 0 && (
+              <div>
+                <h2 className="text-sm font-bold text-blue-600 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <FlaskConical size={14} /> {t.statusInProgress} ({inProgress.length})
+                </h2>
+                <div className="space-y-4">
+                  {inProgress.map(req => (
+                    <RequestCard key={req._id} req={req} onStart={handleStart} onComplete={handleComplete} />
+                  ))}
+                </div>
+              </div>
+            )}
+            {pending.length > 0 && (
+              <div>
+                <h2 className="text-sm font-bold text-yellow-600 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Clock size={14} /> {t.statusPending} ({pending.length})
+                </h2>
+                <div className="space-y-4">
+                  {pending.map(req => (
+                    <RequestCard key={req._id} req={req} onStart={handleStart} onComplete={handleComplete} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )
       ) : (
-        <div className="space-y-6">
-          {/* In Progress — show first */}
-          {inProgress.length > 0 && (
-            <div>
-              <h2 className="text-sm font-bold text-blue-600 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FlaskConical size={14} /> {t.statusInProgress} ({inProgress.length})
-              </h2>
-              <div className="space-y-4">
-                {inProgress.map(req => (
-                  <RequestCard key={req._id} req={req} onStart={handleStart} onComplete={handleComplete} />
-                ))}
-              </div>
+        completed.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border border-gray-100 shadow-sm text-center">
+            <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+              <FileText size={40} className="text-gray-300" />
             </div>
-          )}
-
-          {/* Pending */}
-          {pending.length > 0 && (
-            <div>
-              <h2 className="text-sm font-bold text-yellow-600 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <Clock size={14} /> {t.statusPending} ({pending.length})
-              </h2>
-              <div className="space-y-4">
-                {pending.map(req => (
-                  <RequestCard key={req._id} req={req} onStart={handleStart} onComplete={handleComplete} />
-                ))}
+            <h3 className="text-xl font-bold text-gray-600 mb-2">{t.noHistory}</h3>
+            <p className="text-gray-400 text-sm">{t.noHistorySub}</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {completed.map(req => (
+              <div key={req._id} className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-full uppercase">
+                        {t.labDone}
+                      </span>
+                      <span className="text-xs text-gray-500 font-mono flex items-center gap-1">
+                        <Clock size={12} /> {formatDateTime(lang, req.createdAt)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-blue-100 text-primary rounded-xl flex items-center justify-center font-bold text-lg shrink-0">
+                        {req.patient?.fullName?.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-800">{req.patient?.fullName}</h3>
+                        <p className="text-xs text-gray-500 font-mono">
+                          {req.patient?.patientId} • {t.doctorShort}: {req.doctor?.fullName}
+                        </p>
+                      </div>
+                    </div>
+                    <ul className="list-disc pl-4 text-sm text-gray-700 font-medium space-y-1 mb-4">
+                      {req.tests?.map((test, i) => (
+                        <li key={i}>{test.testName} <span className="text-gray-400 text-xs">({test.testType})</span></li>
+                      ))}
+                    </ul>
+                    {req.result?.files?.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {req.result.files.map((f, idx) => (
+                          <a key={idx} href={`${API_URL}${f.fileUrl}`} target="_blank" rel="noopener noreferrer"
+                            className="px-3 py-2 bg-green-50 text-green-700 border border-green-200 rounded-xl text-xs font-bold hover:bg-green-100 flex items-center gap-1.5 transition-colors">
+                            <FileText size={14} />
+                            {t.viewResult} {req.result.files.length > 1 ? idx + 1 : ''}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        )
       )}
     </div>
   );

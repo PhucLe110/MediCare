@@ -1,10 +1,89 @@
-import { API_URL } from '../../config';
+import { API_URL, authFetch } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Search, CheckCircle, XCircle, Clock, Calendar, AlertCircle, ChevronDown, ChevronUp, Eye, X } from 'lucide-react';
+import { useTranslation } from '../../hooks/useTranslation';
+import { getLocale } from '../../utils/i18nHelpers';
 
-const DAY_NAMES = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+const trans = {
+  vi: {
+    loading: 'Đang tải...',
+    toastApproved: 'Đã duyệt yêu cầu ca trực!',
+    toastRejected: 'Đã từ chối yêu cầu.',
+    toastError: 'Có lỗi xảy ra',
+    anonymous: 'Ẩn danh',
+    pendingBanner: (n) => `Có ${n} yêu cầu ca trực đang chờ duyệt`,
+    searchPlaceholder: 'Tìm theo tên bác sĩ, khoa...',
+    noRequests: 'Không có yêu cầu nào.',
+    pendingCount: (n) => `${n} chờ duyệt`,
+    requestCount: (n) => `${n} yêu cầu`,
+    viewSchedule: 'Xem lịch',
+    addShift: 'Thêm ca',
+    cancelShift: 'Hủy ca',
+    statusPending: 'Chờ duyệt',
+    statusApproved: 'Đã duyệt',
+    statusRejected: 'Đã từ chối',
+    approveTitle: 'Duyệt',
+    rejectTitle: 'Từ chối',
+    scheduleTitle: (name) => `Lịch trực — BS. ${name}`,
+    shiftPattern: 'Ca làm việc:',
+    fullWeek: 'Cả tuần',
+    pendingInMonth: (n) => `• ${n} yêu cầu chờ duyệt`,
+    legendShift: 'Ca trực',
+    legendPendingAdd: 'Chờ thêm',
+    legendPendingCancel: 'Chờ hủy',
+    waitingAdd: 'Chờ thêm',
+    waitingCancel: 'Chờ hủy',
+    waitingPrefix: 'Chờ',
+    approveBtn: '✓ Duyệt',
+    rejectBtn: '✕ Từ chối',
+    noShiftDay: 'Ngày không có ca trực',
+    waitingAddShift: '⏳ Chờ thêm ca:',
+    noDaysInMonth: 'Không có ngày trực nào trong tháng này.',
+    months: ['', 'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+    days: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+  },
+  en: {
+    loading: 'Loading...',
+    toastApproved: 'Shift request approved!',
+    toastRejected: 'Request rejected.',
+    toastError: 'Something went wrong',
+    anonymous: 'Unknown',
+    pendingBanner: (n) => `${n} shift request(s) awaiting approval`,
+    searchPlaceholder: 'Search by doctor name, department...',
+    noRequests: 'No requests found.',
+    pendingCount: (n) => `${n} pending`,
+    requestCount: (n) => `${n} request(s)`,
+    viewSchedule: 'View schedule',
+    addShift: 'Add shift',
+    cancelShift: 'Cancel shift',
+    statusPending: 'Pending',
+    statusApproved: 'Approved',
+    statusRejected: 'Rejected',
+    approveTitle: 'Approve',
+    rejectTitle: 'Reject',
+    scheduleTitle: (name) => `Schedule — Dr. ${name}`,
+    shiftPattern: 'Shift pattern:',
+    fullWeek: 'Full week',
+    pendingInMonth: (n) => `• ${n} pending in this month`,
+    legendShift: 'On duty',
+    legendPendingAdd: 'Pending add',
+    legendPendingCancel: 'Pending cancel',
+    waitingAdd: 'pending add',
+    waitingCancel: 'pending cancel',
+    waitingPrefix: 'Waiting',
+    approveBtn: '✓ Approve',
+    rejectBtn: '✕ Reject',
+    noShiftDay: 'No scheduled shift this day',
+    waitingAddShift: '⏳ Pending add:',
+    noDaysInMonth: 'No shift days in this month.',
+    months: ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+  },
+};
 
 export default function AdminShifts() {
+  const { lang, t } = useTranslation(trans);
+  const locale = getLocale(lang);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,10 +102,7 @@ export default function AdminShifts() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const getToken = () => {
-    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-    return userInfo.token;
-  };
+  const jsonHeaders = () => ({ 'Content-Type': 'application/json' });
 
   useEffect(() => {
     fetchRequests();
@@ -38,9 +114,7 @@ export default function AdminShifts() {
 
   const fetchRequests = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/admin/shift-requests`, {
-        headers: { 'Authorization': `Bearer ${getToken()}` }
-      });
+      const res = await authFetch(`${API_URL}/api/admin/shift-requests`);
       const json = await res.json();
       if (json.success) setRequests(json.data);
     } catch (err) {
@@ -54,9 +128,8 @@ export default function AdminShifts() {
     setPreviewLoading(true);
     try {
       const { year, month } = previewMonth;
-      const res = await fetch(
+      const res = await authFetch(
         `${API_URL}/api/admin/doctors/${doctorId}/schedule?year=${year}&month=${month}`,
-        { headers: { 'Authorization': `Bearer ${getToken()}` } }
       );
       const json = await res.json();
       if (json.success) setPreviewSchedule(json.data);
@@ -79,22 +152,22 @@ export default function AdminShifts() {
 
   const updateStatus = async (id, status) => {
     try {
-      const res = await fetch(`${API_URL}/api/admin/shift-requests/${id}/status`, {
+      const res = await authFetch(`${API_URL}/api/admin/shift-requests/${id}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+        headers: jsonHeaders(),
         body: JSON.stringify({ status })
       });
       const json = await res.json();
       if (json.success) {
-        showToast(status === 'approved' ? 'Đã duyệt yêu cầu ca trực!' : 'Đã từ chối yêu cầu.', status === 'approved' ? 'success' : 'error');
+        showToast(status === 'approved' ? t.toastApproved : t.toastRejected, status === 'approved' ? 'success' : 'error');
         fetchRequests();
         // Refresh schedule if preview open
         if (previewDoctor) fetchSchedule(previewDoctor.doctorId);
       } else {
-        showToast(json.message || 'Có lỗi xảy ra', 'error');
+        showToast(json.message || t.toastError, 'error');
       }
     } catch (err) {
-      showToast('Có lỗi xảy ra', 'error');
+      showToast(t.toastError, 'error');
     }
   };
 
@@ -105,7 +178,7 @@ export default function AdminShifts() {
     if (!acc[doctorId]) {
       acc[doctorId] = {
         doctorId,
-        doctorName: r.doctor?.userId?.fullName || 'Ẩn danh',
+        doctorName: r.doctor?.userId?.fullName || t.anonymous,
         department: r.doctor?.department || '',
         requests: []
       };
@@ -121,9 +194,6 @@ export default function AdminShifts() {
 
   const pendingCount = requests.filter(r => r.status === 'pending').length;
 
-  const MONTH_NAMES = ['', 'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
-    'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
-
   const changeMonth = (delta) => {
     setPreviewMonth(prev => {
       let m = prev.month + delta;
@@ -134,7 +204,7 @@ export default function AdminShifts() {
     });
   };
 
-  if (loading) return <div className="text-center py-10 font-bold text-slate-600">Đang tải...</div>;
+  if (loading) return <div className="text-center py-10 font-bold text-slate-600">{t.loading}</div>;
 
   return (
     <div className="space-y-4 animate-in fade-in relative">
@@ -152,7 +222,7 @@ export default function AdminShifts() {
       {pendingCount > 0 && (
         <div className="flex items-center gap-3 px-5 py-3 bg-yellow-50 border border-yellow-200 rounded-2xl text-yellow-800 text-sm font-bold">
           <AlertCircle size={18} className="text-yellow-500 shrink-0" />
-          Có <span className="text-yellow-600 mx-1">{pendingCount}</span> yêu cầu ca trực đang chờ duyệt
+          {t.pendingBanner(pendingCount)}
         </div>
       )}
 
@@ -162,7 +232,7 @@ export default function AdminShifts() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
           <input
             type="text"
-            placeholder="Tìm theo tên bác sĩ, khoa..."
+            placeholder={t.searchPlaceholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-full"
@@ -174,7 +244,7 @@ export default function AdminShifts() {
       {groupedList.length === 0 ? (
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm text-center py-16 text-slate-400">
           <AlertCircle size={40} className="mx-auto mb-3 opacity-20" />
-          <p className="font-semibold text-sm">Không có yêu cầu nào.</p>
+          <p className="font-semibold text-sm">{t.noRequests}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -200,17 +270,17 @@ export default function AdminShifts() {
                   <div className="flex items-center gap-3">
                     {pendingInGroup > 0 && (
                       <span className="px-2.5 py-1 bg-yellow-100 text-yellow-700 text-xs font-black rounded-full">
-                        {pendingInGroup} chờ duyệt
+                        {t.pendingCount(pendingInGroup)}
                       </span>
                     )}
                     <span className="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-full">
-                      {group.requests.length} yêu cầu
+                      {t.requestCount(group.requests.length)}
                     </span>
                     <button
                       onClick={(e) => { e.stopPropagation(); openPreview(group.doctorId, group.doctorName); }}
                       className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-lg hover:bg-indigo-100 transition-colors"
                     >
-                      <Eye size={14} /> Xem lịch
+                      <Eye size={14} /> {t.viewSchedule}
                     </button>
                     {isExpanded ? <ChevronUp size={18} className="text-slate-400" /> : <ChevronDown size={18} className="text-slate-400" />}
                   </div>
@@ -223,11 +293,11 @@ export default function AdminShifts() {
                       <div key={r._id} className="flex items-center justify-between px-5 py-3 hover:bg-slate-50/40 transition-colors">
                         <div className="flex items-center gap-4">
                           <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${r.type === 'add' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
-                            {r.type === 'add' ? 'Thêm ca' : 'Hủy ca'}
+                            {r.type === 'add' ? t.addShift : t.cancelShift}
                           </span>
                           <div className="flex items-center gap-2 text-sm text-slate-600 font-medium">
                             <Calendar size={14} className="text-slate-400" />
-                            {new Date(r.date).toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit' })}
+                            {new Date(r.date).toLocaleDateString(locale, { weekday: 'short', day: '2-digit', month: '2-digit' })}
                           </div>
                           <div className="flex flex-wrap gap-1.5">
                             {(r.times || []).map(t => (
@@ -238,15 +308,15 @@ export default function AdminShifts() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          {r.status === 'pending' && <span className="text-yellow-600 bg-yellow-50 px-2.5 py-1 rounded-lg text-xs font-bold border border-yellow-100">Chờ duyệt</span>}
-                          {r.status === 'approved' && <span className="text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg text-xs font-bold border border-emerald-100">Đã duyệt</span>}
-                          {r.status === 'rejected' && <span className="text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg text-xs font-bold border border-rose-100">Đã từ chối</span>}
+                          {r.status === 'pending' && <span className="text-yellow-600 bg-yellow-50 px-2.5 py-1 rounded-lg text-xs font-bold border border-yellow-100">{t.statusPending}</span>}
+                          {r.status === 'approved' && <span className="text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg text-xs font-bold border border-emerald-100">{t.statusApproved}</span>}
+                          {r.status === 'rejected' && <span className="text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg text-xs font-bold border border-rose-100">{t.statusRejected}</span>}
                           {r.status === 'pending' && (
                             <>
-                              <button onClick={() => updateStatus(r._id, 'approved')} className="p-1.5 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors" title="Duyệt">
+                              <button onClick={() => updateStatus(r._id, 'approved')} className="p-1.5 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors" title={t.approveTitle}>
                                 <CheckCircle size={18} />
                               </button>
-                              <button onClick={() => updateStatus(r._id, 'rejected')} className="p-1.5 text-rose-600 hover:bg-rose-100 rounded-lg transition-colors" title="Từ chối">
+                              <button onClick={() => updateStatus(r._id, 'rejected')} className="p-1.5 text-rose-600 hover:bg-rose-100 rounded-lg transition-colors" title={t.rejectTitle}>
                                 <XCircle size={18} />
                               </button>
                             </>
@@ -289,12 +359,12 @@ export default function AdminShifts() {
               {/* Modal header */}
               <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-black text-slate-800">Lịch trực — BS. {previewDoctor.doctorName}</h3>
+                  <h3 className="text-lg font-black text-slate-800">{t.scheduleTitle(previewDoctor.doctorName)}</h3>
                   {previewSchedule && (
                     <p className="text-xs text-slate-500 font-medium mt-0.5">
-                      Ca làm việc: <span className="font-bold text-indigo-600">{previewSchedule.doctor?.shiftPattern || 'Cả tuần'}</span>
+                      {t.shiftPattern} <span className="font-bold text-indigo-600">{previewSchedule.doctor?.shiftPattern || t.fullWeek}</span>
                       {pendingReqs.length > 0 && (
-                        <span className="ml-3 text-yellow-600 font-bold">• {pendingReqs.length} yêu cầu chờ duyệt</span>
+                        <span className="ml-3 text-yellow-600 font-bold">{t.pendingInMonth(pendingReqs.length)}</span>
                       )}
                     </p>
                   )}
@@ -307,15 +377,15 @@ export default function AdminShifts() {
               {/* Month nav */}
               <div className="flex items-center justify-between px-6 py-3 border-b border-slate-100 bg-slate-50/50">
                 <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-600 font-bold">‹</button>
-                <span className="font-black text-slate-700">{MONTH_NAMES[previewMonth.month]} {previewMonth.year}</span>
+                <span className="font-black text-slate-700">{t.months[previewMonth.month]} {previewMonth.year}</span>
                 <button onClick={() => changeMonth(1)} className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-600 font-bold">›</button>
               </div>
 
               {/* Legend */}
               <div className="flex items-center gap-4 px-6 py-2.5 bg-slate-50/60 border-b border-slate-100 text-[11px] font-bold">
-                <span className="flex items-center gap-1.5 text-slate-500"><span className="w-3 h-3 rounded-sm bg-white border border-slate-200 inline-block"></span>Ca trực</span>
-                <span className="flex items-center gap-1.5 text-emerald-600"><span className="w-3 h-3 rounded-sm bg-emerald-100 border border-emerald-300 inline-block"></span>Chờ thêm</span>
-                <span className="flex items-center gap-1.5 text-rose-600"><span className="w-3 h-3 rounded-sm bg-rose-100 border border-rose-300 inline-block"></span>Chờ hủy</span>
+                <span className="flex items-center gap-1.5 text-slate-500"><span className="w-3 h-3 rounded-sm bg-white border border-slate-200 inline-block"></span>{t.legendShift}</span>
+                <span className="flex items-center gap-1.5 text-emerald-600"><span className="w-3 h-3 rounded-sm bg-emerald-100 border border-emerald-300 inline-block"></span>{t.legendPendingAdd}</span>
+                <span className="flex items-center gap-1.5 text-rose-600"><span className="w-3 h-3 rounded-sm bg-rose-100 border border-rose-300 inline-block"></span>{t.legendPendingCancel}</span>
               </div>
 
               {/* Schedule content */}
@@ -335,7 +405,7 @@ export default function AdminShifts() {
                           return (
                             <div key={s.date} className={`p-3 border rounded-xl transition-all ${hasPending ? 'border-yellow-300 bg-yellow-50/40' : isToday ? 'border-indigo-400 bg-indigo-50' : 'border-slate-100 bg-slate-50/50'}`}>
                               <div className="flex items-center justify-between mb-2">
-                                <span className={`text-xs font-black ${isToday ? 'text-indigo-600' : 'text-slate-600'}`}>{DAY_NAMES[s.dayOfWeek]}</span>
+                                <span className={`text-xs font-black ${isToday ? 'text-indigo-600' : 'text-slate-600'}`}>{t.days[s.dayOfWeek]}</span>
                                 <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${isToday ? 'bg-indigo-500 text-white' : 'bg-white text-slate-500 border border-slate-200'}`}>
                                   {dateObj.getDate()}/{dateObj.getMonth() + 1}
                                 </span>
@@ -350,7 +420,7 @@ export default function AdminShifts() {
                               {pendingForDay.map(pr => (
                                 <div key={pr._id} className={`mt-1 pt-1.5 border-t ${pr.type === 'add' ? 'border-emerald-200' : 'border-rose-200'}`}>
                                   <p className={`text-[9px] font-black uppercase mb-1 ${pr.type === 'add' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                    ⏳ Chờ {pr.type === 'add' ? 'thêm' : 'hủy'}:
+                                    ⏳ {t.waitingPrefix} {pr.type === 'add' ? t.waitingAdd : t.waitingCancel}:
                                   </p>
                                   <div className="flex flex-wrap gap-1">
                                     {(pr.times || []).map(t => (
@@ -358,8 +428,8 @@ export default function AdminShifts() {
                                     ))}
                                   </div>
                                   <div className="flex gap-1 mt-1.5">
-                                    <button onClick={() => updateStatus(pr._id, 'approved')} className="flex-1 text-[9px] font-black text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded-md py-1 transition-colors">✓ Duyệt</button>
-                                    <button onClick={() => updateStatus(pr._id, 'rejected')} className="flex-1 text-[9px] font-black text-rose-700 bg-rose-100 hover:bg-rose-200 rounded-md py-1 transition-colors">✕ Từ chối</button>
+                                    <button onClick={() => updateStatus(pr._id, 'approved')} className="flex-1 text-[9px] font-black text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded-md py-1 transition-colors">{t.approveBtn}</button>
+                                    <button onClick={() => updateStatus(pr._id, 'rejected')} className="flex-1 text-[9px] font-black text-rose-700 bg-rose-100 hover:bg-rose-200 rounded-md py-1 transition-colors">{t.rejectBtn}</button>
                                   </div>
                                 </div>
                               ))}
@@ -375,23 +445,23 @@ export default function AdminShifts() {
                           return (
                             <div key={dateStr} className="p-3 border border-yellow-300 bg-yellow-50/60 rounded-xl">
                               <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-black text-yellow-700">{DAY_NAMES[dow]}</span>
+                                <span className="text-xs font-black text-yellow-700">{t.days[dow]}</span>
                                 <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-yellow-100 text-yellow-700 border border-yellow-200">
                                   {dateObj.getDate()}/{dateObj.getMonth() + 1}
                                 </span>
                               </div>
-                              <p className="text-[9px] text-yellow-600 font-bold mb-1">Ngày không có ca trực</p>
+                              <p className="text-[9px] text-yellow-600 font-bold mb-1">{t.noShiftDay}</p>
                               {pendingForDay.map(pr => (
                                 <div key={pr._id} className="mt-1 pt-1 border-t border-emerald-200">
-                                  <p className="text-[9px] font-black text-emerald-600 uppercase mb-1">⏳ Chờ thêm ca:</p>
+                                  <p className="text-[9px] font-black text-emerald-600 uppercase mb-1">{t.waitingAddShift}</p>
                                   <div className="flex flex-wrap gap-1 mb-1.5">
                                     {(pr.times || []).map(t => (
                                       <span key={t} className="px-1.5 py-0.5 text-[10px] font-bold rounded-md border bg-emerald-100 text-emerald-700 border-emerald-300">{t}</span>
                                     ))}
                                   </div>
                                   <div className="flex gap-1">
-                                    <button onClick={() => updateStatus(pr._id, 'approved')} className="flex-1 text-[9px] font-black text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded-md py-1 transition-colors">✓ Duyệt</button>
-                                    <button onClick={() => updateStatus(pr._id, 'rejected')} className="flex-1 text-[9px] font-black text-rose-700 bg-rose-100 hover:bg-rose-200 rounded-md py-1 transition-colors">✕ Từ chối</button>
+                                    <button onClick={() => updateStatus(pr._id, 'approved')} className="flex-1 text-[9px] font-black text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded-md py-1 transition-colors">{t.approveBtn}</button>
+                                    <button onClick={() => updateStatus(pr._id, 'rejected')} className="flex-1 text-[9px] font-black text-rose-700 bg-rose-100 hover:bg-rose-200 rounded-md py-1 transition-colors">{t.rejectBtn}</button>
                                   </div>
                                 </div>
                               ))}
@@ -402,7 +472,7 @@ export default function AdminShifts() {
                     ) : (
                       <div className="text-center py-12 text-slate-400">
                         <Calendar size={40} className="mx-auto mb-3 opacity-20" />
-                        <p className="font-medium text-sm">Không có ngày trực nào trong tháng này.</p>
+                        <p className="font-medium text-sm">{t.noDaysInMonth}</p>
                       </div>
                     )}
                   </>

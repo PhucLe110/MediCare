@@ -1,4 +1,4 @@
-import { API_URL } from '../../config';
+import { API_URL, authFetch } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Search, Ban, CheckCircle, ShieldAlert, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -88,17 +88,11 @@ export default function AdminUsers() {
   // Custom Confirm Dialog State
   const [confirmDialog, setConfirmDialog] = useState({ show: false, userId: null, currentStatus: '', message: '' });
 
+  const jsonHeaders = () => ({ 'Content-Type': 'application/json' });
+
   const fetchUsers = async () => {
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
-      const res = await fetch(`${API_URL}/api/admin/users`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const res = await authFetch(`${API_URL}/api/admin/users`);
       const json = await res.json();
       if (json.success) {
         setUsers(json.data);
@@ -150,16 +144,9 @@ export default function AdminUsers() {
     const nextStatus = currentStatus === 'active' ? 'blocked' : 'active';
 
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
-      const res = await fetch(`${API_URL}/api/admin/users/${id}`, {
+      const res = await authFetch(`${API_URL}/api/admin/users/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: jsonHeaders(),
         body: JSON.stringify({ status: nextStatus })
       });
       const json = await res.json();
@@ -176,16 +163,9 @@ export default function AdminUsers() {
 
   const handleUpdateRole = async (id, newRole) => {
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
-      const res = await fetch(`${API_URL}/api/admin/users/${id}`, {
+      const res = await authFetch(`${API_URL}/api/admin/users/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: jsonHeaders(),
         body: JSON.stringify({ role: newRole })
       });
       const json = await res.json();

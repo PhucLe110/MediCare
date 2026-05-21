@@ -60,7 +60,9 @@ const MainLayout = () => {
       copyright: '© 2024 MediCare. Tất cả quyền được bảo lưu.',
       terms: 'Điều khoản',
       privacy: 'Bảo mật',
-      cookies: 'Cookies'
+      cookies: 'Cookies',
+      lightMode: 'Chế độ Sáng',
+      darkMode: 'Chế độ Tối',
     },
     en: {
       home: 'Home',
@@ -87,7 +89,9 @@ const MainLayout = () => {
       copyright: '© 2024 MediCare Hospital. All Rights Reserved.',
       terms: 'Terms',
       privacy: 'Privacy',
-      cookies: 'Cookies'
+      cookies: 'Cookies',
+      lightMode: 'Light Mode',
+      darkMode: 'Dark Mode',
     }
   };
 
@@ -144,14 +148,14 @@ const MainLayout = () => {
                   <button 
                     onClick={() => setTheme('light')}
                     className={`w-7 h-7 rounded-full transition-all flex items-center justify-center ${theme === 'light' ? 'bg-white text-primary shadow-sm scale-105' : 'text-gray-500 hover:text-gray-800'}`}
-                    title={lang === 'vi' ? 'Chế độ Sáng' : 'Light Mode'}
+                    title={t.lightMode}
                   >
                     <Sun size={14} />
                   </button>
                   <button 
                     onClick={() => setTheme('dark')}
                     className={`w-7 h-7 rounded-full transition-all flex items-center justify-center ${theme === 'dark' ? 'bg-white text-primary shadow-sm scale-105' : 'text-gray-500 hover:text-gray-800'}`}
-                    title={lang === 'vi' ? 'Chế độ Tối' : 'Dark Mode'}
+                    title={t.darkMode}
                   >
                     <Moon size={14} />
                   </button>

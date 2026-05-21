@@ -1,11 +1,11 @@
-import { API_URL as API } from '../config';
+import { API_URL as API, authFetch } from '../config';
 import React, { useState, useEffect } from 'react';
 import { Bell, Clock, CreditCard, ChevronRight, Stethoscope } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
+import { formatMoney, formatDoctorName, formatDate } from '../utils/i18nHelpers';
 
 // const API = API;
-const authH = () => ({ Authorization: `Bearer ${JSON.parse(localStorage.getItem('userInfo') || '{}').token}` });
 
 const trans = {
   vi: {
@@ -28,9 +28,20 @@ const trans = {
     doctorTitle: 'Phụ trách',
     apptReminderTitle: '⏰ Nhắc lịch khám — Sắp đến giờ!',
     billTitle: 'Hóa đơn mới cập nhật',
-    billDescSuffix: '— Vui lòng hoàn tất để nhận kết quả khám',
+    billDescSuffix: '— Vui lòng thanh toán',
+    billConsultation: 'Phí khám bệnh',
+    billLab: 'Phí xét nghiệm',
+    billMedicine: 'Phí thuốc',
     completedApptTitle: 'Cập nhật chẩn bệnh của Bác sĩ',
     completedApptDesc: 'BS. {doctor} đã cập nhật thông tin chẩn đoán và đơn thuốc cho ca khám ngày {date}',
+    payLabHint: ' — Thanh toán để được xét nghiệm',
+    payMedicineHint: ' — Thanh toán để nhận thuốc',
+    payConsultHint: ' — Thanh toán để xác nhận lịch khám',
+    minsRemaining: (m) => `còn ${m} phút`,
+    hoursRemaining: (h) => `còn ${h} giờ`,
+    minsAgo: (m) => `${m} phút trước`,
+    hoursAgo: (h) => `${h} giờ trước`,
+    daysAgo: (d) => `${d} ngày trước`,
   },
   en: {
     title: 'Notifications',
@@ -52,9 +63,20 @@ const trans = {
     doctorTitle: 'Attending Doctor',
     apptReminderTitle: '⏰ Appointment Reminder — Upcoming!',
     billTitle: 'New Billing Statement Published',
-    billDescSuffix: '— Please complete payment to retrieve your laboratory results',
+    billDescSuffix: '— Please complete payment',
+    billConsultation: 'Consultation fee',
+    billLab: 'Lab test fee',
+    billMedicine: 'Medicine fee',
     completedApptTitle: 'Clinical Record Updated',
     completedApptDesc: 'Dr. {doctor} has successfully updated the medical diagnosis and prescription card for your visit on {date}',
+    payLabHint: ' — Pay to proceed with lab tests',
+    payMedicineHint: ' — Pay to receive medicine',
+    payConsultHint: ' — Pay to confirm appointment',
+    minsRemaining: (m) => `${m} mins remaining`,
+    hoursRemaining: (h) => `${h} hours remaining`,
+    minsAgo: (m) => `${m} mins ago`,
+    hoursAgo: (h) => `${h} hours ago`,
+    daysAgo: (d) => `${d} days ago`,
   }
 };
 
@@ -66,42 +88,32 @@ export default function Notifications() {
   const [filter, setFilter] = useState('all');
   const navigate = useNavigate();
 
-  const fmt = (n) => {
-    return lang === 'vi'
-      ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n || 0)
-      : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format((n || 0) / 25000);
-  };
-
-  const getDoctorDisplayName = (name) => {
-    if (!name) return t.doctorTitle;
-    const trimmed = name.trim();
-    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
-    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
-  };
+  const fmt = (n) => formatMoney(lang, n);
+  const getDoctorDisplayName = (name) => formatDoctorName(lang, name) || t.doctorTitle;
 
   const timeAgo = (dateVal) => {
     const s = (Date.now() - new Date(dateVal)) / 1000;
     if (s < 60) return t.timeJustNow;
-    if (s < 3600) return `${Math.floor(s / 60)} ${lang === 'vi' ? 'phút trước' : 'mins ago'}`;
-    if (s < 86400) return `${Math.floor(s / 3600)} ${lang === 'vi' ? 'giờ trước' : 'hours ago'}`;
-    if (s < 86400 * 7) return `${Math.floor(s / 86400)} ${lang === 'vi' ? 'ngày trước' : 'days ago'}`;
-    return lang === 'vi' ? new Date(dateVal).toLocaleDateString('vi-VN') : new Date(dateVal).toLocaleDateString('en-US');
+    if (s < 3600) return t.minsAgo(Math.floor(s / 60));
+    if (s < 86400) return t.hoursAgo(Math.floor(s / 3600));
+    if (s < 86400 * 7) return t.daysAgo(Math.floor(s / 86400));
+    return formatDate(lang, dateVal);
   };
 
   const timeUntil = (date, timeStr) => {
     const apptTime = new Date(`${date}T${timeStr}`);
     const mins = Math.round((apptTime - Date.now()) / 60000);
     if (mins <= 0) return t.timeUntilReady;
-    if (mins < 60) return lang === 'vi' ? `còn ${mins} phút` : `${mins} mins remaining`;
-    return lang === 'vi' ? `còn ${Math.round(mins/60)} giờ` : `${Math.round(mins/60)} hours remaining`;
+    if (mins < 60) return t.minsRemaining(mins);
+    return t.hoursRemaining(Math.round(mins / 60));
   };
 
   useEffect(() => {
     (async () => {
       try {
         const [ar, br] = await Promise.all([
-          fetch(`${API}/api/appointments`, { headers: authH() }),
-          fetch(`${API}/api/bills/my`, { headers: authH() }),
+          authFetch(`${API}/api/appointments`),
+          authFetch(`${API}/api/bills/my`),
         ]);
         const [ad, bd] = await Promise.all([ar.json(), br.json()]);
         if (ad.success) setAppts(ad.data);
@@ -129,22 +141,33 @@ export default function Notifications() {
     }
   });
 
-  // 2. Unpaid bills (Hóa đơn mới cập nhật)
+  const billTypeLabel = (type) => {
+    if (type === 'consultation') return t.billConsultation;
+    if (type === 'lab') return t.billLab;
+    if (type === 'medicine') return t.billMedicine;
+    return t.billTitle;
+  };
+
+  // 2. Unpaid bills — từng loại hóa đơn riêng
   bills.filter(b => b.status === 'unpaid').forEach(b => {
+    const label = billTypeLabel(b.billType);
+    const hint = b.billType === 'lab'
+      ? t.payLabHint
+      : b.billType === 'medicine'
+        ? t.payMedicineHint
+        : t.payConsultHint;
     all.push({
       id: `bill-unpaid-${b._id}`, type: 'bill', urgent: true,
       icon: CreditCard, color: '#d97706', bg: '#fef3c7',
-      title: t.billTitle,
-      desc: `${fmt(b.totalAmount)} ${t.billDescSuffix}`,
+      title: label,
+      desc: `${fmt(b.totalAmount)}${hint}`,
       time: b.createdAt, link: '/dashboard/billing',
     });
   });
 
   // 3. Completed appointments (Cập nhật chẩn bệnh)
   appts.filter(a => a.status === 'completed').slice(0, 5).forEach(a => {
-    const dateFormatted = lang === 'vi' 
-      ? new Date(a.date).toLocaleDateString('vi-VN')
-      : new Date(a.date).toLocaleDateString('en-US');
+    const dateFormatted = formatDate(lang, a.date);
     all.push({
       id: `done-${a._id}`, type: 'update',
       icon: Stethoscope, color: '#059669', bg: '#d1fae5',

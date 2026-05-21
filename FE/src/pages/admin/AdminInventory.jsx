@@ -1,7 +1,8 @@
-import { API_URL } from '../../config';
+import { API_URL, authFetch } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Pill, AlertCircle, Plus, Search, X, Edit3, Trash2, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
+import { formatMoney, localizeMedicineUnit, formatDate, pickLang } from '../../utils/i18nHelpers';
 
 const trans = {
   vi: {
@@ -123,17 +124,11 @@ export default function AdminInventory() {
   // Custom Confirm Dialog State
   const [confirmDialog, setConfirmDialog] = useState({ show: false, medId: null, message: '' });
 
+  const jsonHeaders = () => ({ 'Content-Type': 'application/json' });
+
   const fetchMedicines = async () => {
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
-      const res = await fetch(`${API_URL}/api/admin/medicines`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const res = await authFetch(`${API_URL}/api/admin/medicines`);
       const json = await res.json();
       if (json.success) {
         setMedicines(json.data);
@@ -203,15 +198,8 @@ export default function AdminInventory() {
     setConfirmDialog({ show: false, medId: null, message: '' });
 
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
-      const res = await fetch(`${API_URL}/api/admin/medicines/${id}`, {
+      const res = await authFetch(`${API_URL}/api/admin/medicines/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
       });
       const json = await res.json();
       if (json.success) {
@@ -229,10 +217,6 @@ export default function AdminInventory() {
     e.preventDefault();
 
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
       const body = {
         name,
         dosage,
@@ -249,12 +233,9 @@ export default function AdminInventory() {
 
       const method = editingMed ? 'PUT' : 'POST';
 
-      const res = await fetch(url, {
+      const res = await authFetch(url, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: jsonHeaders(),
         body: JSON.stringify(body)
       });
 
@@ -271,36 +252,8 @@ export default function AdminInventory() {
     }
   };
 
-  const getLocalizedUnit = (unitVal) => {
-    if (!unitVal) return '';
-    if (lang === 'vi') {
-      const unitsMap = {
-        'Tablet': 'Viên',
-        'Bottle': 'Lọ',
-        'Sachet': 'Gói',
-        'Tube': 'Tuýp',
-        'Ampoule': 'Ống',
-        'Flacon': 'Chai',
-      };
-      return unitsMap[unitVal] || unitVal;
-    } else {
-      const unitsMap = {
-        'Viên': 'Tablet',
-        'Lọ': 'Bottle',
-        'Gói': 'Sachet',
-        'Tuýp': 'Tube',
-        'Ống': 'Ampoule',
-        'Chai': 'Flacon',
-      };
-      return unitsMap[unitVal] || unitVal;
-    }
-  };
-
-  const fmt = (n) => {
-    return lang === 'vi'
-      ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n || 0)
-      : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.round((n || 0) / 25000));
-  };
+  const getLocalizedUnit = (unitVal) => localizeMedicineUnit(lang, unitVal);
+  const fmt = (n) => formatMoney(lang, n);
 
   const filteredMedicines = medicines.filter(m => {
     return m.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -407,7 +360,7 @@ export default function AdminInventory() {
                   </td>
                   <td className="p-4 font-bold text-slate-600">{item.stock} {getLocalizedUnit(item.unit)}</td>
                   <td className="p-4 font-black text-indigo-600">{fmt(item.unitPrice)}</td>
-                  <td className="p-4 font-semibold text-slate-500 text-xs">{lang === 'vi' ? new Date(item.expiry).toLocaleDateString('vi-VN') : new Date(item.expiry).toLocaleDateString('en-US')}</td>
+                  <td className="p-4 font-semibold text-slate-500 text-xs">{formatDate(lang, item.expiry)}</td>
                   <td className="p-4">
                     {item.stock >= 150 ? (
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-100">{t.statusNormal}</span>
@@ -481,7 +434,7 @@ export default function AdminInventory() {
                   <input required type="number" value={stock} onChange={(e) => setStock(e.target.value)} className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 outline-none" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">{lang === 'vi' ? t.labelPrice : t.labelPriceEn}</label>
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-1">{pickLang(lang, t.labelPrice, t.labelPriceEn)}</label>
                   <input required type="number" value={unitPrice} onChange={(e) => setUnitPrice(e.target.value)} className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 outline-none" />
                 </div>
               </div>

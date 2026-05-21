@@ -1,0 +1,7 @@
+module.exports = {
+  MAX_PATIENTS_PER_SLOT: 5,
+  RESCHEDULE_MAX_PER_DOCTOR: 3,
+  SLOT_TIMES_BOOKING: ['08:00', '09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'],
+  SLOT_TIMES_SHIFT: ['08:00', '09:00', '10:00', '14:00', '15:00', '16:00'],
+  DEFAULT_SHIFT_PATTERN: 'Cả tuần'
+};

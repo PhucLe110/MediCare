@@ -1,7 +1,9 @@
 import { API_URL } from '../config';
-import React, { useState } from 'react';
+import { saveAuthSession } from '../utils/auth';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
+import LangThemeControls from '../components/LangThemeControls';
 
 const trans = {
   vi: {
@@ -48,6 +50,7 @@ const trans = {
 
 const Register = () => {
   const { lang, t } = useTranslation(trans);
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -58,6 +61,12 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (theme === 'dark') document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -87,7 +96,7 @@ const Register = () => {
       const data = await res.json();
 
       if (data.success) {
-        localStorage.setItem('userInfo', JSON.stringify(data.data));
+        saveAuthSession(data.data);
         navigate('/dashboard');
       } else {
         setError(data.message);
@@ -98,7 +107,10 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 relative">
+      <div className="absolute top-4 right-4">
+        <LangThemeControls lang={lang} setLang={() => {}} theme={theme} setTheme={setTheme} />
+      </div>
       <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
         <div className="flex flex-col items-center mb-8">
           <Link to="/" className="flex items-center cursor-pointer mb-6">

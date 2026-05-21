@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Bot, FolderHeart, CreditCard, Activity, ShieldCheck, FileText, ChevronRight, Stethoscope, HeartPulse, Brain, Bone, Eye, Star, CheckCircle2, Award, Users, Clock } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
+import { resolveDeptLabel } from '../utils/i18nHelpers';
 
 const trans = {
   vi: {
@@ -161,13 +162,7 @@ const LandingPage = () => {
       .catch(console.error);
   }, []);
 
-  const getDeptTranslation = (dept) => {
-    if (!dept) return '';
-    const dLower = dept.toLowerCase();
-    if (dLower.includes('tổng quát') || dLower.includes('general')) return lang === 'vi' ? 'Khám tổng quát' : 'General Practice';
-    if (dLower.includes('xét nghiệm') || dLower.includes('lab')) return lang === 'vi' ? 'Xét nghiệm' : 'Laboratory';
-    return dept;
-  };
+  const getDeptTranslation = (dept) => resolveDeptLabel(lang, dept, 'landing');
 
   return (
     <>

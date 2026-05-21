@@ -1,42 +1,12 @@
-const User = require('../models/User');
+const asyncHandler = require('../utils/asyncHandler');
+const userService = require('../services/userService');
 
-// @desc    Get current user's health profile
-// @route   GET /api/users/health-profile
-// @access  Private
-exports.getHealthProfile = async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id).select('healthProfile');
-    res.status(200).json({ success: true, data: user.healthProfile || {} });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+exports.getHealthProfile = asyncHandler(async (req, res) => {
+  const data = await userService.getHealthProfile(req.user._id);
+  res.status(200).json({ success: true, data });
+});
 
-// @desc    Update current user's health profile
-// @route   PUT /api/users/health-profile
-// @access  Private
-exports.updateHealthProfile = async (req, res) => {
-  try {
-    const { bloodType, height, weight, bloodPressure, allergies, medicalHistory } = req.body;
-
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      {
-        healthProfile: {
-          bloodType,
-          height,
-          weight,
-          bloodPressure,
-          allergies,
-          medicalHistory,
-          isFilled: true
-        }
-      },
-      { new: true, runValidators: false }
-    ).select('healthProfile');
-
-    res.status(200).json({ success: true, data: user.healthProfile });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+exports.updateHealthProfile = asyncHandler(async (req, res) => {
+  const data = await userService.updateHealthProfile(req.user._id, req.body);
+  res.status(200).json({ success: true, data });
+});

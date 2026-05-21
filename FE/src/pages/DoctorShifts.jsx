@@ -1,10 +1,81 @@
 import React, { useState, useEffect } from 'react';
-import { API_URL } from '../config';
+import { API_URL, authFetch } from '../config';
 import { Calendar, Clock, Plus, Trash2, CheckCircle, XCircle, AlertCircle, Send } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
+import { getLocale } from '../utils/i18nHelpers';
 
 const ALL_TIMES = ['08:00', '09:00', '10:00', '14:00', '15:00', '16:00'];
 
+const trans = {
+  vi: {
+    errSelectDate: 'Vui lòng chọn ngày',
+    errSelectTime: 'Vui lòng chọn ít nhất một khung giờ',
+    submitSuccess: (n) => `Đã gửi yêu cầu thành công (${n} khung giờ)!`,
+    errGeneric: 'Có lỗi xảy ra',
+    errRetry: 'Có lỗi xảy ra, vui lòng thử lại',
+    statusApproved: 'Đã duyệt',
+    statusRejected: 'Từ chối',
+    statusPending: 'Chờ duyệt',
+    title: 'Thời gian trực khám',
+    subtitle: 'Quản lý ca trực và yêu cầu thay đổi lịch trình của bạn',
+    newRequest: 'Tạo yêu cầu mới',
+    requestType: 'Loại yêu cầu',
+    addShift: 'Thêm ca trực',
+    cancelShift: 'Hủy ca trực',
+    dateLabel: 'Ngày',
+    timeSlots: 'Chọn khung giờ',
+    multiSelect: '(có thể chọn nhiều)',
+    selected: 'Đã chọn:',
+    sending: 'Đang gửi...',
+    sendRequest: 'Gửi yêu cầu',
+    sendN: (n) => `Gửi ${n} yêu cầu`,
+    schedule30: 'Lịch trực 30 ngày tới',
+    basePattern: 'Lịch làm việc cơ bản của bạn là:',
+    fullWeek: 'Cả tuần',
+    off: 'Nghỉ',
+    noShifts30: 'Bạn không có ca trực nào trong 30 ngày tới.',
+    history: 'Lịch sử yêu cầu',
+    reqAdd: 'Yêu cầu thêm ca',
+    reqCancel: 'Yêu cầu hủy ca',
+    noHistory: 'Chưa có yêu cầu nào.',
+  },
+  en: {
+    errSelectDate: 'Please select a date',
+    errSelectTime: 'Please select at least one time slot',
+    submitSuccess: (n) => `Request sent successfully (${n} slot(s))!`,
+    errGeneric: 'Something went wrong',
+    errRetry: 'An error occurred, please try again',
+    statusApproved: 'Approved',
+    statusRejected: 'Rejected',
+    statusPending: 'Pending',
+    title: 'Shift Schedule',
+    subtitle: 'Manage your shifts and schedule change requests',
+    newRequest: 'New request',
+    requestType: 'Request type',
+    addShift: 'Add shift',
+    cancelShift: 'Cancel shift',
+    dateLabel: 'Date',
+    timeSlots: 'Time slots',
+    multiSelect: '(multiple allowed)',
+    selected: 'Selected:',
+    sending: 'Sending...',
+    sendRequest: 'Submit request',
+    sendN: (n) => `Submit ${n} request(s)`,
+    schedule30: 'Next 30 days',
+    basePattern: 'Your base schedule:',
+    fullWeek: 'Full week',
+    off: 'Off',
+    noShifts30: 'No shifts in the next 30 days.',
+    history: 'Request history',
+    reqAdd: 'Add shift request',
+    reqCancel: 'Cancel shift request',
+    noHistory: 'No requests yet.',
+  },
+};
+
 const DoctorShifts = () => {
+  const { lang, t } = useTranslation(trans);
+  const locale = getLocale(lang);
   const [requests, setRequests] = useState([]);
   const [profile, setProfile] = useState(null);
   const [schedule, setSchedule] = useState([]);
@@ -24,10 +95,7 @@ const DoctorShifts = () => {
     setTimeout(() => setToast(null), 4000);
   };
 
-  const getAuthHeaders = () => {
-    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-    return { 'Authorization': `Bearer ${userInfo.token}`, 'Content-Type': 'application/json' };
-  };
+  const jsonHeaders = () => ({ 'Content-Type': 'application/json' });
 
   useEffect(() => {
     fetchData();
@@ -37,8 +105,8 @@ const DoctorShifts = () => {
     setLoading(true);
     try {
       const [resReq, resProf] = await Promise.all([
-        fetch(`${API_URL}/api/doctors/shift-requests`, { headers: getAuthHeaders() }),
-        fetch(`${API_URL}/api/doctors/profile`, { headers: getAuthHeaders() })
+        authFetch(`${API_URL}/api/doctors/shift-requests`),
+        authFetch(`${API_URL}/api/doctors/profile`),
       ]);
       const dataReq = await resReq.json();
       const dataProf = await resProf.json();
@@ -117,30 +185,30 @@ const DoctorShifts = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!date) return showToast('Vui lòng chọn ngày', 'error');
-    if (selectedTimes.length === 0) return showToast('Vui lòng chọn ít nhất một khung giờ', 'error');
+    if (!date) return showToast(t.errSelectDate, 'error');
+    if (selectedTimes.length === 0) return showToast(t.errSelectTime, 'error');
 
     setSubmitting(true);
     try {
       // Send ONE request with all selected times
-      const res = await fetch(`${API_URL}/api/doctors/shift-requests`, {
+      const res = await authFetch(`${API_URL}/api/doctors/shift-requests`, {
         method: 'POST',
-        headers: getAuthHeaders(),
+        headers: jsonHeaders(),
         body: JSON.stringify({ type, date, times: selectedTimes.sort() })
       });
       const data = await res.json();
 
       if (data.success) {
-        showToast(`Đã gửi yêu cầu thành công (${selectedTimes.length} khung giờ)!`, 'success');
+        showToast(t.submitSuccess(selectedTimes.length), 'success');
         fetchData();
         setDate('');
         setSelectedTimes([]);
       } else {
-        showToast(data.message || 'Có lỗi xảy ra', 'error');
+        showToast(data.message || t.errGeneric, 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
+      showToast(t.errRetry, 'error');
     } finally {
       setSubmitting(false);
     }
@@ -148,9 +216,9 @@ const DoctorShifts = () => {
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case 'approved': return <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 flex items-center gap-1 w-max"><CheckCircle size={14} /> Đã duyệt</span>;
-      case 'rejected': return <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 flex items-center gap-1 w-max"><XCircle size={14} /> Từ chối</span>;
-      default: return <span className="px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 flex items-center gap-1 w-max"><Clock size={14} /> Chờ duyệt</span>;
+      case 'approved': return <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 flex items-center gap-1 w-max"><CheckCircle size={14} /> {t.statusApproved}</span>;
+      case 'rejected': return <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 flex items-center gap-1 w-max"><XCircle size={14} /> {t.statusRejected}</span>;
+      default: return <span className="px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 flex items-center gap-1 w-max"><Clock size={14} /> {t.statusPending}</span>;
     }
   };
 
@@ -172,29 +240,29 @@ const DoctorShifts = () => {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black text-gray-800 tracking-tight">Thời gian trực khám</h1>
-          <p className="text-gray-500 mt-2">Quản lý ca trực và yêu cầu thay đổi lịch trình của bạn</p>
+          <h1 className="text-3xl font-black text-gray-800 tracking-tight">{t.title}</h1>
+          <p className="text-gray-500 mt-2">{t.subtitle}</p>
         </div>
       </div>
 
       {/* Create Request Form */}
       <div className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-100">
-        <h2 className="text-xl font-bold mb-6 text-gray-800">Tạo yêu cầu mới</h2>
+        <h2 className="text-xl font-bold mb-6 text-gray-800">{t.newRequest}</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Loại yêu cầu</label>
+              <label className="block text-xs font-bold text-gray-400 uppercase mb-2">{t.requestType}</label>
               <select
                 className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-bold"
                 value={type}
                 onChange={(e) => { setType(e.target.value); setSelectedTimes([]); }}
               >
-                <option value="add">Thêm ca trực</option>
-                <option value="cancel">Hủy ca trực</option>
+                <option value="add">{t.addShift}</option>
+                <option value="cancel">{t.cancelShift}</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Ngày</label>
+              <label className="block text-xs font-bold text-gray-400 uppercase mb-2">{t.dateLabel}</label>
               <input
                 type="date"
                 className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-bold"
@@ -207,7 +275,7 @@ const DoctorShifts = () => {
 
           <div>
             <label className="block text-xs font-bold text-gray-400 uppercase mb-3">
-              Chọn khung giờ <span className="text-primary normal-case">(có thể chọn nhiều)</span>
+              {t.timeSlots} <span className="text-primary normal-case">{t.multiSelect}</span>
             </label>
             <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
               {ALL_TIMES.map(t => (
@@ -229,7 +297,7 @@ const DoctorShifts = () => {
             </div>
             {selectedTimes.length > 0 && (
               <p className="mt-3 text-xs text-gray-500 font-medium">
-                Đã chọn: <span className="font-bold text-primary">{selectedTimes.sort().join(', ')}</span>
+                {t.selected} <span className="font-bold text-primary">{selectedTimes.sort().join(', ')}</span>
               </p>
             )}
           </div>
@@ -246,9 +314,9 @@ const DoctorShifts = () => {
             }`}
           >
             {submitting ? (
-              <><div className="animate-spin h-5 w-5 border-b-2 border-white rounded-full" /> Đang gửi...</>
+              <><div className="animate-spin h-5 w-5 border-b-2 border-white rounded-full" /> {t.sending}</>
             ) : (
-              <><Send size={18} /> Gửi {selectedTimes.length > 0 ? `${selectedTimes.length} yêu cầu` : 'yêu cầu'}</>
+              <><Send size={18} /> {selectedTimes.length > 0 ? t.sendN(selectedTimes.length) : t.sendRequest}</>
             )}
           </button>
         </form>
@@ -256,10 +324,10 @@ const DoctorShifts = () => {
 
       {/* 30-day Schedule */}
       <div className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-100">
-        <h2 className="text-xl font-bold mb-2 text-gray-800">Lịch trực 30 ngày tới</h2>
+        <h2 className="text-xl font-bold mb-2 text-gray-800">{t.schedule30}</h2>
         <p className="text-sm text-gray-500 mb-6 font-medium">
-          Lịch làm việc cơ bản của bạn là:{' '}
-          <span className="font-bold text-primary">{profile?.shiftPattern || 'Cả tuần'}</span>
+          {t.basePattern}{' '}
+          <span className="font-bold text-primary">{profile?.shiftPattern || t.fullWeek}</span>
         </p>
 
         {loading ? (
@@ -272,10 +340,10 @@ const DoctorShifts = () => {
                 <div key={idx} className={`p-4 border rounded-2xl transition-all shadow-sm ${isToday ? 'border-primary bg-primary/5 shadow-primary/10' : 'border-gray-100 bg-white hover:border-primary/30 hover:shadow-md'}`}>
                   <div className="flex items-center justify-between mb-3 border-b border-gray-100 pb-2">
                     <p className={`text-sm font-black ${isToday ? 'text-primary' : 'text-gray-800'}`}>
-                      {s.date.toLocaleDateString('vi-VN', { weekday: 'short' })}
+                      {s.date.toLocaleDateString(locale, { weekday: 'short' })}
                     </p>
                     <p className={`text-xs font-bold ${isToday ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'} px-2 py-1 rounded-md`}>
-                      {s.date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })}
+                      {s.date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit' })}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -284,7 +352,7 @@ const DoctorShifts = () => {
                         {t}
                       </span>
                     )) : (
-                      <span className="text-xs font-medium text-gray-400 italic">Nghỉ</span>
+                      <span className="text-xs font-medium text-gray-400 italic">{t.off}</span>
                     )}
                   </div>
                 </div>
@@ -292,13 +360,13 @@ const DoctorShifts = () => {
             })}
           </div>
         ) : (
-          <div className="text-center py-6 text-gray-400 text-sm font-medium">Bạn không có ca trực nào trong 30 ngày tới.</div>
+          <div className="text-center py-6 text-gray-400 text-sm font-medium">{t.noShifts30}</div>
         )}
       </div>
 
       {/* Request History */}
       <div className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-100">
-        <h2 className="text-xl font-bold mb-6 text-gray-800">Lịch sử yêu cầu</h2>
+        <h2 className="text-xl font-bold mb-6 text-gray-800">{t.history}</h2>
         {loading ? (
           <div className="text-center py-10"><div className="animate-spin h-8 w-8 border-b-2 border-primary rounded-full mx-auto" /></div>
         ) : requests.length > 0 ? (
@@ -310,9 +378,9 @@ const DoctorShifts = () => {
                     {req.type === 'add' ? <Plus size={20} /> : <Trash2 size={20} />}
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-800 text-sm">{req.type === 'add' ? 'Yêu cầu thêm ca' : 'Yêu cầu hủy ca'}</h3>
+                    <h3 className="font-bold text-gray-800 text-sm">{req.type === 'add' ? t.reqAdd : t.reqCancel}</h3>
                     <p className="text-xs text-gray-500 font-medium flex items-center gap-2 mt-0.5">
-                      <Calendar size={12} /> {new Date(req.date).toLocaleDateString('vi-VN')}
+                      <Calendar size={12} /> {new Date(req.date).toLocaleDateString(locale)}
                       <Clock size={12} className="ml-1" /> {req.time}
                     </p>
                   </div>
@@ -324,7 +392,7 @@ const DoctorShifts = () => {
         ) : (
           <div className="text-center py-12 text-gray-400">
             <AlertCircle size={48} className="mx-auto mb-4 opacity-20" />
-            <p className="font-medium text-sm">Chưa có yêu cầu nào.</p>
+            <p className="font-medium text-sm">{t.noHistory}</p>
           </div>
         )}
       </div>

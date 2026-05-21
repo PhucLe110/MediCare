@@ -1,8 +1,9 @@
-import { API_URL } from '../config';
+import { API_URL, authFetch } from '../config';
 import React, { useState } from 'react';
 import { Bot, Activity, ArrowRight, Loader2, RefreshCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
+import { getLocalizedDept } from '../utils/i18nHelpers';
 
 const trans = {
   vi: {
@@ -67,30 +68,6 @@ const AITriage = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const getLocalizedDept = (dept) => {
-    if (!dept) return '';
-    if (lang === 'vi') return dept;
-    const deptsMap = {
-      'Khoa Nội': 'Internal Medicine',
-      'Khoa Ngoại': 'Surgery',
-      'Khoa Nhi': 'Pediatrics',
-      'Khoa Sản': 'Obstetrics & Gynecology',
-      'Khoa Da liễu': 'Dermatology',
-      'Khoa Tai Mũi Họng': 'Otorhinolaryngology (ENT)',
-      'Khoa Mắt': 'Ophthalmology',
-      'Khoa Răng Hàm Mặt': 'Odonto-Stomatology',
-      'Khoa Tim mạch': 'Cardiology',
-      'Khoa Thần kinh': 'Neurology',
-      'Khoa Cơ xương khớp': 'Orthopedics & Rheumatology',
-      'Khoa Cấp cứu': 'Emergency Department',
-      'Khoa Xét nghiệm': 'Laboratory Medicine',
-      'Khoa Chẩn đoán hình ảnh': 'Diagnostic Imaging',
-      'Ngoại tổng quát': 'General Surgery',
-      'Nội tổng quát': 'General Internal Medicine',
-    };
-    return deptsMap[dept] || dept;
-  };
-
   const handlePredict = async () => {
     if (!symptoms.trim()) {
       setError(t.promptError);
@@ -101,13 +78,9 @@ const AITriage = () => {
     setLoading(true);
 
     try {
-      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-      const res = await fetch(`${API_URL}/api/ai/predict`, {
+      const res = await authFetch(`${API_URL}/api/ai/predict`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userInfo.token}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ symptoms })
       });
       const data = await res.json();
@@ -262,7 +235,7 @@ const AITriage = () => {
                     </div>
                     <div>
                       <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t.recDept}</p>
-                      <h3 className="text-2xl font-black text-gray-800">{getLocalizedDept(result.department)}</h3>
+                      <h3 className="text-2xl font-black text-gray-800">{getLocalizedDept(lang, result.department)}</h3>
                     </div>
                   </div>
                   <span className={`px-4 py-2 text-xs font-black uppercase rounded-xl border tracking-wider shadow-sm ${
@@ -278,7 +251,7 @@ const AITriage = () => {
                     <Bot size={100} />
                   </div>
                   <p className="text-sm font-medium text-blue-100 mb-1">{t.specLabel}</p>
-                  <p className="text-xl font-bold relative z-10">{getLocalizedDept(result.specialty)}</p>
+                  <p className="text-xl font-bold relative z-10">{getLocalizedDept(lang, result.specialty)}</p>
                 </div>
               </div>
               

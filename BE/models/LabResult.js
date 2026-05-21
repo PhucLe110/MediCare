@@ -16,28 +16,32 @@ const labResultSchema = new mongoose.Schema({
     ref: 'User', // Lab staff account
     required: true
   },
-  testName: {
-    type: String,
-    required: [true, 'Vui lòng nhập tên xét nghiệm'],
-    trim: true
-  },
-  testType: {
-    type: String,
-    enum: ['blood', 'urine', 'xray', 'mri', 'ct', 'ultrasound', 'ecg', 'other'],
-    default: 'other'
-  },
+  tests: [{
+    testName: {
+      type: String,
+      required: [true, 'Vui lòng nhập tên xét nghiệm'],
+      trim: true
+    },
+    testType: {
+      type: String,
+      enum: ['blood', 'urine', 'xray', 'mri', 'ct', 'ultrasound', 'ecg', 'other'],
+      default: 'other'
+    }
+  }],
   notes: {
     type: String,
     default: ''
   },
-  fileUrl: {
-    type: String,
-    required: true  // Path to uploaded PDF
-  },
-  fileName: {
-    type: String,
-    required: true
-  },
+  files: [{
+    fileUrl: {
+      type: String,
+      required: true
+    },
+    fileName: {
+      type: String,
+      required: true
+    }
+  }],
   status: {
     type: String,
     enum: ['pending', 'ready'],

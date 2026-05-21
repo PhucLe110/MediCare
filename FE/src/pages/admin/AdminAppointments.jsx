@@ -1,7 +1,8 @@
-import { API_URL } from '../../config';
+import { API_URL, authFetch } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, AlertCircle, CheckCircle, XCircle, Search, UserRoundCheck, RefreshCw, X, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
+import { formatDoctorName, getLocalizedDept, getApptStatusLabel } from '../../utils/i18nHelpers';
 
 const trans = {
   vi: {
@@ -127,17 +128,11 @@ export default function AdminAppointments() {
   // Custom Confirm Dialog State
   const [confirmDialog, setConfirmDialog] = useState({ show: false, apptId: null, action: '', message: '' });
 
+  const jsonHeaders = () => ({ 'Content-Type': 'application/json' });
+
   const fetchAppointments = async () => {
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
-      const res = await fetch(`${API_URL}/api/admin/appointments`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const res = await authFetch(`${API_URL}/api/admin/appointments`);
       const json = await res.json();
       if (json.success) {
         setAppointments(json.data);
@@ -184,15 +179,7 @@ export default function AdminAppointments() {
   const fetchAvailableDoctors = async (apptId, date, time) => {
     setLoadingModal(true);
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
-      const res = await fetch(`${API_URL}/api/admin/appointments/${apptId}/available-doctors?date=${date}&time=${time}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const res = await authFetch(`${API_URL}/api/admin/appointments/${apptId}/available-doctors?date=${date}&time=${time}`);
       const json = await res.json();
       if (json.success) {
         setAvailableData(json.data);
@@ -218,16 +205,9 @@ export default function AdminAppointments() {
     }
 
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
-      const res = await fetch(`${API_URL}/api/admin/appointments/${selectedAppt._id}/reschedule`, {
+      const res = await authFetch(`${API_URL}/api/admin/appointments/${selectedAppt._id}/reschedule`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: jsonHeaders(),
         body: JSON.stringify({
           doctorId: selectedDoctorId,
           date: newDate,
@@ -261,16 +241,9 @@ export default function AdminAppointments() {
     setConfirmDialog({ show: false, apptId: null, action: '', message: '' });
 
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
-      const res = await fetch(`${API_URL}/api/admin/appointments/${apptId}/status`, {
+      const res = await authFetch(`${API_URL}/api/admin/appointments/${apptId}/status`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: jsonHeaders(),
         body: JSON.stringify({ status: action })
       });
       const json = await res.json();
@@ -285,46 +258,8 @@ export default function AdminAppointments() {
     }
   };
 
-  const getDoctorDisplayName = (name) => {
-    if (!name) return '';
-    const trimmed = name.trim();
-    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
-    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
-  };
-
-  const getLocalizedDept = (dept) => {
-    if (!dept) return '';
-    if (lang === 'vi') return dept;
-    const deptsMap = {
-      'Khoa Nội': 'Internal Medicine',
-      'Khoa Ngoại': 'Surgery',
-      'Khoa Nhi': 'Pediatrics',
-      'Khoa Sản': 'Obstetrics & Gynecology',
-      'Khoa Da liễu': 'Dermatology',
-      'Khoa Tai Mũi Họng': 'ENT',
-      'Khoa Mắt': 'Ophthalmology',
-      'Khoa Răng Hàm Mặt': 'Odonto-Stomatology',
-      'Khoa Tim mạch': 'Cardiology',
-      'Khoa Thần kinh': 'Neurology',
-      'Khoa Cơ xương khớp': 'Orthopedics & Rheumatology',
-      'Khoa Cấp cứu': 'Emergency',
-      'Khoa Xét nghiệm': 'Laboratory',
-      'Khoa Chẩn đoán hình ảnh': 'Diagnostic Imaging',
-      'Ngoại tổng quát': 'General Surgery',
-      'Nội tổng quát': 'General Internal Medicine',
-    };
-    return deptsMap[dept] || dept;
-  };
-
-  const getLocalizedStatus = (status) => {
-    const statusMap = {
-      pending: lang === 'vi' ? 'Chờ xác nhận' : 'Pending',
-      confirmed: lang === 'vi' ? 'Đã xác nhận' : 'Confirmed',
-      completed: lang === 'vi' ? 'Đã khám' : 'Completed',
-      cancelled: lang === 'vi' ? 'Đã hủy' : 'Cancelled',
-    };
-    return statusMap[status] || status;
-  };
+  const getDoctorDisplayName = (name) => formatDoctorName(lang, name);
+  const getLocalizedStatus = (status) => getApptStatusLabel(lang, status);
 
   const filteredAppointments = appointments.filter(app => {
     const patientName = app.patient?.fullName?.toLowerCase() || '';
@@ -462,7 +397,7 @@ export default function AdminAppointments() {
                   <td className="p-4">
                     <div className="flex flex-col font-medium">
                       <span className="font-bold text-slate-800 text-sm">{getDoctorDisplayName(app.doctor?.userId?.fullName)}</span>
-                      <span className="text-xs text-indigo-600 font-bold">{getLocalizedDept(app.doctor?.department)}</span>
+                      <span className="text-xs text-indigo-600 font-bold">{getLocalizedDept(lang, app.doctor?.department)}</span>
                     </div>
                   </td>
                   <td className="p-4">
@@ -531,7 +466,7 @@ export default function AdminAppointments() {
                   <p>{t.modalOrigPatient} <span className="font-bold text-slate-800">{selectedAppt.patient?.fullName}</span></p>
                   <p>{t.modalOrigPhone} <span className="font-bold text-slate-800">{selectedAppt.patient?.phone}</span></p>
                   <p>{t.modalOrigDoctor} <span className="font-bold text-slate-800">{getDoctorDisplayName(selectedAppt.doctor?.userId?.fullName)}</span></p>
-                  <p>{t.modalOrigDept} <span className="font-bold text-indigo-600">{getLocalizedDept(selectedAppt.doctor?.department)} ({getLocalizedDept(selectedAppt.doctor?.specialty)})</span></p>
+                  <p>{t.modalOrigDept} <span className="font-bold text-indigo-600">{getLocalizedDept(lang, selectedAppt.doctor?.department)} ({getLocalizedDept(lang, selectedAppt.doctor?.specialty)})</span></p>
                 </div>
               </div>
 
@@ -612,7 +547,7 @@ export default function AdminAppointments() {
                             </div>
                             <div>
                               <p className="font-bold text-slate-800 text-xs">{getDoctorDisplayName(doc.fullName)}</p>
-                              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{getLocalizedDept(doc.department)} • {getLocalizedDept(doc.specialty)}</p>
+                              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{getLocalizedDept(lang, doc.department)} • {getLocalizedDept(lang, doc.specialty)}</p>
                             </div>
                           </div>
 

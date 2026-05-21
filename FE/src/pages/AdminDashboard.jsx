@@ -1,9 +1,10 @@
-import { API_URL } from '../config';
+import { API_URL, authFetch } from '../config';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, CreditCard, CalendarDays, UserRoundCog, ArrowUpRight, ArrowDownRight, Bot } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { useTranslation } from '../hooks/useTranslation';
+import { formatMoney, formatDoctorName, getLocalizedDept, formatChartTick } from '../utils/i18nHelpers';
 
 const trans = {
   vi: {
@@ -42,7 +43,8 @@ const trans = {
     docPerfEmpty: 'Chưa có bác sĩ nào',
     docPerfConsultationsCount: (c) => `${c} Ca khám`,
     docPerfSpecialtyLabel: 'Chuyên khoa sâu',
-    docTitle: 'BS'
+    docTitle: 'BS',
+    deptLabel: 'Khoa',
   },
   en: {
     loadingStats: 'Fetching analytical dashboards...',
@@ -80,7 +82,8 @@ const trans = {
     docPerfEmpty: 'No practitioners currently assigned',
     docPerfConsultationsCount: (c) => `${c} visit${c > 1 ? 's' : ''}`,
     docPerfSpecialtyLabel: 'Specialist Domain',
-    docTitle: 'Dr.'
+    docTitle: 'Dr.',
+    deptLabel: 'Dept',
   }
 };
 
@@ -91,56 +94,13 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const fmt = (n) => {
-    const locale = lang === 'vi' ? 'vi-VN' : 'en-US';
-    const currency = lang === 'vi' ? 'VND' : 'USD';
-    const finalVal = lang === 'vi' ? n : Math.round(n / 25000);
-    return new Intl.NumberFormat(locale, { style: 'currency', currency, maximumFractionDigits: 0 }).format(finalVal || 0);
-  };
-
-  const getDoctorDisplayName = (name) => {
-    if (!name) return '';
-    const trimmed = name.trim();
-    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
-    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
-  };
-
-  const getLocalizedDept = (dept) => {
-    if (!dept) return '';
-    if (lang === 'vi') return dept;
-    const deptsMap = {
-      'Khoa Nội': 'Internal Medicine',
-      'Khoa Ngoại': 'Surgery',
-      'Khoa Nhi': 'Pediatrics',
-      'Khoa Sản': 'Obstetrics & Gynecology',
-      'Khoa Da liễu': 'Dermatology',
-      'Khoa Tai Mũi Họng': 'Otorhinolaryngology (ENT)',
-      'Khoa Mắt': 'Ophthalmology',
-      'Khoa Răng Hàm Mặt': 'Odonto-Stomatology',
-      'Khoa Tim mạch': 'Cardiology',
-      'Khoa Thần kinh': 'Neurology',
-      'Khoa Cơ xương khớp': 'Orthopedics & Rheumatology',
-      'Khoa Cấp cứu': 'Emergency Department',
-      'Khoa Xét nghiệm': 'Laboratory Medicine',
-      'Khoa Chẩn đoán hình ảnh': 'Diagnostic Imaging',
-      'Ngoại tổng quát': 'General Surgery',
-      'Nội tổng quát': 'General Internal Medicine',
-    };
-    return deptsMap[dept] || dept;
-  };
+  const fmt = (n) => formatMoney(lang, n);
+  const getDoctorDisplayName = (name) => formatDoctorName(lang, name);
 
   useEffect(() => {
     const fetchDashboardStats = async () => {
       try {
-        const userInfo = localStorage.getItem('userInfo');
-        if (!userInfo) return;
-        const { token } = JSON.parse(userInfo);
-
-        const res = await fetch(`${API_URL}/api/admin/dashboard-stats`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+        const res = await authFetch(`${API_URL}/api/admin/dashboard-stats`);
         const json = await res.json();
         if (json.success) {
           setData(json.data);
@@ -169,7 +129,7 @@ export default function AdminDashboard() {
 
   const localizedDeptData = departmentData.map(d => ({
     ...d,
-    name: getLocalizedDept(d.name)
+    name: getLocalizedDept(lang, d.name)
   }));
 
   return (
@@ -233,7 +193,7 @@ export default function AdminDashboard() {
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12, fontWeight: 600}} dy={10} />
-                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12, fontWeight: 600}} tickFormatter={(val) => lang === 'vi' ? `${val / 1000}k` : `$${Math.round(val / 25000)}`} />
+                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12, fontWeight: 600}} tickFormatter={(val) => formatChartTick(lang, val)} />
                 <Tooltip 
                   contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }}
                   formatter={(value, name) => [name === 'revenue' ? fmt(value) : value, name === 'revenue' ? t.chartTooltipRevenue : t.chartTooltipAppointments]}
@@ -324,7 +284,7 @@ export default function AdminDashboard() {
                     </div>
                     <div>
                       <h4 className="font-bold text-slate-800">{getDoctorDisplayName(doc.fullName)}</h4>
-                      <p className="text-sm text-slate-500 font-medium">{lang === 'vi' ? 'Khoa' : 'Dept'} {getLocalizedDept(doc.department)}</p>
+                      <p className="text-sm text-slate-500 font-medium">{t.deptLabel} {getLocalizedDept(lang, doc.department)}</p>
                     </div>
                   </div>
                   <div className="text-right">

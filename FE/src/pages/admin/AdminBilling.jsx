@@ -1,7 +1,8 @@
-import { API_URL } from '../../config';
+import { API_URL, authFetch } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Download, Search, CheckCircle2, Clock, ShieldAlert, AlertCircle } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
+import { formatMoney, formatDate, getLocale } from '../../utils/i18nHelpers';
 
 const trans = {
   vi: {
@@ -78,15 +79,7 @@ export default function AdminBilling() {
 
   const fetchBills = async () => {
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
-      const res = await fetch(`${API_URL}/api/admin/bills`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const res = await authFetch(`${API_URL}/api/admin/bills`);
       const json = await res.json();
       if (json.success) {
         setBills(json.data);
@@ -133,15 +126,8 @@ export default function AdminBilling() {
     setConfirmDialog({ show: false, billId: null, message: '' });
 
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
-      const res = await fetch(`${API_URL}/api/bills/${billId}/pay`, {
+      const res = await authFetch(`${API_URL}/api/bills/${billId}/pay`, {
         method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
       });
       const json = await res.json();
       if (json.success) {
@@ -155,11 +141,8 @@ export default function AdminBilling() {
     }
   };
 
-  const fmt = (n) => {
-    return lang === 'vi'
-      ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n || 0)
-      : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.round((n || 0) / 25000));
-  };
+  const fmt = (n) => formatMoney(lang, n);
+  const locale = getLocale(lang);
 
   const filteredBills = bills.filter(b => {
     const patientName = b.patient?.fullName?.toLowerCase() || '';
@@ -263,7 +246,7 @@ export default function AdminBilling() {
                   <td className="p-4 pl-6 font-medium">
                     <div className="flex flex-col">
                       <span className="font-mono font-bold text-indigo-600 text-sm">{b._id?.slice(-8).toUpperCase()}</span>
-                      <span className="text-xs text-slate-500 mt-0.5">{lang === 'vi' ? new Date(b.createdAt).toLocaleDateString('vi-VN') : new Date(b.createdAt).toLocaleDateString('en-US')}</span>
+                      <span className="text-xs text-slate-500 mt-0.5">{formatDate(lang, b.createdAt)}</span>
                     </div>
                   </td>
                   <td className="p-4 font-bold text-slate-800">
@@ -298,7 +281,7 @@ export default function AdminBilling() {
                         {t.btnConfirmPay}
                       </button>
                     ) : (
-                      <span className="text-xs font-bold text-slate-400">{t.paidTimePrefix} {b.paidAt ? (lang === 'vi' ? new Date(b.paidAt).toLocaleTimeString('vi-VN') : new Date(b.paidAt).toLocaleTimeString('en-US')) : ''}</span>
+                      <span className="text-xs font-bold text-slate-400">{t.paidTimePrefix} {b.paidAt ? new Date(b.paidAt).toLocaleTimeString(locale) : ''}</span>
                     )}
                   </td>
                 </tr>

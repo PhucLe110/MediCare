@@ -45,6 +45,11 @@ const userSchema = new mongoose.Schema({
     unique: true,
     sparse: true
   },
+  /** Tăng khi logout để vô hiệu hóa mọi refresh token cũ */
+  refreshTokenVersion: {
+    type: Number,
+    default: 0,
+  },
   healthProfile: {
     bloodType: { type: String, default: '' },
     height: { type: String, default: '' },

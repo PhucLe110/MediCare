@@ -5,6 +5,7 @@ import {
   FileStack, Pill, CreditCard, Bot, Settings, LogOut, ChevronLeft,
   Sun, Moon, Globe, CalendarClock
 } from 'lucide-react';
+import { ensureValidSession, logoutAuth } from '../utils/auth';
 
 const AdminLayout = () => {
   const location = useLocation();
@@ -14,17 +15,22 @@ const AdminLayout = () => {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
   useEffect(() => {
-    const userInfo = localStorage.getItem('userInfo');
-    if (userInfo) {
-      const u = JSON.parse(userInfo);
-      if (u.role !== 'admin') {
-        navigate('/dashboard'); // Kick out non-admins
-      } else {
+    (async () => {
+      try {
+        const u = await ensureValidSession();
+        if (!u) {
+          navigate('/');
+          return;
+        }
+        if (u.role !== 'admin') {
+          navigate('/dashboard');
+          return;
+        }
         setUser(u);
+      } catch {
+        navigate('/');
       }
-    } else {
-      navigate('/');
-    }
+    })();
   }, [navigate]);
 
   useEffect(() => {
@@ -52,8 +58,8 @@ const AdminLayout = () => {
     return () => window.removeEventListener('language-change', handleLangChange);
   }, [lang]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('userInfo');
+  const handleLogout = async () => {
+    await logoutAuth();
     navigate('/');
   };
 

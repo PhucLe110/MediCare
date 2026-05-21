@@ -16,29 +16,42 @@ const labRequestSchema = new mongoose.Schema({
     ref: 'Appointment',
     default: null
   },
-  testName: {
-    type: String,
-    required: [true, 'Vui lòng nhập tên xét nghiệm'],
-    trim: true
+  bill: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Bill',
+    default: null
   },
-  testType: {
-    type: String,
-    enum: ['blood', 'urine', 'xray', 'mri', 'ct', 'ultrasound', 'ecg', 'other'],
-    default: 'blood'
-  },
-  clinicalNotes: {
-    type: String,  // Ghi chú lâm sàng từ bác sĩ
-    default: ''
-  },
-  urgency: {
-    type: String,
-    enum: ['normal', 'urgent'],
-    default: 'normal'
-  },
+  tests: [{
+    testName: {
+      type: String,
+      required: [true, 'Vui lòng nhập tên xét nghiệm'],
+      trim: true
+    },
+    testType: {
+      type: String,
+      enum: ['blood', 'urine', 'xray', 'mri', 'ct', 'ultrasound', 'ecg', 'other'],
+      default: 'blood'
+    },
+    clinicalNotes: {
+      type: String,
+      default: ''
+    },
+    urgency: {
+      type: String,
+      enum: ['normal', 'urgent'],
+      default: 'normal'
+    }
+  }],
   status: {
     type: String,
     enum: ['pending', 'in_progress', 'completed', 'cancelled'],
     default: 'pending'
+  },
+  /** Đợt chỉ định XN này đã được BN thanh toán (theo từng lần quét bill lab) */
+  paymentStatus: {
+    type: String,
+    enum: ['unpaid', 'paid'],
+    default: 'unpaid'
   },
   result: {
     type: mongoose.Schema.Types.ObjectId,

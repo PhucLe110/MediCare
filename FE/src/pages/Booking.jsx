@@ -1,15 +1,13 @@
-import { API_URL } from '../config';
+import { API_URL, authFetch, getStoredUser } from '../config';
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, ChevronDown, CreditCard, CheckCircle, ShieldCheck, Printer, ArrowRight } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
+import { formatDoctorName, getLocalizedDept, formatDate, formatMoney } from '../utils/i18nHelpers';
 
 // const API_URL = API_URL;
 
-const getAuthHeaders = () => {
-  const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-  return { 'Authorization': `Bearer ${userInfo.token}`, 'Content-Type': 'application/json' };
-};
+const jsonHeaders = () => ({ 'Content-Type': 'application/json' });
 
 const trans = {
   vi: {
@@ -35,6 +33,8 @@ const trans = {
     validationAlert: 'Vui lòng chọn đầy đủ thông tin!',
     errorAlert: 'Đã xảy ra lỗi khi đặt lịch',
     currencyUnit: 'đ',
+    genderMale: 'Nam',
+    genderFemale: 'Nữ',
     
     // Slip
     slipHospitalName: 'Bệnh viện Đa khoa MediCare',
@@ -85,6 +85,8 @@ const trans = {
     validationAlert: 'Please provide all required parameters!',
     errorAlert: 'An error occurred during appointment reservation.',
     currencyUnit: 'USD',
+    genderMale: 'Male',
+    genderFemale: 'Female',
 
     // Slip
     slipHospitalName: 'MediCare General Hospital',
@@ -143,6 +145,25 @@ const Booking = () => {
     return new Date(y, m - 1, d).getDay();
   };
 
+  const getTodayString = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const isPastTime = (timeSlot) => {
+    if (selectedDate !== getTodayString()) return false;
+    const [slotHour, slotMin] = timeSlot.split(':').map(Number);
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMin = now.getMinutes();
+    if (slotHour < currentHour) return true;
+    if (slotHour === currentHour && slotMin <= currentMin) return true;
+    return false;
+  };
+
   // Fetch times when doctor or date changes
   useEffect(() => {
     const fetchAvailableTimes = async () => {
@@ -153,9 +174,7 @@ const Booking = () => {
       }
       setLoadingTimes(true);
       try {
-        const res = await fetch(`${API_URL}/api/appointments/doctors/${selectedDoctor._id}/availability?date=${selectedDate}`, {
-          headers: getAuthHeaders()
-        });
+        const res = await authFetch(`${API_URL}/api/appointments/doctors/${selectedDoctor._id}/availability?date=${selectedDate}`);
         const data = await res.json();
         if (data.success) {
           setAvailableTimes(data.data);
@@ -170,48 +189,15 @@ const Booking = () => {
     fetchAvailableTimes();
   }, [selectedDoctor, selectedDate]);
 
-  const getDoctorDisplayName = (name) => {
-    if (!name) return '';
-    const trimmed = name.trim();
-    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
-    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
-  };
-
-  const getLocalizedDept = (dept) => {
-    if (!dept) return '';
-    if (lang === 'vi') return dept;
-    const deptsMap = {
-      'Khoa Nội': 'Internal Medicine',
-      'Khoa Ngoại': 'Surgery',
-      'Khoa Nhi': 'Pediatrics',
-      'Khoa Sản': 'Obstetrics & Gynecology',
-      'Khoa Da liễu': 'Dermatology',
-      'Khoa Tai Mũi Họng': 'Otorhinolaryngology (ENT)',
-      'Khoa Mắt': 'Ophthalmology',
-      'Khoa Răng Hàm Mặt': 'Odonto-Stomatology',
-      'Khoa Tim mạch': 'Cardiology',
-      'Khoa Thần kinh': 'Neurology',
-      'Khoa Cơ xương khớp': 'Orthopedics & Rheumatology',
-      'Khoa Cấp cứu': 'Emergency Department',
-      'Khoa Xét nghiệm': 'Laboratory Medicine',
-      'Khoa Chẩn đoán hình ảnh': 'Diagnostic Imaging',
-      'Ngoại tổng quát': 'General Surgery',
-      'Nội tổng quát': 'General Internal Medicine',
-    };
-    return deptsMap[dept] || dept;
-  };
+  const getDoctorDisplayName = (name) => formatDoctorName(lang, name);
 
   const getLocalizedGender = (gender) => {
-    if (!gender) return lang === 'vi' ? 'Nam' : 'Male';
+    if (!gender) return t.genderMale;
     if (lang === 'vi') return gender;
-    return gender === 'Nam' ? 'Male' : 'Female';
+    return gender === 'Nam' ? t.genderMale : t.genderFemale;
   };
 
-  const fmtFee = (n) => {
-    return lang === 'vi'
-      ? `${n.toLocaleString('vi-VN')} đ`
-      : `$${Math.round(n / 25000).toLocaleString('en-US')}`;
-  };
+  const fmtFee = (n) => formatMoney(lang, n);
 
   useEffect(() => {
     fetchDoctors();
@@ -220,9 +206,7 @@ const Booking = () => {
 
   const fetchDoctors = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/appointments/doctors`, {
-        headers: getAuthHeaders()
-      });
+      const res = await authFetch(`${API_URL}/api/appointments/doctors`);
       const data = await res.json();
       if (data.success) setDoctors(data.data);
     } catch (err) { console.error(err); } finally { setLoading(false); }
@@ -241,9 +225,9 @@ const Booking = () => {
     if (!selectedDoctor || !selectedDate || !selectedTime) return alert(t.validationAlert);
 
     try {
-      const res = await fetch(`${API_URL}/api/appointments`, {
+      const res = await authFetch(`${API_URL}/api/appointments`, {
         method: 'POST',
-        headers: getAuthHeaders(),
+        headers: jsonHeaders(),
         body: JSON.stringify({
           doctorId: selectedDoctor._id,
           date: selectedDate,
@@ -254,12 +238,20 @@ const Booking = () => {
       const data = await res.json();
       
       if (data.success) {
-        setAppointmentResult(data.data);
-        const billsRes = await fetch(`${API_URL}/api/bills/my`, { headers: getAuthHeaders() });
-        const billsData = await billsRes.json();
-        if (billsData.success) {
-          const matchingBill = billsData.data.find(b => b.appointment?._id === data.data._id);
-          setBillResult(matchingBill);
+        const appt = data.data.appointment || data.data;
+        const bill = data.data.consultationBill;
+        setAppointmentResult(appt);
+        if (bill) {
+          setBillResult(bill);
+        } else {
+          const billsRes = await authFetch(`${API_URL}/api/bills/my`);
+          const billsData = await billsRes.json();
+          if (billsData.success) {
+            const matchingBill = billsData.data.find(
+              b => b.appointment?._id === appt._id && b.billType === 'consultation'
+            );
+            setBillResult(matchingBill);
+          }
         }
       } else {
         alert(data.message);
@@ -276,7 +268,7 @@ const Booking = () => {
     if (billResult && !isPaid) {
       interval = setInterval(async () => {
         try {
-          const res = await fetch(`${API_URL}/api/bills/my`, { headers: getAuthHeaders() });
+          const res = await authFetch(`${API_URL}/api/bills/my`);
           const data = await res.json();
           if (data.success) {
             const updatedBill = data.data.find(b => b._id === billResult._id);
@@ -305,10 +297,8 @@ const Booking = () => {
 
   // Render Appointment Slip (ONLY AFTER PAID)
   if (appointmentResult && isPaid) {
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    const dateFormatted = lang === 'vi'
-      ? new Date(selectedDate).toLocaleDateString('vi-VN')
-      : new Date(selectedDate).toLocaleDateString('en-US');
+    const userInfo = getStoredUser();
+    const dateFormatted = formatDate(lang, selectedDate);
     return (
       <div className="max-w-2xl mx-auto mt-6 animate-in fade-in duration-700">
         <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden relative">
@@ -322,7 +312,7 @@ const Booking = () => {
             <p className="text-sm text-gray-500">{t.slipTicketNo} {appointmentResult.ticketNumber}</p>
           </div>
           <div className="p-8 relative z-10 text-center">
-            <h2 className="text-2xl font-bold text-gray-800 uppercase mb-2">{getLocalizedDept(selectedDoctor?.department)}</h2>
+            <h2 className="text-2xl font-bold text-gray-800 uppercase mb-2">{getLocalizedDept(lang, selectedDoctor?.department)}</h2>
             <p className="text-emerald-600 font-bold mb-8">{t.slipRoom}</p>
             <div className="w-24 h-24 rounded-full border-2 border-emerald-300 mx-auto mb-8 flex flex-col items-center justify-center bg-emerald-50">
               <span className="text-4xl font-bold text-emerald-500 leading-none">{appointmentResult.queueNumber}</span>
@@ -406,7 +396,7 @@ const Booking = () => {
                       onChange={(e) => { setSelectedDepartment(e.target.value); setSelectedSpecialty(''); setSelectedDoctor(null); setSelectedDate(null); setSelectedTime(null); }}
                     >
                       <option value="">{t.selectDeptPlaceholder}</option>
-                      {departments.map(dept => <option key={dept} value={dept}>{getLocalizedDept(dept)}</option>)}
+                      {departments.map(dept => <option key={dept} value={dept}>{getLocalizedDept(lang, dept)}</option>)}
                     </select>
                     <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                   </div>
@@ -420,7 +410,7 @@ const Booking = () => {
                         onChange={(e) => { setSelectedSpecialty(e.target.value); setSelectedDoctor(null); setSelectedDate(null); setSelectedTime(null); }}
                       >
                         <option value="">{t.selectSpecPlaceholder}</option>
-                        {specialties.map(spec => <option key={spec} value={spec}>{getLocalizedDept(spec)}</option>)}
+                        {specialties.map(spec => <option key={spec} value={spec}>{getLocalizedDept(lang, spec)}</option>)}
                       </select>
                       <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                     </div>
@@ -445,7 +435,7 @@ const Booking = () => {
                               {getLocalizedGender(doctor.userId.gender)}
                             </span>
                           </h3>
-                          <p className="text-xs text-primary font-bold uppercase tracking-tighter mt-1">{getLocalizedDept(doctor.specialty)} • {doctor.experience} {t.experienceYears}</p>
+                          <p className="text-xs text-primary font-bold uppercase tracking-tighter mt-1">{getLocalizedDept(lang, doctor.specialty)} • {doctor.experience} {t.experienceYears}</p>
                         </div>
                         <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${selectedDoctor?._id === doctor._id ? 'border-primary bg-primary text-white' : 'border-gray-200'}`}>
                           {selectedDoctor?._id === doctor._id && <CheckCircle size={16} />}
@@ -468,7 +458,7 @@ const Booking = () => {
                 <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-4">{t.dateLabel}</p>
                 <input 
                   type="date" 
-                  min={new Date().toISOString().split('T')[0]}
+                  min={getTodayString()}
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
                   className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-gray-800 font-bold"
@@ -485,13 +475,24 @@ const Booking = () => {
                     </div>
                   ) : availableTimes.length > 0 ? (
                     <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
-                      {availableTimes.map((t, idx) => (
-                        <button key={idx} onClick={() => setSelectedTime(t)}
-                          className={`py-3 rounded-xl text-xs font-black border-2 transition-all ${selectedTime === t ? 'border-primary bg-primary/10 text-primary' : 'border-gray-50 hover:border-primary/20 text-gray-600'}`}
-                        >
-                          {t}
-                        </button>
-                      ))}
+                      {availableTimes.map((t, idx) => {
+                        const past = isPastTime(t);
+                        return (
+                          <button key={idx} 
+                            disabled={past}
+                            onClick={() => !past && setSelectedTime(t)}
+                            className={`py-3 rounded-xl text-xs font-black border-2 transition-all ${
+                              past 
+                                ? 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed opacity-50' 
+                                : selectedTime === t 
+                                  ? 'border-primary bg-primary/10 text-primary' 
+                                  : 'border-gray-50 hover:border-primary/20 text-gray-600'
+                            }`}
+                          >
+                            {t}
+                          </button>
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="text-center py-4 text-orange-600 text-sm font-medium bg-orange-50 rounded-2xl border border-orange-100 shadow-sm animate-in fade-in">
@@ -527,13 +528,13 @@ const Booking = () => {
                         {getLocalizedGender(selectedDoctor.userId.gender)}
                       </span>
                     </h4>
-                    <p className="text-[10px] text-primary font-bold uppercase mt-1">{getLocalizedDept(selectedDoctor.department)}</p>
+                    <p className="text-[10px] text-primary font-bold uppercase mt-1">{getLocalizedDept(lang, selectedDoctor.department)}</p>
                   </div>
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center text-xs font-bold uppercase tracking-tighter">
                     <span className="text-gray-400 flex items-center gap-2"><Calendar size={14} /> {t.dateText}</span>
-                    <span className="text-gray-800">{selectedDate ? new Date(selectedDate).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US') : '---'}</span>
+                    <span className="text-gray-800">{selectedDate ? formatDate(lang, selectedDate) : '---'}</span>
                   </div>
                   <div className="flex justify-between items-center text-xs font-bold uppercase tracking-tighter">
                     <span className="text-gray-400 flex items-center gap-2"><Clock size={14} /> {t.timeText}</span>

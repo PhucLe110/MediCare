@@ -2,6 +2,7 @@ import { API_URL } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Filter, Search, Award, Users, Activity, ChevronRight } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
+import { resolveDeptLabel, resolveSpecialtyLabel, otherDeptLabel } from '../../utils/i18nHelpers';
 
 const trans = {
   vi: {
@@ -91,26 +92,12 @@ export default function Doctors() {
     experience: ''
   });
 
-  const getDeptTranslation = (dept) => {
-    if (!dept) return '';
-    const dLower = dept.toLowerCase();
-    if (dLower.includes('tổng quát') || dLower.includes('general')) return lang === 'vi' ? 'Khoa Nội tổng quát' : 'General Practice';
-    if (dLower.includes('xét nghiệm') || dLower.includes('lab')) return lang === 'vi' ? 'Xét nghiệm' : 'Laboratory';
-    return dept;
-  };
-
-  const getSpecialtyTranslation = (spec) => {
-    if (!spec) return '';
-    const sLower = spec.toLowerCase();
-    if (sLower.includes('nội') || sLower.includes('internal')) return lang === 'vi' ? 'Nội tổng quát' : 'Internal Medicine';
-    if (sLower.includes('ngoại') || sLower.includes('surgery')) return lang === 'vi' ? 'Ngoại khoa' : 'Surgery';
-    if (sLower.includes('xét nghiệm') || sLower.includes('laboratory')) return lang === 'vi' ? 'Xét nghiệm y khoa' : 'Medical Laboratory';
-    return spec;
-  };
+  const getDeptTranslation = (dept) => resolveDeptLabel(lang, dept, 'doctors');
+  const getSpecialtyTranslation = (spec) => resolveSpecialtyLabel(lang, spec);
 
   // Nhóm bác sĩ theo khoa
   const groupedDoctors = doctors.reduce((acc, doc) => {
-    const dept = doc.department || (lang === 'vi' ? 'Chuyên Khoa Khác' : 'Other Specialties');
+    const dept = doc.department || otherDeptLabel(lang);
     if (!acc[dept]) acc[dept] = [];
     acc[dept].push(doc);
     return acc;
@@ -140,7 +127,7 @@ export default function Doctors() {
   });
 
   const filteredGrouped = filteredDoctors.reduce((acc, doc) => {
-    const dept = doc.department || (lang === 'vi' ? 'Chuyên Khoa Khác' : 'Other Specialties');
+    const dept = doc.department || otherDeptLabel(lang);
     if (!acc[dept]) acc[dept] = [];
     acc[dept].push(doc);
     return acc;

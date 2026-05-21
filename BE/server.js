@@ -12,7 +12,13 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+// Configure CORS to support cookies
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    credentials: true,
+  }),
+);
 app.use(express.json());
 
 // Serve uploaded files statically
@@ -46,6 +52,9 @@ app.use("/api", billingRoutes);
 app.get("/", (req, res) => {
   res.send("MediCare API is running...");
 });
+
+const errorHandler = require("./middleware/errorHandler");
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 

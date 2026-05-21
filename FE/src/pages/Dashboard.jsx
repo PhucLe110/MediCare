@@ -1,4 +1,4 @@
-import { API_URL as API } from '../config';
+import { API_URL as API, authFetch, getStoredUser } from '../config';
 import React, { useState, useEffect } from 'react';
 import {
   Calendar, FlaskConical, Pill, CreditCard, ChevronRight,
@@ -7,11 +7,10 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
+import { ticketTrans, mergeTrans } from '../i18n/ticketI18n';
+import { formatMoney, formatDoctorName, getLocalizedDept, formatApptMonth, formatDate, getLocale } from '../utils/i18nHelpers';
 
-// const API = API;
-const authH = () => ({ Authorization: `Bearer ${JSON.parse(localStorage.getItem('userInfo') || '{}').token}` });
-
-const trans = {
+const trans = mergeTrans({
   vi: {
     welcome: 'Xin chào',
     upcomingCount: (c) => `Bạn có ${c} lịch hẹn sắp tới`,
@@ -51,6 +50,7 @@ const trans = {
     results: 'Kết quả XN',
     prescriptions: 'Đơn thuốc',
     billing: 'Thanh toán',
+    pending_payment: 'Chờ thanh toán',
   },
   en: {
     welcome: 'Welcome',
@@ -91,8 +91,9 @@ const trans = {
     results: 'Lab Results',
     prescriptions: 'Prescriptions',
     billing: 'Billing & Fees',
+    pending_payment: 'Pending payment',
   }
-};
+}, ticketTrans);
 
 export default function Dashboard() {
   const { lang, t } = useTranslation(trans);
@@ -105,14 +106,12 @@ export default function Dashboard() {
   const [selectedTicketAppt, setSelectedTicketAppt] = useState(null);
   const navigate = useNavigate();
 
-  const fmt = (n) => {
-    const locale = lang === 'vi' ? 'vi-VN' : 'en-US';
-    const currency = lang === 'vi' ? 'VND' : 'USD';
-    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(n || 0);
-  };
+  const fmt = (n) => formatMoney(lang, n);
+  const locale = getLocale(lang);
 
   const STATUS = {
     pending:   { label: t.pending, color: '#d97706', bg: '#fef3c7' },
+    pending_payment: { label: t.pending_payment, color: '#d97706', bg: '#fef3c7' },
     confirmed: { label: t.confirmed,  color: '#2563eb', bg: '#dbeafe' },
     completed: { label: t.completed,      color: '#059669', bg: '#d1fae5' },
     cancelled: { label: t.cancelled,       color: '#dc2626', bg: '#fee2e2' },
@@ -126,51 +125,19 @@ export default function Dashboard() {
     return t.daysAgo(Math.floor(s / 86400));
   };
 
-  const getDoctorDisplayName = (name) => {
-    if (!name) return t.doctorTitle;
-    const trimmed = name.trim();
-    if (trimmed.toLowerCase().startsWith('bs.') || trimmed.toLowerCase().startsWith('bs ') || trimmed.toLowerCase().startsWith('bác sĩ')) {
-      const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
-      return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
-    }
-    return lang === 'vi' ? `BS. ${trimmed}` : `Dr. ${trimmed}`;
-  };
-
-  const getLocalizedDept = (dept) => {
-    if (!dept) return '';
-    if (lang === 'vi') return dept;
-    const deptsMap = {
-      'Khoa Nội': 'Internal Medicine',
-      'Khoa Ngoại': 'Surgery',
-      'Khoa Nhi': 'Pediatrics',
-      'Khoa Sản': 'Obstetrics & Gynecology',
-      'Khoa Da liễu': 'Dermatology',
-      'Khoa Tai Mũi Họng': 'Otorhinolaryngology (ENT)',
-      'Khoa Mắt': 'Ophthalmology',
-      'Khoa Răng Hàm Mặt': 'Odonto-Stomatology',
-      'Khoa Tim mạch': 'Cardiology',
-      'Khoa Thần kinh': 'Neurology',
-      'Khoa Cơ xương khớp': 'Orthopedics & Rheumatology',
-      'Khoa Cấp cứu': 'Emergency Department',
-      'Khoa Xét nghiệm': 'Laboratory Medicine',
-      'Khoa Chẩn đoán hình ảnh': 'Diagnostic Imaging',
-      'Ngoại tổng quát': 'General Surgery',
-      'Nội tổng quát': 'General Internal Medicine',
-    };
-    return deptsMap[dept] || dept;
-  };
+  const getDoctorDisplayName = (name) => formatDoctorName(lang, name) || t.doctorTitle;
 
   useEffect(() => {
-    const u = JSON.parse(localStorage.getItem('userInfo') || 'null');
+    const u = getStoredUser();
     if (!u) return navigate('/login');
     setUser(u);
     (async () => {
       try {
         const [ar, br, lr, rxr] = await Promise.all([
-          fetch(`${API}/api/appointments`, { headers: authH() }),
-          fetch(`${API}/api/bills/my`, { headers: authH() }),
-          fetch(`${API}/api/lab-results/my`, { headers: authH() }),
-          fetch(`${API}/api/prescriptions/my`, { headers: authH() }),
+          authFetch(`${API}/api/appointments`),
+          authFetch(`${API}/api/bills/my`),
+          authFetch(`${API}/api/lab-results/my`),
+          authFetch(`${API}/api/prescriptions/my`),
         ]);
         const [ad, bd, ld, rxd] = await Promise.all([ar.json(), br.json(), lr.json(), rxr.json()]);
         if (ad.success) setAppts(ad.data);
@@ -182,21 +149,20 @@ export default function Dashboard() {
     })();
   }, [navigate]);
 
-  const upcoming    = appts.filter(a => a.status === 'confirmed' || a.status === 'pending');
+  const pendingPay  = appts.filter(a => a.status === 'pending_payment');
+  const upcoming    = appts.filter(a => a.status === 'confirmed' || a.status === 'pending' || a.status === 'pending_payment');
   const completed   = appts.filter(a => a.status === 'completed');
   const paidTotal   = bills.filter(b => b.status === 'paid').reduce((s, b) => s + b.totalAmount, 0);
   const unpaidBills = bills.filter(b => b.status === 'unpaid');
 
   // Check 1-hour reminder
-  const soonAppts = upcoming.filter(a => {
+  const soonAppts = appts.filter(a => (a.status === 'confirmed' || a.status === 'pending')).filter(a => {
     const apptTime = new Date(`${a.date}T${a.time}`);
     const diff = (apptTime - Date.now()) / 60000;
     return diff >= 0 && diff <= 60;
   });
 
-  const formattedDate = lang === 'vi'
-    ? new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long' })
-    : new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const formattedDate = new Date().toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
 
   const STATS = [
     { label: t.statAppts, value: upcoming.length, sub: t.statApptsSub(completed.length), icon: Calendar, color: '#2563eb', bg: '#dbeafe', link: '/dashboard/booking' },
@@ -324,7 +290,7 @@ export default function Dashboard() {
               const st = STATUS[a.status] || STATUS.pending;
               const isSoon = soonAppts.some(s => s._id === a._id);
               const apptDate = new Date(a.date);
-              const formattedApptMonth = lang === 'vi' ? `Th${apptDate.getMonth()+1}` : apptDate.toLocaleDateString('en-US', { month: 'short' });
+              const formattedApptMonth = formatApptMonth(lang, apptDate);
               return (
                 <div key={a._id} onClick={() => navigate(`/dashboard/appointment/${a._id}`)}
                   style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 24px', borderBottom: '1px solid #e2e8f0', background: isSoon ? '#fff7f7' : 'transparent', transition: 'all 0.15s', cursor: 'pointer' }}
@@ -377,7 +343,7 @@ export default function Dashboard() {
                           <polyline points="14 2 14 8 20 8"/>
                           <path d="m9 15 2 2 4-4"/>
                         </svg>
-                        {lang === 'vi' ? 'Xem phiếu STT' : 'View Ticket'}
+                        {t.viewTicket}
                       </button>
                     )}
                     <span style={{ fontSize: 11, fontWeight: 800, color: st.color, background: st.bg, padding: '5px 12px', borderRadius: 999, whiteSpace: 'nowrap' }}>
@@ -438,10 +404,10 @@ export default function Dashboard() {
                 <img src="/LOGO.png" alt="MediCare" style={{ height: 36, width: 'auto', objectFit: 'contain' }} />
               </div>
               <h3 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', margin: '8px 0 0', color: '#1e293b' }}>
-                {lang === 'vi' ? 'PHIẾU HẸN & SỐ THỨ TỰ' : 'QUEUE TICKET'}
+                {t.ticketTitle}
               </h3>
               <p style={{ fontSize: 11, color: '#64748b', marginTop: 4, fontWeight: 600, margin: '4px 0 0' }}>
-                {lang === 'vi' ? 'Hệ thống Y tế thông minh MediCare' : 'MediCare Smart Hospital System'}
+                {t.ticketSubtitle}
               </p>
               
               {/* Left/Right ticket notches */}
@@ -453,7 +419,7 @@ export default function Dashboard() {
             <div style={{ padding: 24 }}>
               {/* Big Queue Number */}
               <div style={{ background: '#f0f7ff', border: '1px solid #e0f2fe', borderRadius: 16, padding: '16px 0', textAlign: 'center', marginBottom: 24 }}>
-                <p style={{ fontSize: 10, fontWeight: 800, color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 6px' }}>{lang === 'vi' ? 'Số Thứ Tự Của Bạn' : 'Your Queue Number'}</p>
+                <p style={{ fontSize: 10, fontWeight: 800, color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 6px' }}>{t.yourQueue}</p>
                 <div style={{
                   display: 'inline-flex', width: 88, height: 88, borderRadius: '50%',
                   background: 'linear-gradient(135deg, #102a63 0%, #2563eb 100%)', color: '#fff',
@@ -462,30 +428,30 @@ export default function Dashboard() {
                 }}>
                   #{selectedTicketAppt.queueNumber || '01'}
                 </div>
-                <p style={{ fontSize: 10, fontWeight: 700, margin: '6px 0 0', color: '#64748b' }}>{lang === 'vi' ? 'Vui lòng theo dõi bảng điện tử tại sảnh chờ' : 'Please watch the monitor in the waiting hall'}</p>
+                <p style={{ fontSize: 10, fontWeight: 700, margin: '6px 0 0', color: '#64748b' }}>{t.watchMonitor}</p>
               </div>
 
               {/* Ticket Details */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13, color: '#334155', fontWeight: 600 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{lang === 'vi' ? 'Mã ca khám:' : 'Ticket ID:'}</span>
+                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{t.ticketId}</span>
                   <span style={{ fontFamily: 'monospace', fontWeight: 900, color: '#1e293b', fontSize: 14 }}>{selectedTicketAppt.ticketNumber}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{lang === 'vi' ? 'Bệnh nhân:' : 'Patient:'}</span>
+                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{t.patient}</span>
                   <span style={{ fontWeight: 800, color: '#1e293b' }}>{user?.fullName}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{lang === 'vi' ? 'Bác sĩ khám:' : 'Physician:'}</span>
+                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{t.physician}</span>
                   <span style={{ fontWeight: 800, color: '#102a63' }}>{getDoctorDisplayName(selectedTicketAppt.doctor?.userId?.fullName)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{lang === 'vi' ? 'Chuyên khoa:' : 'Department:'}</span>
+                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{t.department}</span>
                   <span style={{ fontWeight: 800, color: '#1e293b' }}>{getLocalizedDept(selectedTicketAppt.doctor?.department)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{lang === 'vi' ? 'Thời gian:' : 'Schedule:'}</span>
-                  <span style={{ fontWeight: 800, color: '#1e293b' }}>{selectedTicketAppt.time} • {new Date(selectedTicketAppt.date).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')}</span>
+                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{t.schedule}</span>
+                  <span style={{ fontWeight: 800, color: '#1e293b' }}>{selectedTicketAppt.time} • {formatDate(lang, selectedTicketAppt.date)}</span>
                 </div>
               </div>
 
@@ -519,7 +485,7 @@ export default function Dashboard() {
                 }}
               >
                 <Printer size={14} />
-                {lang === 'vi' ? 'In phiếu' : 'Print Ticket'}
+                {t.printTicket}
               </button>
               <button 
                 onClick={() => setSelectedTicketAppt(null)}
@@ -528,7 +494,7 @@ export default function Dashboard() {
                   fontSize: 12, fontWeight: 700, borderRadius: 12, border: 'none', cursor: 'pointer'
                 }}
               >
-                {lang === 'vi' ? 'Đóng' : 'Close'}
+                {t.close}
               </button>
             </div>
           </div>

@@ -1,13 +1,14 @@
-import { API_URL } from '../config';
+import { API_URL, authFetch, getStoredUser } from '../config';
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, ChevronRight, CheckCircle2, X, CreditCard, Printer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
+import { ticketTrans, mergeTrans } from '../i18n/ticketI18n';
+import { formatDoctorName, getLocalizedDept, formatApptMonth, formatDate } from '../utils/i18nHelpers';
 
 // const API_URL = API_URL;
-const authH = () => ({ Authorization: `Bearer ${JSON.parse(localStorage.getItem('userInfo') || '{}').token}` });
 
-const trans = {
+const trans = mergeTrans({
   vi: {
     title: 'Thông tin lịch khám',
     sub: 'Toàn bộ lịch sử đặt lịch và phiếu khám bệnh của bạn',
@@ -30,9 +31,12 @@ const trans = {
     doctorTitle: 'Bác sĩ phụ trách',
 
     pending: 'Chờ xác nhận',
+    pending_payment: 'Chờ thanh toán phí khám',
+    payNow: 'Thanh toán phí khám',
     confirmed: 'Đã xác nhận',
     completed: 'Đã khám',
     cancelled: 'Đã hủy',
+    viewTicketStt: 'Xem phiếu STT',
   },
   en: {
     title: 'Appointments History',
@@ -56,11 +60,14 @@ const trans = {
     doctorTitle: 'Attending Physician',
 
     pending: 'Pending',
+    pending_payment: 'Awaiting consultation payment',
+    payNow: 'Pay consultation fee',
     confirmed: 'Confirmed',
     completed: 'Completed',
     cancelled: 'Cancelled',
+    viewTicketStt: 'View Ticket',
   }
-};
+}, ticketTrans);
 
 export default function AppointmentsHistory() {
   const { lang, t } = useTranslation(trans);
@@ -71,46 +78,18 @@ export default function AppointmentsHistory() {
 
   const STATUS = {
     pending:   { label: t.pending, color: '#d97706', bg: '#fef3c7', border: '#fde68a' },
+    pending_payment: { label: t.pending_payment, color: '#ea580c', bg: '#ffedd5', border: '#fed7aa' },
     confirmed: { label: t.confirmed,  color: '#2563eb', bg: '#eff6ff', border: '#bfdbfe' },
     completed: { label: t.completed,      color: '#059669', bg: '#d1fae5', border: '#a7f3d0' },
     cancelled: { label: t.cancelled,       color: '#dc2626', bg: '#fef2f2', border: '#fecaca' },
   };
 
-  const getDoctorDisplayName = (name) => {
-    if (!name) return t.doctorTitle;
-    const trimmed = name.trim();
-    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
-    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
-  };
-
-  const getLocalizedDept = (dept) => {
-    if (!dept) return '';
-    if (lang === 'vi') return dept;
-    const deptsMap = {
-      'Khoa Nội': 'Internal Medicine',
-      'Khoa Ngoại': 'Surgery',
-      'Khoa Nhi': 'Pediatrics',
-      'Khoa Sản': 'Obstetrics & Gynecology',
-      'Khoa Da liễu': 'Dermatology',
-      'Khoa Tai Mũi Họng': 'Otorhinolaryngology (ENT)',
-      'Khoa Mắt': 'Ophthalmology',
-      'Khoa Răng Hàm Mặt': 'Odonto-Stomatology',
-      'Khoa Tim mạch': 'Cardiology',
-      'Khoa Thần kinh': 'Neurology',
-      'Khoa Cơ xương khớp': 'Orthopedics & Rheumatology',
-      'Khoa Cấp cứu': 'Emergency Department',
-      'Khoa Xét nghiệm': 'Laboratory Medicine',
-      'Khoa Chẩn đoán hình ảnh': 'Diagnostic Imaging',
-      'Ngoại tổng quát': 'General Surgery',
-      'Nội tổng quát': 'General Internal Medicine',
-    };
-    return deptsMap[dept] || dept;
-  };
+  const getDoctorDisplayName = (name) => formatDoctorName(lang, name) || t.doctorTitle;
 
   useEffect(() => {
     const fetchAppts = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/appointments`, { headers: authH() });
+        const res = await authFetch(`${API_URL}/api/appointments`);
         const data = await res.json();
         if (data.success) {
           setAppts(data.data.sort((a, b) => new Date(b.date) - new Date(a.date)));
@@ -161,7 +140,7 @@ export default function AppointmentsHistory() {
             const st = STATUS[a.status] || STATUS.pending;
             const isCompleted = a.status === 'completed';
             const apptDateObj = new Date(a.date);
-            const apptMonth = lang === 'vi' ? `Th${apptDateObj.getMonth() + 1}` : apptDateObj.toLocaleDateString('en-US', { month: 'short' });
+            const apptMonth = formatApptMonth(lang, apptDateObj);
             return (
               <div key={a._id} className="bg-white rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-start gap-5">
@@ -173,7 +152,7 @@ export default function AppointmentsHistory() {
                   <div>
                     <h3 className="text-lg font-black text-gray-900 mb-1 flex items-center flex-wrap gap-2">
                       {a.doctor?.department || t.generalDept}
-                      {a.status !== 'completed' && a.status !== 'cancelled' && (
+                      {a.status !== 'completed' && a.status !== 'cancelled' && a.status !== 'pending_payment' && (
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
@@ -187,7 +166,7 @@ export default function AppointmentsHistory() {
                             <polyline points="14 2 14 8 20 8"/>
                             <path d="m9 15 2 2 4-4"/>
                           </svg>
-                          {lang === 'vi' ? 'Xem phiếu STT' : 'View Ticket'}
+                          {t.viewTicketStt}
                         </button>
                       )}
                       <span className="px-3 py-1 rounded-full text-xs font-bold" style={{ background: st.bg, color: st.color }}>{st.label}</span>
@@ -195,18 +174,25 @@ export default function AppointmentsHistory() {
                     <p className="text-sm font-medium text-gray-600 mb-2">{getDoctorDisplayName(a.doctor?.userId?.fullName)}</p>
                     <div className="flex items-center gap-4 text-xs font-bold text-gray-500">
                       <span className="flex items-center gap-1.5"><Clock size={14} className="text-gray-400"/> {a.time}</span>
-                      <span className="flex items-center gap-1.5"><Calendar size={14} className="text-gray-400"/> {lang === 'vi' ? apptDateObj.toLocaleDateString('vi-VN') : apptDateObj.toLocaleDateString('en-US')}</span>
+                      <span className="flex items-center gap-1.5"><Calendar size={14} className="text-gray-400"/> {formatDate(lang, apptDateObj)}</span>
                       {a.ticketNumber && <span className="flex items-center gap-1.5"><CreditCard size={14} className="text-gray-400"/> {t.viewTicket}: {a.ticketNumber}</span>}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col md:items-end gap-3 shrink-0">
-                  <button onClick={() => handleAction(a)}
-                    className="px-5 py-2 rounded-xl font-bold text-sm transition-all border bg-blue-50 text-primary border-blue-100 hover:bg-primary hover:text-white shadow-sm shrink-0"
-                  >
-                    {isCompleted ? t.viewRecords : t.viewTicket}
-                  </button>
+                  {a.status === 'pending_payment' ? (
+                    <button onClick={() => navigate('/dashboard/billing')}
+                      className="px-5 py-2 rounded-xl font-bold text-sm transition-all border bg-orange-500 text-white border-orange-600 hover:bg-orange-600 shadow-sm shrink-0">
+                      {t.payNow}
+                    </button>
+                  ) : (
+                    <button onClick={() => handleAction(a)}
+                      className="px-5 py-2 rounded-xl font-bold text-sm transition-all border bg-blue-50 text-primary border-blue-100 hover:bg-primary hover:text-white shadow-sm shrink-0"
+                    >
+                      {isCompleted ? t.viewRecords : t.viewTicket}
+                    </button>
+                  )}
                   {a.paymentStatus === 'paid' ? (
                     <p className="text-xs font-bold text-green-600 flex items-center gap-1"><CheckCircle2 size={14}/> {t.paid}</p>
                   ) : (
@@ -236,10 +222,10 @@ export default function AppointmentsHistory() {
                 <img src="/LOGO.png" alt="MediCare" style={{ height: 36, width: 'auto', objectFit: 'contain' }} />
               </div>
               <h3 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-0.02em', margin: '8px 0 0', color: '#1e293b' }}>
-                {lang === 'vi' ? 'PHIẾU HẸN & SỐ THỨ TỰ' : 'QUEUE TICKET'}
+                {t.ticketTitle}
               </h3>
               <p style={{ fontSize: 11, color: '#64748b', marginTop: 4, fontWeight: 600, margin: '4px 0 0' }}>
-                {lang === 'vi' ? 'Hệ thống Y tế thông minh MediCare' : 'MediCare Smart Hospital System'}
+                {t.ticketSubtitle}
               </p>
               
               {/* Left/Right ticket notches */}
@@ -251,7 +237,7 @@ export default function AppointmentsHistory() {
             <div style={{ padding: 24 }}>
               {/* Big Queue Number */}
               <div style={{ background: '#f0f7ff', border: '1px solid #e0f2fe', borderRadius: 16, padding: '16px 0', textAlign: 'center', marginBottom: 24 }}>
-                <p style={{ fontSize: 10, fontWeight: 800, color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 6px' }}>{lang === 'vi' ? 'Số Thứ Tự Của Bạn' : 'Your Queue Number'}</p>
+                <p style={{ fontSize: 10, fontWeight: 800, color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 6px' }}>{t.yourQueue}</p>
                 <div style={{
                   display: 'inline-flex', width: 88, height: 88, borderRadius: '50%',
                   background: 'linear-gradient(135deg, #102a63 0%, #2563eb 100%)', color: '#fff',
@@ -260,30 +246,30 @@ export default function AppointmentsHistory() {
                 }}>
                   #{ticketModal.queueNumber || '01'}
                 </div>
-                <p style={{ fontSize: 10, fontWeight: 700, margin: '6px 0 0', color: '#64748b' }}>{lang === 'vi' ? 'Vui lòng theo dõi bảng điện tử tại sảnh chờ' : 'Please watch the monitor in the waiting hall'}</p>
+                <p style={{ fontSize: 10, fontWeight: 700, margin: '6px 0 0', color: '#64748b' }}>{t.watchMonitor}</p>
               </div>
 
               {/* Ticket Details */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13, color: '#334155', fontWeight: 600 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{lang === 'vi' ? 'Mã ca khám:' : 'Ticket ID:'}</span>
+                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{t.ticketId}</span>
                   <span style={{ fontFamily: 'monospace', fontWeight: 900, color: '#1e293b', fontSize: 14 }}>{ticketModal.ticketNumber}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{lang === 'vi' ? 'Bệnh nhân:' : 'Patient:'}</span>
-                  <span style={{ fontWeight: 800, color: '#1e293b' }}>{JSON.parse(localStorage.getItem('userInfo') || '{}')?.fullName}</span>
+                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{t.patient}</span>
+                  <span style={{ fontWeight: 800, color: '#1e293b' }}>{getStoredUser()?.fullName}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{lang === 'vi' ? 'Bác sĩ khám:' : 'Physician:'}</span>
+                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{t.physician}</span>
                   <span style={{ fontWeight: 800, color: '#102a63' }}>{getDoctorDisplayName(ticketModal.doctor?.userId?.fullName)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{lang === 'vi' ? 'Chuyên khoa:' : 'Department:'}</span>
+                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{t.department}</span>
                   <span style={{ fontWeight: 800, color: '#1e293b' }}>{getLocalizedDept(ticketModal.doctor?.department)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{lang === 'vi' ? 'Thời gian:' : 'Schedule:'}</span>
-                  <span style={{ fontWeight: 800, color: '#1e293b' }}>{ticketModal.time} • {new Date(ticketModal.date).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')}</span>
+                  <span style={{ color: '#94a3b8', fontWeight: 700 }}>{t.schedule}</span>
+                  <span style={{ fontWeight: 800, color: '#1e293b' }}>{ticketModal.time} • {formatDate(lang, ticketModal.date)}</span>
                 </div>
               </div>
 
@@ -317,7 +303,7 @@ export default function AppointmentsHistory() {
                 }}
               >
                 <Printer size={14} />
-                {lang === 'vi' ? 'In phiếu' : 'Print Ticket'}
+                {t.printTicket}
               </button>
               <button 
                 onClick={() => setTicketModal(null)}
@@ -326,7 +312,7 @@ export default function AppointmentsHistory() {
                   fontSize: 12, fontWeight: 700, borderRadius: 12, border: 'none', cursor: 'pointer'
                 }}
               >
-                {lang === 'vi' ? 'Đóng' : 'Close'}
+                {t.close}
               </button>
             </div>
           </div>

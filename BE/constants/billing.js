@@ -1,0 +1,4 @@
+module.exports = {
+  CONSULTATION_FEE: 150000,
+  LAB_FEE_PER_TEST: 50000
+};

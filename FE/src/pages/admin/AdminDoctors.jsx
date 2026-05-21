@@ -1,7 +1,8 @@
-import { API_URL } from '../../config';
+import { API_URL, authFetch } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Trash2, Edit3, Stethoscope, X, AlertCircle, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
+import { formatDoctorName, localizeAdminDept } from '../../utils/i18nHelpers';
 import AdminShifts from './AdminShifts';
 
 const trans = {
@@ -146,17 +147,11 @@ export default function AdminDoctors() {
   // Custom Confirm Dialog State
   const [confirmDialog, setConfirmDialog] = useState({ show: false, doctorId: null, message: '' });
 
+  const jsonHeaders = () => ({ 'Content-Type': 'application/json' });
+
   const fetchDoctors = async () => {
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
-      const res = await fetch(`${API_URL}/api/admin/doctors`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const res = await authFetch(`${API_URL}/api/admin/doctors`);
       const json = await res.json();
       if (json.success) {
         setDoctors(json.data);
@@ -228,15 +223,8 @@ export default function AdminDoctors() {
     setConfirmDialog({ show: false, doctorId: null, message: '' });
 
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
-      const res = await fetch(`${API_URL}/api/admin/doctors/${id}`, {
+      const res = await authFetch(`${API_URL}/api/admin/doctors/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
       });
       const json = await res.json();
       if (json.success) {
@@ -254,10 +242,6 @@ export default function AdminDoctors() {
     e.preventDefault();
 
     try {
-      const userInfo = localStorage.getItem('userInfo');
-      if (!userInfo) return;
-      const { token } = JSON.parse(userInfo);
-
       const body = {
         fullName,
         email,
@@ -278,12 +262,9 @@ export default function AdminDoctors() {
 
       const method = editingDoctor ? 'PUT' : 'POST';
 
-      const res = await fetch(url, {
+      const res = await authFetch(url, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: jsonHeaders(),
         body: JSON.stringify(body)
       });
 
@@ -300,53 +281,8 @@ export default function AdminDoctors() {
     }
   };
 
-  const getDoctorDisplayName = (name) => {
-    if (!name) return '';
-    const trimmed = name.trim();
-    const bareName = trimmed.replace(/^(bs\.|bs\s|bác sĩ\s)/i, '').trim();
-    return lang === 'vi' ? `BS. ${bareName}` : `Dr. ${bareName}`;
-  };
-
-  const getLocalizedDept = (dept) => {
-    if (!dept) return '';
-    if (lang === 'vi') {
-      const deptsMap = {
-        'Cardiology': 'Tim mạch',
-        'Neurology': 'Thần kinh',
-        'Pediatrics': 'Nhi khoa',
-        'Dermatology': 'Da liễu',
-        'Gastroenterology': 'Tiêu hóa',
-        'Respiratory Medicine': 'Hô hấp',
-        'General Surgery': 'Ngoại tổng quát',
-        'General Internal Medicine': 'Nội tổng quát',
-        'ENT': 'Tai Mũi Họng',
-        'Ophthalmology': 'Mắt',
-        'Odonto-Stomatology': 'Răng Hàm Mặt',
-        'Emergency': 'Cấp cứu',
-        'Laboratory': 'Xét nghiệm',
-        'Diagnostic Imaging': 'Chẩn đoán hình ảnh',
-      };
-      return deptsMap[dept] || dept;
-    } else {
-      const deptsMap = {
-        'Tim mạch': 'Cardiology',
-        'Thần kinh': 'Neurology',
-        'Nhi khoa': 'Pediatrics',
-        'Da liễu': 'Dermatology',
-        'Tiêu hóa': 'Gastroenterology',
-        'Hô hấp': 'Respiratory Medicine',
-        'Ngoại tổng quát': 'General Surgery',
-        'Nội tổng quát': 'General Internal Medicine',
-        'Tai Mũi Họng': 'ENT',
-        'Mắt': 'Ophthalmology',
-        'Răng Hàm Mặt': 'Odonto-Stomatology',
-        'Cấp cứu': 'Emergency',
-        'Xét nghiệm': 'Laboratory',
-        'Chẩn đoán hình ảnh': 'Diagnostic Imaging',
-      };
-      return deptsMap[dept] || dept;
-    }
-  };
+  const getDoctorDisplayName = (name) => formatDoctorName(lang, name);
+  const getLocalizedDept = (dept) => localizeAdminDept(lang, dept);
 
   const filteredDoctors = doctors.filter(d => {
     const nameMatch = d.userId?.fullName?.toLowerCase().includes(searchTerm.toLowerCase());
