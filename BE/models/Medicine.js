@@ -21,7 +21,7 @@ const medicineSchema = new mongoose.Schema({
     default: 100
   },
   expiry: {
-    type: String,
+    type: Date,
     required: [true, 'Vui lòng nhập hạn sử dụng']
   },
   status: {

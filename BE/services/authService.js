@@ -8,16 +8,22 @@ const {
   REFRESH_EXPIRES,
 } = require("../utils/tokenHelper");
 
-const formatAuthUser = (user, accessToken) => ({
-  _id: user._id,
-  fullName: user.fullName,
-  email: user.email,
-  phone: user.phone,
-  role: user.role,
-  gender: user.gender,
-  patientId: user.patientId,
-  token: accessToken,
-});
+const formatAuthUser = (user, accessToken, refreshToken = null) => {
+  const result = {
+    _id: user._id,
+    fullName: user.fullName,
+    email: user.email,
+    phone: user.phone,
+    role: user.role,
+    gender: user.gender,
+    patientId: user.patientId,
+    token: accessToken,
+  };
+  if (refreshToken) {
+    result.refreshToken = refreshToken;
+  }
+  return result;
+};
 
 const calculateExpiresAt = () => {
   const expiresInMs = parseExpiration(REFRESH_EXPIRES);
@@ -52,7 +58,7 @@ const issueTokenPair = async (user, deviceInfo = {}) => {
 
 const register = async (
   { fullName, email, password, phone, gender },
-  deviceInfo = {},
+  deviceInfo = {}
 ) => {
   const userExists = await User.findOne({ email });
   if (userExists) throw new HttpError(400, "Email đã được sử dụng");
@@ -67,7 +73,7 @@ const register = async (
 
   const tokens = await issueTokenPair(user, deviceInfo);
   return {
-    data: formatAuthUser(user, tokens.accessToken),
+    data: formatAuthUser(user, tokens.accessToken, tokens.refreshToken),
     refreshToken: tokens.refreshToken,
   };
 };
@@ -82,7 +88,7 @@ const login = async ({ email, password }, deviceInfo = {}) => {
   if (user.status === "blocked") {
     throw new HttpError(
       403,
-      "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin!",
+      "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin!"
     );
   }
 
@@ -91,7 +97,7 @@ const login = async ({ email, password }, deviceInfo = {}) => {
 
   const tokens = await issueTokenPair(user, deviceInfo);
   return {
-    data: formatAuthUser(user, tokens.accessToken),
+    data: formatAuthUser(user, tokens.accessToken, tokens.refreshToken),
     refreshToken: tokens.refreshToken,
   };
 };
@@ -114,7 +120,18 @@ const refresh = async ({ refreshToken }, deviceInfo = {}) => {
     throw new HttpError(401, "Refresh token không tồn tại");
   }
   if (storedToken.isRevoked) {
-    throw new HttpError(401, "Refresh token đã bị thu hồi");
+    // Breach detection: Revoke all tokens for this user and increment version to force logout
+    await RefreshToken.updateMany(
+      { userId: storedToken.userId },
+      { isRevoked: true, revokedAt: new Date() }
+    );
+    await User.findByIdAndUpdate(storedToken.userId, {
+      $inc: { refreshTokenVersion: 1 },
+    });
+    throw new HttpError(
+      401,
+      "Refresh token đã bị thu hồi. Phát hiện dấu hiệu xâm nhập, tất cả các phiên đăng nhập khác đã bị vô hiệu hóa."
+    );
   }
 
   const user = await User.findById(decoded.id);
@@ -125,7 +142,7 @@ const refresh = async ({ refreshToken }, deviceInfo = {}) => {
   if ((user.refreshTokenVersion ?? 0) !== (decoded.v ?? 0)) {
     throw new HttpError(
       401,
-      "Phiên đăng nhập đã bị thu hồi, vui lòng đăng nhập lại",
+      "Phiên đăng nhập đã bị thu hồi, vui lòng đăng nhập lại"
     );
   }
 
@@ -139,28 +156,47 @@ const refresh = async ({ refreshToken }, deviceInfo = {}) => {
   const tokens = await issueTokenPair(user, deviceInfo);
 
   // Link new token to old token for audit trail
-  await RefreshToken.findByIdAndUpdate(
+  await RefreshToken.findOneAndUpdate(
     { token: tokens.refreshToken },
-    { replacedBy: storedToken._id },
+    { replacedBy: storedToken._id }
   );
 
   return {
-    data: formatAuthUser(user, tokens.accessToken),
+    data: formatAuthUser(user, tokens.accessToken, tokens.refreshToken),
     refreshToken: tokens.refreshToken,
   };
 };
 
-const logout = async (userId, refreshToken = null) => {
-  // Revoke specific refresh token if provided
+const logout = async (refreshToken = null) => {
   if (refreshToken) {
-    await RefreshToken.findOneAndUpdate(
-      { token: refreshToken, userId },
-      { isRevoked: true, revokedAt: new Date() },
-    );
-  }
+    try {
+      const decoded = verifyRefreshToken(refreshToken);
+      const userId = decoded.id;
 
-  // Increment refresh token version to invalidate all other tokens
-  await User.findByIdAndUpdate(userId, { $inc: { refreshTokenVersion: 1 } });
+      // Revoke specific refresh token if provided
+      await RefreshToken.findOneAndUpdate(
+        { token: refreshToken, userId },
+        { isRevoked: true, revokedAt: new Date() }
+      );
+
+      // Increment refresh token version to invalidate all other tokens
+      await User.findByIdAndUpdate(userId, {
+        $inc: { refreshTokenVersion: 1 },
+      });
+    } catch (err) {
+      // If token is expired or invalid, search the DB to revoke and increment version if document is found
+      const storedToken = await RefreshToken.findOne({ token: refreshToken });
+      if (storedToken) {
+        storedToken.isRevoked = true;
+        storedToken.revokedAt = new Date();
+        await storedToken.save();
+
+        await User.findByIdAndUpdate(storedToken.userId, {
+          $inc: { refreshTokenVersion: 1 },
+        });
+      }
+    }
+  }
 
   return { success: true };
 };

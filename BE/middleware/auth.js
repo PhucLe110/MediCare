@@ -12,6 +12,11 @@ exports.protect = async (req, res, next) => {
     return res.status(401).json({ success: false, message: 'Không có quyền truy cập, vui lòng đăng nhập' });
   }
 
+  const { isTokenBlacklisted } = require('../utils/tokenBlacklist');
+  if (isTokenBlacklisted(token)) {
+    return res.status(401).json({ success: false, message: 'Token đã bị vô hiệu hóa (đã đăng xuất), vui lòng đăng nhập lại' });
+  }
+
   try {
     const decoded = verifyAccessToken(token);
     req.user = await User.findById(decoded.id);

@@ -16,7 +16,11 @@ const generateAccessToken = (user) =>
 
 const generateRefreshToken = (user) =>
   jwt.sign(
-    { id: user._id, v: user.refreshTokenVersion ?? 0 },
+    { 
+      id: user._id, 
+      v: user.refreshTokenVersion ?? 0,
+      jti: Math.random().toString(36).substring(2) + Date.now()
+    },
     REFRESH_SECRET,
     { expiresIn: REFRESH_EXPIRES }
   );

@@ -49,31 +49,40 @@ const bookAppointment = async (patientId, { doctorId, date, time, symptoms }) =>
   const doctor = await Doctor.findById(doctorId);
   if (!doctor) throw new HttpError(404, 'Không tìm thấy bác sĩ');
 
-  const appointmentCount = await Appointment.countDocuments({
-    doctor: doctorId,
-    date,
-    time,
-    status: { $nin: ['cancelled'] }
-  });
-  if (appointmentCount >= MAX_PATIENTS_PER_SLOT) {
-    throw new HttpError(400, 'Khung giờ này đã đủ 5 bệnh nhân đặt. Vui lòng chọn khung giờ khác!');
+  // Khoá tài nguyên đặt lịch theo bác sĩ và khung giờ để tránh tranh chấp (Race Condition)
+  const { acquireLock, releaseLock } = require('../utils/lock');
+  const lockKey = `book:${doctorId}:${date}:${time}`;
+  await acquireLock(lockKey);
+
+  try {
+    const appointmentCount = await Appointment.countDocuments({
+      doctor: doctorId,
+      date,
+      time,
+      status: { $nin: ['cancelled'] }
+    });
+    if (appointmentCount >= MAX_PATIENTS_PER_SLOT) {
+      throw new HttpError(400, 'Khung giờ này đã đủ 5 bệnh nhân đặt. Vui lòng chọn khung giờ khác!');
+    }
+
+    const appointment = await Appointment.create({
+      patient: patientId,
+      doctor: doctorId,
+      date,
+      time,
+      symptoms,
+      queueNumber: appointmentCount + 1,
+      ticketNumber: `U${Math.floor(100000000 + Math.random() * 900000000)}`,
+      status: 'pending_payment',
+      paymentStatus: 'unpaid'
+    });
+
+    const consultationBill = await createConsultationBill(appointment._id, patientId);
+
+    return { appointment, consultationBill };
+  } finally {
+    releaseLock(lockKey);
   }
-
-  const appointment = await Appointment.create({
-    patient: patientId,
-    doctor: doctorId,
-    date,
-    time,
-    symptoms,
-    queueNumber: appointmentCount + 1,
-    ticketNumber: `U${Math.floor(100000000 + Math.random() * 900000000)}`,
-    status: 'pending_payment',
-    paymentStatus: 'unpaid'
-  });
-
-  const consultationBill = await createConsultationBill(appointment._id, patientId);
-
-  return { appointment, consultationBill };
 };
 
 const getMyAppointments = async (patientId) => {

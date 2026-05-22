@@ -17,7 +17,13 @@ const getAmountDue = (bill) => {
 
 const createBill = async (appointmentId, patientId, billType, items) => {
   const existing = await getBill(appointmentId, billType);
-  if (existing) return existing;
+  if (existing) {
+    if (existing.status === 'unpaid') {
+      existing.items = items;
+      await existing.save();
+    }
+    return existing;
+  }
 
   return Bill.create({
     appointment: appointmentId,

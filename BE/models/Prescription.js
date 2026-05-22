@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const medicineSchema = new mongoose.Schema({
+  medicineId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Medicine',
+    required: true
+  },
   name: { type: String, required: true },
   dosage: { type: String, default: '' },         // VD: 500mg
   frequency: { type: String, default: '' },      // VD: 2 lần/ngày
