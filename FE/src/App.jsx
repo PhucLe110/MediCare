@@ -1,49 +1,70 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 
 // Layouts
-import MainLayout from './layouts/MainLayout';
-import DashboardLayout from './layouts/DashboardLayout';
+import MainLayout from "./layouts/MainLayout";
+import DashboardLayout from "./layouts/DashboardLayout";
 
 // Pages
-import LandingPage from './pages/LandingPage';
-import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Booking from './pages/Booking';
-import AITriage from './pages/AITriage';
-import Records from './pages/Records';
-import ComingSoon from './pages/ComingSoon';
-import LabResults from './pages/LabResults';
-import LabUpload from './pages/LabUpload';
-import LabStaffDashboard from './pages/LabStaffDashboard';
-import Prescriptions from './pages/Prescriptions';
-import Billing from './pages/Billing';
-import Notifications from './pages/Notifications';
-import AppointmentsHistory from './pages/AppointmentsHistory';
-import AppointmentDetail from './pages/AppointmentDetail';
-import DoctorDashboard from './pages/DoctorDashboard';
-import DoctorShifts from './pages/DoctorShifts';
+import LandingPage from "./pages/LandingPage";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Booking from "./pages/Booking";
+import AITriage from "./pages/AITriage";
+import Records from "./pages/Records";
+import ComingSoon from "./pages/ComingSoon";
+import LabResults from "./pages/LabResults";
+import LabUpload from "./pages/LabUpload";
+import LabStaffDashboard from "./pages/LabStaffDashboard";
+import Prescriptions from "./pages/Prescriptions";
+import Billing from "./pages/Billing";
+import Notifications from "./pages/Notifications";
+import AppointmentsHistory from "./pages/AppointmentsHistory";
+import AppointmentDetail from "./pages/AppointmentDetail";
+import DoctorDashboard from "./pages/DoctorDashboard";
+import DoctorShifts from "./pages/DoctorShifts";
 
 // Public Pages
-import About from './pages/public/About';
-import Services from './pages/public/Services';
-import Doctors from './pages/public/Doctors';
+import About from "./pages/public/About";
+import Services from "./pages/public/Services";
+import Doctors from "./pages/public/Doctors";
 
 // Admin Pages
-import AdminLayout from './layouts/AdminLayout';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminUsers from './pages/admin/AdminUsers';
-import AdminDoctors from './pages/admin/AdminDoctors';
-import AdminAppointments from './pages/admin/AdminAppointments';
-import AdminRecords from './pages/admin/AdminRecords';
-import AdminInventory from './pages/admin/AdminInventory';
-import AdminBilling from './pages/admin/AdminBilling';
-import AdminAI from './pages/admin/AdminAI';
+import AdminLayout from "./layouts/AdminLayout";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminDoctors from "./pages/admin/AdminDoctors";
+import AdminAppointments from "./pages/admin/AdminAppointments";
+import AdminRecords from "./pages/admin/AdminRecords";
+import AdminInventory from "./pages/admin/AdminInventory";
+import AdminBilling from "./pages/admin/AdminBilling";
+import AdminAI from "./pages/admin/AdminAI";
+
+// Scroll to top component
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+  }, [pathname]);
+
+  return null;
+};
 
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         {/* Public Routes without Layout */}
         <Route path="/login" element={<Login />} />
@@ -73,7 +94,10 @@ function App() {
           <Route path="lab-results" element={<LabResults />} />
           <Route path="doctor" element={<DoctorDashboard />} />
           <Route path="doctor-shifts" element={<DoctorShifts />} />
-          <Route path="settings" element={<ComingSoon titleKey="settingsTitle" />} />
+          <Route
+            path="settings"
+            element={<ComingSoon titleKey="settingsTitle" />}
+          />
         </Route>
 
         <Route path="/admin" element={<AdminLayout />}>
