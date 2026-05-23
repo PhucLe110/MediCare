@@ -234,80 +234,27 @@ export default function Notifications() {
   const urgentCount = all.filter((n) => n.urgent).length;
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: "8px 0 40px" }}>
+    <div className="max-w-lg md:max-w-2xl mx-auto px-2 py-4 md:py-8">
       {/* Header */}
-      <div style={{ marginBottom: 32 }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 16,
-            marginBottom: 8,
-          }}
-        >
-          <div
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 16,
-              background: "linear-gradient(135deg,#fbbf24,#f59e0b)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 6px 20px rgba(245,158,11,0.3)",
-            }}
-          >
-            <Bell size={24} color="#fff" />
+      <div className="mb-6 md:mb-8">
+        <div className="flex items-center gap-3 md:gap-4 mb-2 md:mb-2">
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/30 shrink-0">
+            <Bell size={18} md={24} className="text-white" />
           </div>
-          <div>
-            <h1
-              style={{
-                fontSize: 28,
-                fontWeight: 900,
-                color: "var(--text-primary)",
-                letterSpacing: "-0.02em",
-                lineHeight: 1,
-              }}
-            >
+          <div className="flex-1">
+            <h1 className="text-xl md:text-[28px] font-black text-[var(--text-primary)] tracking-tight leading-none">
               {t.title}
             </h1>
-            <p
-              style={{
-                fontSize: 12,
-                color: "var(--text-secondary)",
-                fontWeight: 600,
-                marginTop: 4,
-              }}
-            >
+            <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-semibold mt-1 md:mt-1">
               {urgentCount > 0
                 ? `${urgentCount} ${t.urgentCountText}`
                 : t.defaultCountText}
             </p>
           </div>
           {urgentCount > 0 && (
-            <div
-              style={{
-                marginLeft: "auto",
-                background: "#fef2f2 dark:bg-red-900/20",
-                border: "1px solid #fecaca dark:border-red-900/30",
-                borderRadius: 12,
-                padding: "8px 16px",
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <span
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: "50%",
-                  background: "#ef4444",
-                  animation: "pulse 1s infinite",
-                  display: "block",
-                }}
-              />
-              <p style={{ fontSize: 12, fontWeight: 800, color: "#dc2626" }}>
+            <div className="ml-auto bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 rounded-xl md:rounded-2xl px-3 md:px-4 py-2 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              <p className="text-[10px] md:text-xs font-extrabold text-red-600 dark:text-red-400">
                 {urgentCount} {t.urgentText}
               </p>
             </div>
@@ -316,16 +263,7 @@ export default function Notifications() {
       </div>
 
       {/* Filter Pills */}
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          marginBottom: 24,
-          overflowX: "auto",
-          paddingBottom: 4,
-          scrollbarWidth: "none",
-        }}
-      >
+      <div className="flex gap-2 md:gap-2 mb-4 md:mb-6 overflow-x-auto pb-1 scrollbar-hide">
         {FILTERS.map((f) => {
           const cnt =
             f.key === "all"
@@ -336,42 +274,19 @@ export default function Notifications() {
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 7,
-                padding: "8px 16px",
-                borderRadius: 99,
-                fontWeight: 700,
-                fontSize: 13,
-                whiteSpace: "nowrap",
-                cursor: "pointer",
-                transition: "all 0.15s",
-                border: "none",
-                background: active
-                  ? "var(--text-primary)"
-                  : "var(--bg-tertiary)",
-                color: active ? "#fff" : "var(--text-secondary)",
-                boxShadow: active ? "0 4px 14px rgba(0,0,0,0.2)" : "none",
-              }}
+              className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full font-bold text-xs md:text-sm whitespace-nowrap transition-all border-none ${
+                active
+                  ? "bg-[var(--text-primary)] text-white shadow-md"
+                  : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]"
+              }`}
             >
               {f.label}
               <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 800,
-                  minWidth: 20,
-                  height: 20,
-                  borderRadius: 99,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "0 5px",
-                  background: active
-                    ? "rgba(255,255,255,0.2)"
-                    : "var(--border-color)",
-                  color: active ? "#fff" : "var(--text-tertiary)",
-                }}
+                className={`text-[10px] md:text-[11px] font-extrabold min-w-[20px] h-5 rounded-full flex items-center justify-center px-1.5 ${
+                  active
+                    ? "bg-white/20 text-white"
+                    : "bg-[var(--border-color)] text-[var(--text-tertiary)]"
+                }`}
               >
                 {cnt}
               </span>
@@ -382,46 +297,23 @@ export default function Notifications() {
 
       {/* List */}
       {loading ? (
-        <div
-          style={{
-            padding: "80px 0",
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              border: "3px solid var(--border-color)",
-              borderTopColor: "#f59e0b",
-              borderRadius: "50%",
-              animation: "spin 0.7s linear infinite",
-            }}
-          />
+        <div className="py-16 md:py-20 flex justify-center">
+          <div className="w-8 h-8 md:w-9 md:h-9 border-3 border-[var(--border-color)] border-t-amber-500 rounded-full animate-spin" />
         </div>
       ) : displayed.length === 0 ? (
-        <div
-          style={{
-            padding: "80px 24px",
-            textAlign: "center",
-            color: "var(--text-tertiary)",
-          }}
-        >
-          <Bell size={64} strokeWidth={1} style={{ margin: "0 auto 16px" }} />
-          <p
-            style={{
-              fontWeight: 700,
-              fontSize: 13,
-              textTransform: "uppercase",
-              letterSpacing: "0.15em",
-            }}
-          >
+        <div className="py-16 md:py-20 text-center text-[var(--text-tertiary)]">
+          <Bell
+            size={40}
+            md={64}
+            strokeWidth={1}
+            className="mx-auto mb-4 md:mb-4"
+          />
+          <p className="font-bold text-xs md:text-sm uppercase tracking-widest">
             {t.noNotifications}
           </p>
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div className="flex flex-col gap-2.5 md:gap-2.5">
           {displayed.map((n) => {
             const Icon = n.icon;
             const isReminder = n.type === "reminder";
@@ -429,126 +321,60 @@ export default function Notifications() {
               <div
                 key={n.id}
                 onClick={() => n.link && navigate(n.link)}
-                style={{
-                  background: "var(--card-bg)",
-                  borderRadius: 20,
-                  cursor: n.link ? "pointer" : "default",
-                  border: `1px solid ${isReminder ? "#fecaca dark:border-red-900/30" : n.urgent ? "#fed7aa dark:border-orange-900/30" : "var(--border-color)"}`,
-                  boxShadow: isReminder
-                    ? "0 4px 20px rgba(220,38,38,0.1)"
+                className={`bg-[var(--card-bg)] rounded-xl md:rounded-2xl cursor-pointer border transition-all ${
+                  isReminder
+                    ? "border-red-200 dark:border-red-900/30 shadow-md shadow-red-500/10 bg-gradient-to-br from-red-50/50 dark:from-red-900/10 dark:to-transparent"
                     : n.urgent
-                      ? "0 4px 16px rgba(217,119,6,0.08)"
-                      : "0 1px 4px rgba(0,0,0,0.04)",
-                  transition: "all 0.18s",
-                  ...(isReminder
-                    ? {
-                        background:
-                          "linear-gradient(135deg,#fff5f5 dark:from-red-900/10 dark:to-transparent,var(--card-bg))",
-                      }
-                    : {}),
-                }}
-                onMouseEnter={(e) =>
-                  n.link &&
-                  (e.currentTarget.style.boxShadow =
-                    "0 8px 28px rgba(0,0,0,0.1)")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.boxShadow = isReminder
-                    ? "0 4px 20px rgba(220,38,38,0.1)"
-                    : n.urgent
-                      ? "0 4px 16px rgba(217,119,6,0.08)"
-                      : "0 1px 4px rgba(0,0,0,0.04)")
-                }
+                      ? "border-orange-200 dark:border-orange-900/30 shadow-sm shadow-orange-500/8"
+                      : "border-[var(--border-color)] shadow-sm"
+                } hover:shadow-lg`}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 16,
-                    padding: "18px 20px",
-                  }}
-                >
+                <div className="flex items-center gap-3 md:gap-4 p-3 md:p-5">
                   <div
-                    style={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: 15,
-                      background: n.bg,
-                      flexShrink: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      boxShadow: n.urgent ? `0 4px 16px ${n.color}25` : "none",
-                    }}
+                    className={`w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex-shrink-0 flex items-center justify-center ${
+                      isReminder
+                        ? "bg-red-50 dark:bg-red-900/30 shadow-md shadow-red-500/20"
+                        : n.urgent
+                          ? "bg-amber-50 dark:bg-amber-900/30 shadow-md shadow-amber-500/20"
+                          : "bg-[var(--bg-tertiary)]"
+                    }`}
                   >
-                    <Icon size={22} style={{ color: n.color }} />
+                    <Icon
+                      size={18}
+                      md={22}
+                      className={
+                        isReminder
+                          ? "text-red-600 dark:text-red-400"
+                          : n.urgent
+                            ? "text-amber-600 dark:text-amber-400"
+                            : "text-[var(--text-secondary)]"
+                      }
+                    />
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        justifyContent: "space-between",
-                        gap: 8,
-                        marginBottom: 4,
-                      }}
-                    >
-                      <p
-                        style={{
-                          fontWeight: 800,
-                          fontSize: 14,
-                          color: "var(--text-primary)",
-                          lineHeight: 1.3,
-                        }}
-                      >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <p className="font-extrabold text-xs md:text-sm text-[var(--text-primary)] leading-tight">
                         {n.title}
                       </p>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 6,
-                          flexShrink: 0,
-                        }}
-                      >
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
                         {n.urgent && (
                           <span
-                            style={{
-                              width: 8,
-                              height: 8,
-                              borderRadius: "50%",
-                              background: isReminder ? "#ef4444" : "#f59e0b",
-                              animation: "pulse 1.5s infinite",
-                              display: "block",
-                            }}
+                            className={`w-2 h-2 rounded-full animate-pulse ${isReminder ? "bg-red-500" : "bg-amber-500"}`}
                           />
                         )}
                         {n.link && (
                           <ChevronRight
-                            size={14}
-                            style={{ color: "var(--text-tertiary)" }}
+                            size={12}
+                            md={14}
+                            className="text-[var(--text-tertiary)]"
                           />
                         )}
                       </div>
                     </div>
-                    <p
-                      style={{
-                        fontSize: 13,
-                        color: "var(--text-secondary)",
-                        fontWeight: 500,
-                        lineHeight: 1.4,
-                      }}
-                    >
+                    <p className="text-[11px] md:text-sm text-[var(--text-secondary)] font-medium leading-relaxed">
                       {n.desc}
                     </p>
-                    <p
-                      style={{
-                        fontSize: 11,
-                        color: "var(--text-tertiary)",
-                        fontWeight: 600,
-                        marginTop: 6,
-                      }}
-                    >
+                    <p className="text-[10px] md:text-xs text-[var(--text-tertiary)] font-semibold mt-1 md:mt-1.5">
                       {timeAgo(n.time)}
                     </p>
                   </div>
@@ -558,11 +384,6 @@ export default function Notifications() {
           })}
         </div>
       )}
-
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
-      `}</style>
     </div>
   );
 }

@@ -138,39 +138,39 @@ export default function AdminRecords() {
     );
 
   return (
-    <div className="space-y-6 animate-in fade-in">
-      <div className="flex justify-between items-center bg-[var(--card-bg)] p-6 rounded-3xl border border-[var(--border-color)] shadow-sm">
+    <div className="space-y-4 md:space-y-6 animate-in fade-in">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 bg-[var(--card-bg)] p-4 md:p-6 rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm">
         <div>
-          <h2 className="text-2xl font-black text-[var(--text-primary)]">
+          <h2 className="text-xl md:text-2xl font-black text-[var(--text-primary)]">
             {t.headerTitle}
           </h2>
-          <p className="text-[var(--text-secondary)] font-medium mt-1">
+          <p className="text-xs md:text-sm text-[var(--text-secondary)] font-medium mt-1">
             {t.headerSubtitle}
           </p>
         </div>
         <button
           onClick={handleBackup}
-          className="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl flex items-center gap-2 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition-all shrink-0"
+          className="px-4 md:px-5 py-2 md:py-2.5 bg-indigo-600 text-white font-bold rounded-xl flex items-center gap-2 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition-all shrink-0 text-xs md:text-sm"
         >
-          <Database size={18} /> {t.btnBackup}
+          <Database size={16} md={18} /> {t.btnBackup}
         </button>
       </div>
 
-      <div className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border-color)] shadow-sm overflow-hidden">
+      <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm overflow-hidden">
         {/* Navigation Tabs */}
-        <div className="flex border-b border-[var(--border-color)] bg-[var(--bg-tertiary)] p-2 gap-2">
+        <div className="flex flex-col md:flex-row border-b border-[var(--border-color)] bg-[var(--bg-tertiary)] p-2 gap-2">
           <button
             onClick={() => {
               setActiveTab("prescriptions");
               setSearchTerm("");
             }}
-            className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
+            className={`px-3 md:px-5 py-2 md:py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
               activeTab === "prescriptions"
                 ? "bg-[var(--card-bg)] text-indigo-600 dark:text-indigo-400 shadow-sm border border-[var(--border-color)]"
                 : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             }`}
           >
-            <FileText size={16} /> {t.tabPrescriptions} (
+            <FileText size={14} md={16} /> {t.tabPrescriptions} (
             {records.prescriptions.length})
           </button>
           <button
@@ -178,23 +178,24 @@ export default function AdminRecords() {
               setActiveTab("labResults");
               setSearchTerm("");
             }}
-            className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
+            className={`px-3 md:px-5 py-2 md:py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
               activeTab === "labResults"
                 ? "bg-[var(--card-bg)] text-indigo-600 dark:text-indigo-400 shadow-sm border border-[var(--border-color)]"
                 : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             }`}
           >
-            <Activity size={16} /> {t.tabLabResults} (
+            <Activity size={14} md={16} /> {t.tabLabResults} (
             {records.labResults.length})
           </button>
         </div>
 
         {/* Search */}
-        <div className="p-4 border-b border-[var(--border-color)] flex items-center bg-[var(--card-bg)]">
-          <div className="relative w-80">
+        <div className="p-3 md:p-4 border-b border-[var(--border-color)] flex items-center bg-[var(--card-bg)]">
+          <div className="relative w-full md:w-80">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
-              size={18}
+              size={16}
+              md={18}
             />
             <input
               type="text"
@@ -205,7 +206,7 @@ export default function AdminRecords() {
               }
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-[var(--border-color)] rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-[var(--text-primary)]"
+              className="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2 border border-[var(--border-color)] rounded-xl text-xs md:text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-[var(--text-primary)]"
             />
           </div>
         </div>
@@ -213,14 +214,14 @@ export default function AdminRecords() {
         {/* Tab Content */}
         <div className="overflow-x-auto">
           {activeTab === "prescriptions" ? (
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-[700px]">
               <thead>
-                <tr className="bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-xs uppercase tracking-wider font-bold">
-                  <th className="p-4 pl-6">{t.colPatient}</th>
-                  <th className="p-4">{t.colDoctor}</th>
-                  <th className="p-4">{t.colDiagnosis}</th>
-                  <th className="p-4">{t.colMedsList}</th>
-                  <th className="p-4">{t.colPrescribedDate}</th>
+                <tr className="bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-[10px] md:text-xs uppercase tracking-wider font-bold">
+                  <th className="p-3 md:p-4 pl-4 md:pl-6">{t.colPatient}</th>
+                  <th className="p-3 md:p-4">{t.colDoctor}</th>
+                  <th className="p-3 md:p-4">{t.colDiagnosis}</th>
+                  <th className="p-3 md:p-4">{t.colMedsList}</th>
+                  <th className="p-3 md:p-4">{t.colPrescribedDate}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border-color)]">
@@ -228,7 +229,7 @@ export default function AdminRecords() {
                   <tr>
                     <td
                       colSpan="5"
-                      className="text-center py-10 text-[var(--text-tertiary)] font-bold"
+                      className="text-center py-10 text-[var(--text-tertiary)] font-bold text-xs md:text-sm"
                     >
                       {t.noPrescriptions}
                     </td>
@@ -239,41 +240,41 @@ export default function AdminRecords() {
                       key={p._id}
                       className="hover:bg-[var(--bg-tertiary)] transition-colors"
                     >
-                      <td className="p-4 pl-6 font-medium">
+                      <td className="p-3 md:p-4 pl-4 md:pl-6 font-medium">
                         <div className="flex flex-col">
-                          <span className="font-bold text-[var(--text-primary)] text-sm">
+                          <span className="font-bold text-[var(--text-primary)] text-xs md:text-sm">
                             {p.patient?.fullName || "N/A"}
                           </span>
-                          <span className="text-xs text-[var(--text-secondary)] font-mono">
+                          <span className="text-[10px] md:text-xs text-[var(--text-secondary)] font-mono">
                             {t.patientIdPrefix} {p.patient?.patientId || "N/A"}
                           </span>
                         </div>
                       </td>
-                      <td className="p-4 font-bold text-[var(--text-primary)] text-sm">
+                      <td className="p-3 md:p-4 font-bold text-[var(--text-primary)] text-xs md:text-sm">
                         <span>
                           {getDoctorDisplayName(
                             p.appointment?.doctor?.userId?.fullName,
                           )}
                         </span>
                       </td>
-                      <td className="p-4 font-medium">
-                        <span className="px-2.5 py-1 bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 font-bold text-xs rounded-lg border border-amber-200 dark:border-amber-900/30">
+                      <td className="p-3 md:p-4 font-medium">
+                        <span className="px-2 md:px-2.5 py-1 bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 font-bold text-[10px] md:text-xs rounded-lg border border-amber-200 dark:border-amber-900/30">
                           {p.diagnosis}
                         </span>
                       </td>
-                      <td className="p-4 max-w-xs font-medium">
+                      <td className="p-3 md:p-4 max-w-xs font-medium">
                         <div className="flex flex-wrap gap-1">
                           {p.medicines?.map((m, idx) => (
                             <span
                               key={idx}
-                              className="px-2 py-0.5 bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-xs font-bold rounded-lg border border-[var(--border-color)]"
+                              className="px-2 py-0.5 bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-[10px] md:text-xs font-bold rounded-lg border border-[var(--border-color)]"
                             >
                               {m.name} ({m.dosage})
                             </span>
                           ))}
                         </div>
                       </td>
-                      <td className="p-4 text-xs font-bold text-[var(--text-secondary)] font-mono">
+                      <td className="p-3 md:p-4 text-[10px] md:text-xs font-bold text-[var(--text-secondary)] font-mono">
                         {formatDate(lang, p.createdAt)}
                       </td>
                     </tr>
@@ -282,14 +283,14 @@ export default function AdminRecords() {
               </tbody>
             </table>
           ) : (
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-[700px]">
               <thead>
-                <tr className="bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-xs uppercase tracking-wider font-bold">
-                  <th className="p-4 pl-6">{t.colPatient}</th>
-                  <th className="p-4">{t.colTestName}</th>
-                  <th className="p-4">{t.colSummary}</th>
-                  <th className="p-4">{t.colAttachment}</th>
-                  <th className="p-4">{t.colTestDate}</th>
+                <tr className="bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-[10px] md:text-xs uppercase tracking-wider font-bold">
+                  <th className="p-3 md:p-4 pl-4 md:pl-6">{t.colPatient}</th>
+                  <th className="p-3 md:p-4">{t.colTestName}</th>
+                  <th className="p-3 md:p-4">{t.colSummary}</th>
+                  <th className="p-3 md:p-4">{t.colAttachment}</th>
+                  <th className="p-3 md:p-4">{t.colTestDate}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border-color)]">
@@ -297,7 +298,7 @@ export default function AdminRecords() {
                   <tr>
                     <td
                       colSpan="5"
-                      className="text-center py-10 text-[var(--text-tertiary)] font-bold"
+                      className="text-center py-10 text-[var(--text-tertiary)] font-bold text-xs md:text-sm"
                     >
                       {t.noLabResults}
                     </td>
@@ -308,41 +309,41 @@ export default function AdminRecords() {
                       key={l._id}
                       className="hover:bg-[var(--bg-tertiary)] transition-colors"
                     >
-                      <td className="p-4 pl-6 font-medium">
+                      <td className="p-3 md:p-4 pl-4 md:pl-6 font-medium">
                         <div className="flex flex-col">
-                          <span className="font-bold text-[var(--text-primary)] text-sm">
+                          <span className="font-bold text-[var(--text-primary)] text-xs md:text-sm">
                             {l.patient?.fullName || "N/A"}
                           </span>
-                          <span className="text-xs text-[var(--text-secondary)] font-mono">
+                          <span className="text-[10px] md:text-xs text-[var(--text-secondary)] font-mono">
                             {t.patientIdPrefix} {l.patient?.patientId || "N/A"}
                           </span>
                         </div>
                       </td>
-                      <td className="p-4 font-bold text-[var(--text-primary)] text-sm">
+                      <td className="p-3 md:p-4 font-bold text-[var(--text-primary)] text-xs md:text-sm">
                         <span>{l.labRequest?.testName || "N/A"}</span>
                       </td>
-                      <td className="p-4 font-medium">
-                        <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 font-bold text-xs rounded-lg border border-emerald-200 dark:border-emerald-900/30">
+                      <td className="p-3 md:p-4 font-medium">
+                        <span className="px-2 md:px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 font-bold text-[10px] md:text-xs rounded-lg border border-emerald-200 dark:border-emerald-900/30">
                           {l.resultSummary}
                         </span>
                       </td>
-                      <td className="p-4 font-medium">
+                      <td className="p-3 md:p-4 font-medium">
                         {l.fileUrl ? (
                           <a
                             href={`${API_URL}/${l.fileUrl}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline flex items-center gap-1"
+                            className="text-[10px] md:text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline flex items-center gap-1"
                           >
                             {t.downloadFile}
                           </a>
                         ) : (
-                          <span className="text-xs font-medium text-[var(--text-tertiary)]">
+                          <span className="text-[10px] md:text-xs font-medium text-[var(--text-tertiary)]">
                             {t.noFileAttached}
                           </span>
                         )}
                       </td>
-                      <td className="p-4 text-xs font-bold text-[var(--text-secondary)] font-mono">
+                      <td className="p-3 md:p-4 text-[10px] md:text-xs font-bold text-[var(--text-secondary)] font-mono">
                         {formatDate(lang, l.createdAt)}
                       </td>
                     </tr>

@@ -13,6 +13,8 @@ import {
   ChevronLeft,
   Sun,
   Moon,
+  Menu,
+  X,
 } from "lucide-react";
 import { ensureValidSession, logoutAuth } from "../utils/auth";
 
@@ -22,6 +24,7 @@ const AdminLayout = () => {
   const [user, setUser] = useState(null);
   const [lang, setLang] = useState(localStorage.getItem("lang") || "vi");
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -67,6 +70,14 @@ const AdminLayout = () => {
     return () =>
       window.removeEventListener("language-change", handleLangChange);
   }, [lang]);
+
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.classList.add("menu-open");
+    } else {
+      document.body.classList.remove("menu-open");
+    }
+  }, [sidebarOpen]);
 
   const handleLogout = async () => {
     await logoutAuth();
@@ -129,8 +140,16 @@ const AdminLayout = () => {
 
   return (
     <div className="flex h-screen bg-[var(--bg-secondary)] font-sans overflow-hidden transition-colors duration-200">
+      {/* Mobile Sidebar Overlay */}
+      <div
+        className={`sidebar-overlay ${sidebarOpen ? "open" : ""}`}
+        onClick={() => setSidebarOpen(false)}
+      ></div>
+
       {/* Sidebar - Dark Premium Theme */}
-      <div className="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl relative z-20">
+      <div
+        className={`w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl relative z-20 sidebar-mobile ${sidebarOpen ? "open" : ""}`}
+      >
         <div className="p-6 pb-2 border-b border-slate-800">
           <Link to="/admin" className="flex items-center justify-center gap-3">
             <img
@@ -239,8 +258,29 @@ const AdminLayout = () => {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col relative min-w-0">
-        {/* Top Navbar */}
-        <header className="h-16 bg-[var(--card-bg)]/80 backdrop-blur-md border-b border-[var(--border-color)] flex items-center justify-between px-8 shrink-0 z-10 sticky top-0">
+        {/* Mobile Top Bar */}
+        <div className="mobile-top-bar md:hidden">
+          <button
+            className="hamburger-button"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Menu size={24} />
+          </button>
+          <div className="flex items-center gap-2">
+            <img
+              src="/LOGO.png"
+              alt="MediCare"
+              className="h-8 w-auto object-contain drop-shadow-md no-invert"
+            />
+            <span className="font-black text-primary tracking-widest uppercase text-sm">
+              Admin
+            </span>
+          </div>
+          <div className="w-10"></div>
+        </div>
+
+        {/* Top Navbar - Desktop */}
+        <header className="h-16 bg-[var(--card-bg)]/80 backdrop-blur-md border-b border-[var(--border-color)] flex items-center justify-between px-8 shrink-0 z-10 sticky top-0 hidden md:flex">
           <div className="flex items-center gap-4">
             <h1 className="text-xl font-black text-[var(--text-primary)] tracking-tight">
               {adminMenu.find((m) => m.path === location.pathname)?.name ||
@@ -266,7 +306,7 @@ const AdminLayout = () => {
         </header>
 
         {/* Scrollable Content */}
-        <main className="flex-1 overflow-y-auto bg-[var(--bg-secondary)] p-8">
+        <main className="flex-1 overflow-y-auto bg-[var(--bg-secondary)] p-4 md:p-8 main-content-mobile">
           <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>

@@ -351,93 +351,106 @@ const Booking = () => {
     const userInfo = getStoredUser();
     const dateFormatted = formatDate(lang, selectedDate);
     return (
-      <div className="max-w-2xl mx-auto mt-6 animate-in fade-in duration-700">
-        <div className="bg-[var(--card-bg)] rounded-3xl shadow-2xl border border-[var(--border-color)] overflow-hidden relative">
+      <div className="max-w-2xl mx-auto mt-4 md:mt-6 px-4 animate-in fade-in duration-700">
+        <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl shadow-2xl border border-[var(--border-color)] overflow-hidden relative">
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none flex items-center justify-center">
-            <img src="/LOGO.png" alt="watermark" className="w-96 h-auto" />
+            <img
+              src="/LOGO.png"
+              alt="watermark"
+              className="w-64 md:w-96 h-auto"
+            />
           </div>
-          <div className="p-8 relative z-10 text-center border-b border-[var(--border-color)] bg-emerald-50/30">
-            <CheckCircle className="text-emerald-500 mx-auto mb-4" size={48} />
-            <h2 className="font-bold text-[var(--text-primary)] text-lg">
+          <div className="p-5 md:p-8 relative z-10 text-center border-b border-[var(--border-color)] bg-emerald-50/30">
+            <CheckCircle
+              className="text-emerald-500 mx-auto mb-3 md:mb-4"
+              size={36}
+            />
+            <h2 className="font-bold text-[var(--text-primary)] text-sm md:text-lg">
               {t.slipHospitalName}
             </h2>
-            <h1 className="text-2xl font-bold text-emerald-600 mb-1">
+            <h1 className="text-xl md:text-2xl font-bold text-emerald-600 mb-1">
               {t.slipTitle}
             </h1>
-            <p className="text-sm text-[var(--text-secondary)]">
+            <p className="text-xs md:text-sm text-[var(--text-secondary)]">
               {t.slipTicketNo} {appointmentResult.ticketNumber}
             </p>
           </div>
-          <div className="p-8 relative z-10 text-center">
-            <h2 className="text-2xl font-bold text-[var(--text-primary)] uppercase mb-2">
+          <div className="p-5 md:p-8 relative z-10 text-center">
+            <h2 className="text-xl md:text-2xl font-bold text-[var(--text-primary)] uppercase mb-2">
               {getLocalizedDept(lang, selectedDoctor?.department)}
             </h2>
-            <p className="text-emerald-600 font-bold mb-8">{t.slipRoom}</p>
-            <div className="w-24 h-24 rounded-full border-2 border-emerald-300 mx-auto mb-8 flex flex-col items-center justify-center bg-emerald-50">
-              <span className="text-4xl font-bold text-emerald-500 leading-none">
+            <p className="text-emerald-600 font-bold mb-6 md:mb-8 text-sm md:text-base">
+              {t.slipRoom}
+            </p>
+            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-emerald-300 mx-auto mb-6 md:mb-8 flex flex-col items-center justify-center bg-emerald-50">
+              <span className="text-3xl md:text-4xl font-bold text-emerald-500 leading-none">
                 {appointmentResult.queueNumber}
               </span>
-              <span className="text-xs text-emerald-400 font-medium mt-1">
+              <span className="text-[10px] md:text-xs text-emerald-400 font-medium mt-1">
                 {t.slipQueueNoLabel}
               </span>
             </div>
-            <div className="text-left space-y-4 max-w-sm mx-auto text-[var(--text-primary)]">
+            <div className="text-left space-y-3 md:space-y-4 max-w-sm mx-auto text-[var(--text-primary)]">
               <div className="flex justify-between border-b border-[var(--border-color)] pb-2">
-                <span className="text-[var(--text-secondary)]">
+                <span className="text-[var(--text-secondary)] text-xs md:text-sm">
                   {t.slipPatient}
                 </span>
-                <span className="font-bold uppercase">{userInfo.fullName}</span>
+                <span className="font-bold uppercase text-xs md:text-sm">
+                  {userInfo.fullName}
+                </span>
               </div>
               <div className="flex justify-between border-b border-[var(--border-color)] pb-2">
-                <span className="text-[var(--text-secondary)]">
+                <span className="text-[var(--text-secondary)] text-xs md:text-sm">
                   {t.slipPatientId}
                 </span>
-                <span className="font-bold">{userInfo.patientId}</span>
+                <span className="font-bold text-xs md:text-sm">
+                  {userInfo.patientId}
+                </span>
               </div>
               <div className="flex justify-between border-b border-[var(--border-color)] pb-2">
-                <span className="text-[var(--text-secondary)]">
+                <span className="text-[var(--text-secondary)] text-xs md:text-sm">
                   {t.slipTime}
                 </span>
-                <span className="font-bold">
+                <span className="font-bold text-xs md:text-sm">
                   {dateFormatted} - {selectedTime}
                 </span>
               </div>
               <div className="flex justify-between border-b border-[var(--border-color)] pb-2">
-                <span className="text-[var(--text-secondary)]">
+                <span className="text-[var(--text-secondary)] text-xs md:text-sm">
                   {t.slipDoctor}
                 </span>
-                <span className="font-bold">
+                <span className="font-bold text-xs md:text-sm">
                   {getDoctorDisplayName(selectedDoctor?.userId?.fullName)}
                 </span>
               </div>
               <div className="flex justify-between pb-2">
-                <span className="text-[var(--text-secondary)]">
+                <span className="text-[var(--text-secondary)] text-xs md:text-sm">
                   {t.slipStatus}
                 </span>
-                <span className="font-bold text-emerald-600 uppercase">
+                <span className="font-bold text-emerald-600 uppercase text-xs md:text-sm">
                   {t.slipPaidStatus}
                 </span>
               </div>
             </div>
-            <div className="mt-8 pt-6 border-t border-[var(--border-color)]">
-              <p className="text-sm text-[var(--text-primary)] italic font-medium">
+            <div className="mt-6 md:mt-8 pt-4 md:pt-6 border-t border-[var(--border-color)]">
+              <p className="text-xs md:text-sm text-[var(--text-primary)] italic font-medium">
                 {t.slipNote}
               </p>
             </div>
           </div>
         </div>
-        <div className="flex justify-center gap-4 mt-8">
+        <div className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 mt-6 md:mt-8">
           <button
             onClick={() => window.print()}
-            className="px-6 py-3 bg-[var(--card-bg)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-xl font-bold hover:bg-[var(--bg-tertiary)] flex items-center gap-2"
+            className="px-5 py-2.5 md:px-6 md:py-3 bg-[var(--card-bg)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-xl font-bold hover:bg-[var(--bg-tertiary)] flex items-center justify-center gap-2 text-xs md:text-sm"
           >
-            <Printer size={18} /> {t.btnPrint}
+            <Printer size={16} /> {t.btnPrint}
           </button>
           <button
             onClick={() => navigate("/dashboard")}
-            className="px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 flex items-center gap-2 shadow-lg shadow-primary/20"
+            className="px-5 py-2.5 md:px-6 md:py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 flex items-center justify-center gap-2 shadow-lg shadow-primary/20 text-xs md:text-sm"
           >
-            {t.btnHome} <ArrowRight size={18} />
+            {t.btnHome} <ArrowRight size={16} />
           </button>
         </div>
       </div>
@@ -447,35 +460,35 @@ const Booking = () => {
   // Render Payment Screen (BEFORE PAID)
   if (appointmentResult && !isPaid) {
     return (
-      <div className="max-w-2xl mx-auto mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="bg-[var(--card-bg)] rounded-[40px] shadow-2xl border border-[var(--border-color)] overflow-hidden">
-          <div className="p-8 bg-primary text-white text-center">
-            <CreditCard className="mx-auto mb-4" size={48} />
-            <h2 className="text-2xl font-black uppercase tracking-tight">
+      <div className="max-w-2xl mx-auto mt-4 md:mt-6 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="bg-[var(--card-bg)] rounded-[32px] md:rounded-[40px] shadow-2xl border border-[var(--border-color)] overflow-hidden">
+          <div className="p-5 md:p-8 bg-primary text-white text-center">
+            <CreditCard className="mx-auto mb-3 md:mb-4" size={36} />
+            <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight">
               {t.payTitle}
             </h2>
-            <p className="text-primary-light text-sm mt-2 font-medium">
+            <p className="text-primary-light text-xs md:text-sm mt-2 font-medium">
               {t.paySubtitle}
             </p>
           </div>
-          <div className="p-10 flex flex-col items-center">
-            <div className="bg-[var(--card-bg)] p-4 rounded-3xl shadow-2xl border border-[var(--border-color)] mb-8">
+          <div className="p-6 md:p-10 flex flex-col items-center">
+            <div className="bg-[var(--card-bg)] p-3 md:p-4 rounded-3xl shadow-2xl border border-[var(--border-color)] mb-6 md:mb-8">
               {billResult && (
                 <img
                   src={generateQrUrl(billResult)}
                   alt="VietQR"
-                  className="w-64 h-64 object-contain"
+                  className="w-48 h-48 md:w-64 md:h-64 object-contain"
                 />
               )}
             </div>
-            <div className="w-full max-w-sm space-y-6">
-              <div className="flex items-center justify-center gap-3 py-2 px-4 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full animate-pulse mb-6">
-                <Clock size={16} className="animate-spin" />
-                <span className="text-xs font-black uppercase tracking-widest">
+            <div className="w-full max-w-sm space-y-4 md:space-y-6">
+              <div className="flex items-center justify-center gap-2 md:gap-3 py-2 px-4 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full animate-pulse mb-4 md:mb-6">
+                <Clock size={14} className="animate-spin" />
+                <span className="text-[10px] md:text-xs font-black uppercase tracking-widest">
                   {t.payPending}
                 </span>
               </div>
-              <div className="space-y-4 text-sm font-medium text-[var(--text-secondary)] border-t border-[var(--border-color)] pt-6">
+              <div className="space-y-3 md:space-y-4 text-xs md:text-sm font-medium text-[var(--text-secondary)] border-t border-[var(--border-color)] pt-4 md:pt-6">
                 <div className="flex justify-between">
                   <span>{t.payService}</span>
                   <span className="font-bold text-[var(--text-primary)]">
@@ -484,13 +497,13 @@ const Booking = () => {
                 </div>
                 <div className="flex justify-between">
                   <span>{t.payAmount}</span>
-                  <span className="font-black text-primary text-xl tracking-tighter">
+                  <span className="font-black text-primary text-lg md:text-xl tracking-tighter">
                     {fmtFee(150000)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>{t.payContent}</span>
-                  <span className="font-bold text-[var(--text-primary)] uppercase">
+                  <span className="font-bold text-[var(--text-primary)] uppercase text-xs md:text-sm">
                     MediCare HD{" "}
                     {billResult?._id
                       .substring(billResult._id.length - 6)
@@ -498,8 +511,8 @@ const Booking = () => {
                   </span>
                 </div>
               </div>
-              <div className="p-4 bg-[var(--bg-secondary)] rounded-2xl flex items-center gap-3 text-[10px] text-[var(--text-secondary)] font-medium">
-                <ShieldCheck size={20} className="text-primary" />
+              <div className="p-3 md:p-4 bg-[var(--bg-secondary)] rounded-2xl flex items-center gap-2 md:gap-3 text-[10px] md:text-xs text-[var(--text-secondary)] font-medium">
+                <ShieldCheck size={16} className="text-primary" />
                 <p>{t.payDisclaimer}</p>
               </div>
             </div>
@@ -510,16 +523,16 @@ const Booking = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto py-8">
-      <h1 className="text-3xl font-black text-[var(--text-primary)] mb-8 tracking-tight">
+    <div className="max-w-5xl mx-auto py-6 md:py-8 px-4">
+      <h1 className="text-2xl md:text-3xl font-black text-[var(--text-primary)] mb-6 md:mb-8 tracking-tight">
         {t.bookingTitle}
       </h1>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        <div className="lg:col-span-2 space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10">
+        <div className="lg:col-span-2 space-y-6 md:space-y-8">
           {/* Step 1: Selection */}
-          <div className="bg-[var(--card-bg)] p-8 rounded-[32px] shadow-sm border border-[var(--border-color)]">
-            <h2 className="text-lg font-black text-[var(--text-primary)] mb-8 flex items-center gap-3">
-              <span className="w-10 h-10 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20">
+          <div className="bg-[var(--card-bg)] p-5 md:p-8 rounded-[24px] md:rounded-[32px] shadow-sm border border-[var(--border-color)]">
+            <h2 className="text-base md:text-lg font-black text-[var(--text-primary)] mb-6 md:mb-8 flex items-center gap-3">
+              <span className="w-9 h-9 md:w-10 md:h-10 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 text-sm md:text-base">
                 1
               </span>
               {t.step1}
@@ -529,14 +542,14 @@ const Booking = () => {
                 <div className="animate-spin h-8 w-8 border-b-2 border-primary rounded-full mx-auto"></div>
               </div>
             ) : (
-              <div className="space-y-8">
+              <div className="space-y-6 md:space-y-8">
                 <div>
-                  <label className="block text-[11px] font-black text-[var(--text-tertiary)] uppercase tracking-widest mb-3">
+                  <label className="block text-[10px] md:text-[11px] font-black text-[var(--text-tertiary)] uppercase tracking-widest mb-2 md:mb-3">
                     {t.selectDeptLabel}
                   </label>
                   <div className="relative">
                     <select
-                      className="w-full pl-6 pr-12 py-4 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl appearance-none focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-[var(--text-primary)] font-bold"
+                      className="w-full pl-4 md:pl-6 pr-10 md:pr-12 py-3 md:py-4 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl appearance-none focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-[var(--text-primary)] font-bold text-sm md:text-base"
                       value={selectedDepartment}
                       onChange={(e) => {
                         setSelectedDepartment(e.target.value);
@@ -553,17 +566,20 @@ const Booking = () => {
                         </option>
                       ))}
                     </select>
-                    <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    <ChevronDown
+                      className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                      size={16}
+                    />
                   </div>
                 </div>
                 {selectedDepartment && (
                   <div className="animate-in fade-in slide-in-from-top-4 duration-500">
-                    <label className="block text-[11px] font-black text-[var(--text-tertiary)] uppercase tracking-widest mb-3">
+                    <label className="block text-[10px] md:text-[11px] font-black text-[var(--text-tertiary)] uppercase tracking-widest mb-2 md:mb-3">
                       {t.selectSpecLabel}
                     </label>
                     <div className="relative">
                       <select
-                        className="w-full pl-6 pr-12 py-4 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl appearance-none focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-[var(--text-primary)] font-bold"
+                        className="w-full pl-4 md:pl-6 pr-10 md:pr-12 py-3 md:py-4 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl appearance-none focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-[var(--text-primary)] font-bold text-sm md:text-base"
                         value={selectedSpecialty}
                         onChange={(e) => {
                           setSelectedSpecialty(e.target.value);
@@ -579,12 +595,16 @@ const Booking = () => {
                           </option>
                         ))}
                       </select>
-                      <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] pointer-events-none" />
+                      <ChevronDown
+                        className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] pointer-events-none"
+                        size={16}
+                        md={20}
+                      />
                     </div>
                   </div>
                 )}
                 {selectedSpecialty && (
-                  <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                  <div className="space-y-3 md:space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                     {filteredDoctors.map((doctor) => (
                       <div
                         key={doctor._id}
@@ -593,7 +613,7 @@ const Booking = () => {
                           setSelectedDate(null);
                           setSelectedTime(null);
                         }}
-                        className={`flex items-start gap-5 p-5 rounded-3xl border-2 cursor-pointer transition-all ${selectedDoctor?._id === doctor._id ? "border-primary bg-primary/[0.02] shadow-xl shadow-primary/5" : "border-[var(--border-color)] hover:border-primary/20 bg-[var(--card-bg)]"}`}
+                        className={`flex items-start gap-3 md:gap-5 p-4 md:p-5 rounded-2xl md:rounded-3xl border-2 cursor-pointer transition-all ${selectedDoctor?._id === doctor._id ? "border-primary bg-primary/[0.02] shadow-xl shadow-primary/5" : "border-[var(--border-color)] hover:border-primary/20 bg-[var(--card-bg)]"}`}
                       >
                         <img
                           src={
@@ -605,10 +625,10 @@ const Booking = () => {
                             e.target.onerror = null;
                             e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.userId.fullName)}&background=102A63&color=fff`;
                           }}
-                          className="w-16 h-16 rounded-2xl object-cover shrink-0"
+                          className="w-12 h-12 md:w-16 md:h-16 rounded-2xl object-cover shrink-0"
                         />
                         <div className="flex-1">
-                          <h3 className="font-black text-[var(--text-primary)] text-lg tracking-tight flex items-center gap-2">
+                          <h3 className="font-black text-[var(--text-primary)] text-sm md:text-lg tracking-tight flex items-center gap-2">
                             {getDoctorDisplayName(doctor.userId.fullName)}
                             <span
                               className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wide ${doctor.userId.gender === "Nam" ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" : "bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400"}`}
@@ -616,16 +636,16 @@ const Booking = () => {
                               {getLocalizedGender(doctor.userId.gender)}
                             </span>
                           </h3>
-                          <p className="text-xs text-primary font-bold uppercase tracking-tighter mt-1">
+                          <p className="text-[10px] md:text-xs text-primary font-bold uppercase tracking-tighter mt-1">
                             {getLocalizedDept(lang, doctor.specialty)} •{" "}
                             {doctor.experience} {t.experienceYears}
                           </p>
                         </div>
                         <div
-                          className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${selectedDoctor?._id === doctor._id ? "border-primary bg-primary text-white" : "border-[var(--border-color)]"}`}
+                          className={`w-7 h-7 md:w-8 md:h-8 rounded-full border-2 flex items-center justify-center transition-all ${selectedDoctor?._id === doctor._id ? "border-primary bg-primary text-white" : "border-[var(--border-color)]"}`}
                         >
                           {selectedDoctor?._id === doctor._id && (
-                            <CheckCircle size={16} />
+                            <CheckCircle size={14} />
                           )}
                         </div>
                       </div>
@@ -637,15 +657,15 @@ const Booking = () => {
           </div>
           {/* Step 2: Date/Time */}
           {selectedDoctor && (
-            <div className="bg-[var(--card-bg)] p-8 rounded-[32px] shadow-sm border border-[var(--border-color)] animate-in fade-in slide-in-from-bottom-6 duration-700">
-              <h2 className="text-lg font-black text-[var(--text-primary)] mb-8 flex items-center gap-3">
-                <span className="w-10 h-10 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20">
+            <div className="bg-[var(--card-bg)] p-5 md:p-8 rounded-[24px] md:rounded-[32px] shadow-sm border border-[var(--border-color)] animate-in fade-in slide-in-from-bottom-6 duration-700">
+              <h2 className="text-base md:text-lg font-black text-[var(--text-primary)] mb-6 md:mb-8 flex items-center gap-3">
+                <span className="w-9 h-9 md:w-10 md:h-10 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 text-sm md:text-base">
                   2
                 </span>
                 {t.step2}
               </h2>
-              <div className="mb-8">
-                <p className="text-[11px] font-black text-[var(--text-tertiary)] uppercase tracking-widest mb-4">
+              <div className="mb-6 md:mb-8">
+                <p className="text-[10px] md:text-[11px] font-black text-[var(--text-tertiary)] uppercase tracking-widest mb-2 md:mb-4">
                   {t.dateLabel}
                 </p>
                 <input
@@ -653,12 +673,12 @@ const Booking = () => {
                   min={getTodayString()}
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full p-4 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-[var(--text-primary)] font-bold"
+                  className="w-full p-3 md:p-4 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-[var(--text-primary)] font-bold text-sm md:text-base"
                 />
               </div>
               {selectedDate && (
                 <div>
-                  <p className="text-[11px] font-black text-[var(--text-tertiary)] uppercase tracking-widest mb-4">
+                  <p className="text-[10px] md:text-[11px] font-black text-[var(--text-tertiary)] uppercase tracking-widest mb-2 md:mb-4">
                     {t.timeLabel}
                   </p>
                   {loadingTimes ? (
@@ -666,12 +686,12 @@ const Booking = () => {
                       <div className="animate-spin h-6 w-6 border-b-2 border-primary rounded-full mx-auto"></div>
                     </div>
                   ) : getDayOfWeek(selectedDate) === 0 ? (
-                    <div className="text-center py-4 text-red-500 dark:text-red-400 text-sm font-medium bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-100 dark:border-red-900/30 shadow-sm animate-in fade-in">
+                    <div className="text-center py-4 text-red-500 dark:text-red-400 text-xs md:text-sm font-medium bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-100 dark:border-red-900/30 shadow-sm animate-in fade-in">
                       Bệnh viện không làm việc Chủ Nhật. Vui lòng chọn ngày
                       khác!
                     </div>
                   ) : availableTimes.length > 0 ? (
-                    <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 md:gap-3">
                       {availableTimes.map((t, idx) => {
                         const past = isPastTime(t);
                         return (
@@ -679,7 +699,7 @@ const Booking = () => {
                             key={idx}
                             disabled={past}
                             onClick={() => !past && setSelectedTime(t)}
-                            className={`py-3 rounded-xl text-xs font-black border-2 transition-all ${
+                            className={`py-2 md:py-3 rounded-xl text-[10px] md:text-xs font-black border-2 transition-all ${
                               past
                                 ? "border-[var(--border-color)] bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] cursor-not-allowed opacity-50"
                                 : selectedTime === t
@@ -693,7 +713,7 @@ const Booking = () => {
                       })}
                     </div>
                   ) : (
-                    <div className="text-center py-4 text-orange-600 dark:text-orange-400 text-sm font-medium bg-orange-50 dark:bg-orange-900/20 rounded-2xl border border-orange-100 dark:border-orange-900/30 shadow-sm animate-in fade-in">
+                    <div className="text-center py-4 text-orange-600 dark:text-orange-400 text-xs md:text-sm font-medium bg-orange-50 dark:bg-orange-900/20 rounded-2xl border border-orange-100 dark:border-orange-900/30 shadow-sm animate-in fade-in">
                       Bác sĩ không có lịch trực vào ngày này hoặc đã kín lịch.
                       Vui lòng chọn ngày khác!
                     </div>
@@ -704,20 +724,23 @@ const Booking = () => {
           )}
         </div>
         <div className="lg:col-span-1">
-          <div className="bg-[var(--card-bg)] p-8 rounded-[40px] shadow-sm border border-[var(--border-color)] sticky top-8">
-            <h3 className="text-lg font-black text-[var(--text-primary)] mb-8 tracking-tight">
+          <div className="bg-[var(--card-bg)] p-5 md:p-8 rounded-[32px] md:rounded-[40px] shadow-sm border border-[var(--border-color)] sticky top-4 md:top-8">
+            <h3 className="text-base md:text-lg font-black text-[var(--text-primary)] mb-6 md:mb-8 tracking-tight">
               {t.detailTitle}
             </h3>
             {!selectedDoctor ? (
-              <div className="text-center py-12 text-[var(--text-tertiary)]">
-                <Calendar size={64} className="mx-auto mb-6 opacity-10" />
-                <p className="text-xs font-bold uppercase tracking-widest leading-loose">
+              <div className="text-center py-8 md:py-12 text-[var(--text-tertiary)]">
+                <Calendar
+                  size={48}
+                  className="mx-auto mb-4 md:mb-6 opacity-10"
+                />
+                <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest leading-loose">
                   {t.detailPlaceholder}
                 </p>
               </div>
             ) : (
-              <div className="space-y-8 animate-in fade-in duration-500">
-                <div className="flex items-center gap-4 pb-8 border-b border-[var(--border-color)]">
+              <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500">
+                <div className="flex items-center gap-3 md:gap-4 pb-6 md:pb-8 border-b border-[var(--border-color)]">
                   <img
                     src={
                       selectedDoctor.avatar ||
@@ -728,10 +751,10 @@ const Booking = () => {
                       e.target.onerror = null;
                       e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedDoctor.userId.fullName)}&background=102A63&color=fff`;
                     }}
-                    className="w-14 h-14 rounded-2xl object-cover shrink-0"
+                    className="w-12 h-12 md:w-14 md:h-14 rounded-2xl object-cover shrink-0"
                   />
                   <div>
-                    <h4 className="font-black text-[var(--text-primary)] tracking-tight flex items-center gap-1.5">
+                    <h4 className="font-black text-[var(--text-primary)] tracking-tight flex items-center gap-1.5 text-sm md:text-base">
                       {getDoctorDisplayName(selectedDoctor.userId.fullName)}
                       <span
                         className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase ${selectedDoctor.userId.gender === "Nam" ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" : "bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400"}`}
@@ -744,39 +767,39 @@ const Booking = () => {
                     </p>
                   </div>
                 </div>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-tighter">
+                <div className="space-y-3 md:space-y-4">
+                  <div className="flex justify-between items-center text-[10px] md:text-xs font-bold uppercase tracking-tighter">
                     <span className="text-[var(--text-tertiary)] flex items-center gap-2">
-                      <Calendar size={14} /> {t.dateText}
+                      <Calendar size={12} /> {t.dateText}
                     </span>
                     <span className="text-[var(--text-primary)]">
                       {selectedDate ? formatDate(lang, selectedDate) : "---"}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-tighter">
+                  <div className="flex justify-between items-center text-[10px] md:text-xs font-bold uppercase tracking-tighter">
                     <span className="text-[var(--text-tertiary)] flex items-center gap-2">
-                      <Clock size={14} /> {t.timeText}
+                      <Clock size={12} /> {t.timeText}
                     </span>
                     <span className="text-[var(--text-primary)]">
                       {selectedTime || "---"}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-tighter pt-4 border-t border-[var(--border-color)]">
+                  <div className="flex justify-between items-center text-[10px] md:text-xs font-bold uppercase tracking-tighter pt-3 md:pt-4 border-t border-[var(--border-color)]">
                     <span className="text-[var(--text-tertiary)]">
                       {t.feeText}
                     </span>
-                    <span className="text-lg font-black text-emerald-500 tracking-tighter">
+                    <span className="text-base md:text-lg font-black text-emerald-500 tracking-tighter">
                       {fmtFee(fixedFee)}
                     </span>
                   </div>
                 </div>
-                <div className="pt-4">
-                  <p className="text-[10px] font-black text-[var(--text-tertiary)] uppercase tracking-widest mb-3">
+                <div className="pt-3 md:pt-4">
+                  <p className="text-[10px] font-black text-[var(--text-tertiary)] uppercase tracking-widest mb-2 md:mb-3">
                     {t.symptomsLabel}
                   </p>
                   <textarea
                     rows="3"
-                    className="w-full p-4 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl text-xs font-medium focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all resize-none text-[var(--text-primary)]"
+                    className="w-full p-3 md:p-4 bg-[var(--input-bg)] border border-[var(--border-color)] rounded-2xl text-xs font-medium focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all resize-none text-[var(--text-primary)]"
                     placeholder={t.symptomsPlaceholder}
                     value={symptoms}
                     onChange={(e) => setSymptoms(e.target.value)}
@@ -785,7 +808,7 @@ const Booking = () => {
                 <button
                   onClick={handleBooking}
                   disabled={!selectedDate || !selectedTime}
-                  className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-xl ${!selectedDate || !selectedTime ? "bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] cursor-not-allowed" : "bg-primary text-white hover:scale-[1.02] shadow-primary/30 active:scale-95"}`}
+                  className={`w-full py-3 md:py-4 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-[0.2em] transition-all shadow-xl ${!selectedDate || !selectedTime ? "bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] cursor-not-allowed" : "bg-primary text-white hover:scale-[1.02] shadow-primary/30 active:scale-95"}`}
                 >
                   {t.btnConfirm}
                 </button>

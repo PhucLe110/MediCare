@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   AlertCircle,
   ChevronRight,
+  ChevronDown,
   QrCode,
   FileText,
   X,
@@ -34,6 +35,7 @@ const trans = {
     recentVisits: "Ca khám gần đây",
     generalDept: "Khám tổng quát",
     selectVisit: "Chọn một ca khám",
+    noAppointments: "Chưa có ca khám đã đặt",
     doctorTitle: "Bác sĩ phụ trách",
     needPay: "Cần thanh toán",
     paySub: "Hoàn tất để nhận kết quả khám",
@@ -68,6 +70,7 @@ const trans = {
     recentVisits: "Recent Visits",
     generalDept: "General Consultation",
     selectVisit: "Select a clinical visit",
+    noAppointments: "No appointments booked yet",
     doctorTitle: "Attending Physician",
     needPay: "Requires Payment",
     paySub: "Complete payment to release clinical results",
@@ -223,39 +226,19 @@ export default function Billing() {
     );
 
   return (
-    <div className="flex" style={{ height: "calc(100vh - 64px)" }}>
+    <div
+      className="flex flex-col md:flex-row"
+      style={{ height: "calc(100vh - 64px)" }}
+    >
       {/* ══ SIDEBAR — soft white ══ */}
-      <aside
-        style={{
-          width: 320,
-          minWidth: 280,
-          background: "var(--bg-secondary)",
-          borderRight: "1px solid var(--border-color)",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
+      <aside className="w-full md:w-80 md:min-w-72 bg-[var(--bg-secondary)] border-r border-[var(--border-color)] flex flex-col md:block hidden">
         {/* Logo + title */}
-        <div
-          style={{
-            padding: "24px 20px 16px",
-            borderBottom: "1px solid var(--border-color)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              marginBottom: 16,
-            }}
-          >
-            <img src="/LOGO.png" alt="Logo" style={{ height: 30 }} />
+        <div className="p-4 md:p-6 md:px-5 md:pb-4 border-b border-[var(--border-color)]">
+          <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+            <img src="/LOGO.png" alt="Logo" className="h-6 md:h-8" />
           </div>
           {/* Stats */}
-          <div
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}
-          >
+          <div className="grid grid-cols-2 gap-2">
             {[
               {
                 label: t.paid,
@@ -280,32 +263,15 @@ export default function Billing() {
             ].map((s) => (
               <div
                 key={s.label}
-                style={{
-                  background: s.bg,
-                  borderRadius: 12,
-                  padding: "10px 12px",
-                  border: "1px solid var(--border-color)",
-                }}
+                className="rounded-xl md:rounded-2xl p-2 md:p-3 border border-[var(--border-color)]"
+                style={{ background: s.bg }}
               >
-                <p
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 800,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.12em",
-                    color: "#94a3b8",
-                    marginBottom: 3,
-                  }}
-                >
+                <p className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">
                   {s.label}
                 </p>
                 <p
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 900,
-                    color: s.color,
-                    letterSpacing: "-0.02em",
-                  }}
+                  className="text-xs md:text-sm font-black"
+                  style={{ color: s.color }}
                 >
                   {s.value}
                 </p>
@@ -315,28 +281,12 @@ export default function Billing() {
         </div>
 
         {/* List */}
-        <div style={{ padding: "14px 16px 8px", flexShrink: 0 }}>
-          <p
-            style={{
-              fontSize: 10,
-              fontWeight: 800,
-              textTransform: "uppercase",
-              letterSpacing: "0.16em",
-              color: "var(--text-tertiary)",
-            }}
-          >
+        <div className="px-3 md:px-4 py-2 md:py-3 md:pb-2 flex-shrink-0">
+          <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[var(--text-tertiary)]">
             {t.recentVisits}
           </p>
         </div>
-        <div
-          style={{
-            flex: 1,
-            overflowY: "auto",
-            padding: "4px 10px 16px",
-            scrollbarWidth: "thin",
-            scrollbarColor: "var(--border-color) transparent",
-          }}
-        >
+        <div className="flex-1 overflow-y-auto px-2 md:px-3 py-1 md:py-0 md:pb-4 scrollbar-thin">
           {appList.map((app) => {
             const active = selId === app.id;
             const d = new Date(app.date);
@@ -346,135 +296,62 @@ export default function Billing() {
               <button
                 key={app.id}
                 onClick={() => setSelId(app.id)}
-                style={{
-                  width: "100%",
-                  textAlign: "left",
-                  padding: "12px 14px",
-                  borderRadius: 16,
-                  marginBottom: 4,
-                  background: active ? "var(--card-bg)" : "transparent",
-                  border: active
-                    ? "1px solid var(--border-color)"
-                    : "1px solid transparent",
-                  boxShadow: active ? "0 2px 12px rgba(0,0,0,0.06)" : "none",
-                  cursor: "pointer",
-                  transition: "all 0.18s",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                }}
-                onMouseEnter={(e) => {
-                  if (!active)
-                    e.currentTarget.style.background = "var(--bg-tertiary)";
-                }}
-                onMouseLeave={(e) => {
-                  if (!active) e.currentTarget.style.background = "transparent";
-                }}
+                className={`w-full text-left p-2 md:p-3 rounded-xl md:rounded-2xl mb-1 md:mb-1 border transition-all duration-180 flex items-center gap-2 md:gap-3 ${
+                  active
+                    ? "bg-[var(--card-bg)] border-[var(--border-color)] shadow-sm"
+                    : "bg-transparent border-transparent hover:bg-[var(--bg-tertiary)]"
+                }`}
               >
                 {/* Date box */}
                 <div
-                  style={{
-                    width: 48,
-                    height: 52,
-                    borderRadius: 12,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                    background: active
-                      ? "var(--color-primary, #3b82f6)"
-                      : "var(--bg-tertiary)",
-                  }}
+                  className={`w-10 h-11 md:w-12 md:h-13 rounded-lg md:rounded-xl flex flex-col items-center justify-center flex-shrink-0 ${
+                    active
+                      ? "bg-[var(--color-primary,#3b82f6)]"
+                      : "bg-[var(--bg-tertiary)]"
+                  }`}
                 >
                   <span
-                    style={{
-                      fontSize: 9,
-                      fontWeight: 800,
-                      color: active
-                        ? "rgba(255,255,255,0.8)"
-                        : "var(--text-tertiary)",
-                      lineHeight: 1,
-                      textTransform: "uppercase",
-                    }}
+                    className={`text-[8px] md:text-[9px] font-black leading-none uppercase ${
+                      active ? "text-white/80" : "text-[var(--text-tertiary)]"
+                    }`}
                   >
                     {appMonth}
                   </span>
                   <span
-                    style={{
-                      fontSize: 20,
-                      fontWeight: 900,
-                      color: active ? "#fff" : "var(--text-primary)",
-                      lineHeight: 1,
-                      marginTop: 2,
-                    }}
+                    className={`text-lg md:text-xl font-black leading-none mt-0.5 ${
+                      active ? "text-white" : "text-[var(--text-primary)]"
+                    }`}
                   >
                     {d.getDate()}
                   </span>
                 </div>
                 {/* Info */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                      marginBottom: 2,
-                    }}
-                  >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 md:gap-2 mb-0.5">
                     <p
-                      style={{
-                        fontWeight: 800,
-                        fontSize: 13,
-                        color: active
-                          ? "var(--text-primary)"
-                          : "var(--text-secondary)",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
+                      className={`font-black text-xs md:text-sm truncate ${
+                        active
+                          ? "text-[var(--text-primary)]"
+                          : "text-[var(--text-secondary)]"
+                      }`}
                     >
                       {app.department}
                     </p>
                     {hasUnpaid && (
-                      <span
-                        style={{
-                          width: 6,
-                          height: 6,
-                          borderRadius: "50%",
-                          background: "#f59e0b",
-                          flexShrink: 0,
-                        }}
-                      />
+                      <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-amber-500 flex-shrink-0" />
                     )}
                   </div>
-                  <p
-                    style={{
-                      fontSize: 11,
-                      color: "#3b82f6",
-                      fontWeight: 700,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      marginBottom: 1,
-                    }}
-                  >
+                  <p className="text-[10px] md:text-xs text-blue-600 font-bold truncate mb-0.5">
                     {getDoctorDisplayName(app.doctor)}
                   </p>
-                  <p
-                    style={{
-                      fontSize: 10,
-                      color: "var(--text-tertiary)",
-                      fontWeight: 600,
-                    }}
-                  >
+                  <p className="text-[9px] md:text-[10px] text-[var(--text-tertiary)] font-semibold">
                     {formatDate(lang, d)}
                   </p>
                 </div>
                 {active && (
                   <ChevronRight
-                    size={14}
-                    style={{ color: "var(--text-tertiary)", flexShrink: 0 }}
+                    size={12}
+                    className="text-[var(--text-tertiary)] flex-shrink-0"
                   />
                 )}
               </button>
@@ -483,114 +360,104 @@ export default function Billing() {
         </div>
       </aside>
 
-      {/* ══ MAIN — white ══ */}
-      <main
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          background: "var(--bg-primary)",
-          scrollbarWidth: "thin",
-          scrollbarColor: "var(--border-color) transparent",
-        }}
-      >
-        {!sel ? (
-          <div
-            style={{
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "var(--text-tertiary)",
-            }}
-          >
-            <Receipt
-              size={56}
-              strokeWidth={1}
-              style={{ marginBottom: 12, opacity: 0.3 }}
-            />
-            <p
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: "0.2em",
-              }}
+      {/* Mobile selector */}
+      <div className="md:hidden p-3 bg-[var(--bg-secondary)] border-b border-[var(--border-color)]">
+        {appList.length === 0 ? (
+          <div className="w-full p-3 bg-[var(--card-bg)] border-2 border-[var(--border-color)] rounded-xl text-center">
+            <p className="text-sm font-bold text-[var(--text-tertiary)]">
+              {t.noAppointments}
+            </p>
+          </div>
+        ) : (
+          <div className="relative">
+            <select
+              value={selId}
+              onChange={(e) => setSelId(e.target.value)}
+              className="w-full p-3 pr-10 bg-[var(--card-bg)] border-2 border-[var(--border-color)] rounded-xl text-sm font-bold text-[var(--text-primary)] appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
             >
+              {appList.map((app) => (
+                <option key={app.id} value={app.id}>
+                  {app.department} - {formatDate(lang, new Date(app.date))}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={18}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] pointer-events-none"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* ══ MAIN — white ══ */}
+      <main className="flex-1 overflow-y-auto bg-[var(--bg-primary)] scrollbar-thin">
+        {/* Mobile stats - visible only on mobile */}
+        <div className="md:hidden p-3 bg-[var(--bg-secondary)] border-b border-[var(--border-color)]">
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              {
+                label: t.paid,
+                value: fmt(
+                  bills
+                    .filter((b) => b.status === "paid")
+                    .reduce((s, b) => s + b.totalAmount, 0),
+                ),
+                color: "#059669",
+                bg: "#ecfdf5",
+              },
+              {
+                label: t.unpaid,
+                value: fmt(
+                  bills
+                    .filter((b) => b.status === "unpaid")
+                    .reduce((s, b) => s + amountDue(b), 0),
+                ),
+                color: "#d97706",
+                bg: "#fffbeb",
+              },
+            ].map((s) => (
+              <div
+                key={s.label}
+                className="rounded-xl p-2 border border-[var(--border-color)]"
+                style={{ background: s.bg }}
+              >
+                <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                  {s.label}
+                </p>
+                <p className="text-xs font-black" style={{ color: s.color }}>
+                  {s.value}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {!sel ? (
+          <div className="h-full flex flex-col items-center justify-center text-[var(--text-tertiary)] p-8">
+            <Receipt
+              size={40}
+              strokeWidth={1}
+              className="mb-3 md:mb-4 opacity-30"
+            />
+            <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest">
               {t.selectVisit}
             </p>
           </div>
         ) : (
-          <div
-            style={{ maxWidth: 720, margin: "0 auto", padding: "40px 32px" }}
-          >
+          <div className="max-w-2xl md:max-w-3xl mx-auto p-4 md:p-8 md:px-8 md:py-10">
             {/* Header — gradient card */}
-            <div
-              style={{
-                marginBottom: 32,
-                background:
-                  "linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%)",
-                borderRadius: 24,
-                padding: "28px 32px",
-                border: "1px solid var(--border-color)",
-                display: "flex",
-                alignItems: "flex-start",
-                justifyContent: "space-between",
-                gap: 16,
-              }}
-            >
+            <div className="mb-6 md:mb-8 bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-primary)] rounded-2xl md:rounded-3xl p-4 md:p-6 md:px-8 border border-[var(--border-color)] flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
               <div>
-                <h1
-                  style={{
-                    fontSize: 28,
-                    fontWeight: 900,
-                    color: "var(--text-primary)",
-                    letterSpacing: "-0.02em",
-                    marginBottom: 12,
-                    lineHeight: 1.2,
-                  }}
-                >
+                <h1 className="text-xl md:text-2xl font-black text-[var(--text-primary)] tracking-tight mb-2 md:mb-3 leading-tight md:leading-tight">
                   {sel.department}
                 </h1>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <span
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 6,
-                      fontSize: 12,
-                      color: "var(--text-secondary)",
-                      fontWeight: 700,
-                      background: "var(--card-bg)",
-                      padding: "5px 12px",
-                      borderRadius: 999,
-                      border: "1px solid var(--border-color)",
-                    }}
-                  >
-                    <Calendar size={13} color="var(--text-tertiary)" />
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 text-[10px] md:text-xs text-[var(--text-secondary)] font-bold bg-[var(--card-bg)] px-2 md:px-3 py-1 md:py-1.5 rounded-full border border-[var(--border-color)]">
+                    <Calendar size={10} color="var(--text-tertiary)" />
                     {formatDate(lang, sel.date)}
                   </span>
-                  <span
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 6,
-                      fontSize: 12,
-                      color: "#0369a1",
-                      fontWeight: 700,
-                      background: "var(--bg-tertiary)",
-                      padding: "5px 12px",
-                      borderRadius: 999,
-                    }}
-                  >
-                    <User size={13} />
+                  <span className="inline-flex items-center gap-1.5 text-[10px] md:text-xs text-sky-700 font-bold bg-[var(--bg-tertiary)] px-2 md:px-3 py-1 md:py-1.5 rounded-full">
+                    <User size={10} />
                     {getDoctorDisplayName(sel.doctor)}
                   </span>
                 </div>
@@ -598,7 +465,7 @@ export default function Billing() {
               <img
                 src="/LOGO.png"
                 alt="Logo"
-                style={{ height: 36, opacity: 0.15, flexShrink: 0 }}
+                className="h-7 md:h-9 opacity-15 flex-shrink-0"
               />
             </div>
 
@@ -618,184 +485,67 @@ export default function Billing() {
               return (
                 <div
                   key={bill._id}
-                  style={{
-                    marginBottom: 20,
-                    background: "var(--card-bg)",
-                    borderRadius: 28,
-                    overflow: "hidden",
-                    border: "2px solid #fed7aa",
-                    boxShadow: "0 8px 40px rgba(251,146,60,0.12)",
-                  }}
+                  className="mb-4 md:mb-5 bg-[var(--card-bg)] rounded-2xl md:rounded-3xl overflow-hidden border-2 border-orange-200 shadow-lg shadow-orange-200/30"
                 >
-                  <div
-                    style={{
-                      background: "linear-gradient(135deg,#fff7ed,#ffedd5)",
-                      padding: "18px 24px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 10,
-                      borderBottom: "1px solid #fed7aa",
-                    }}
-                  >
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-3 md:p-4 md:px-6 flex items-center gap-2 md:gap-3 border-b border-orange-200">
                     <div
-                      style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: 10,
-                        background: meta.color,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
+                      className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center"
+                      style={{ background: meta.color }}
                     >
-                      <AlertCircle size={18} color="#fff" />
+                      <AlertCircle size={14} color="#fff" />
                     </div>
-                    <div>
-                      <p
-                        style={{
-                          fontWeight: 900,
-                          fontSize: 14,
-                          color: "#c2410c",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                        }}
-                      >
+                    <div className="flex-1">
+                      <p className="font-black text-xs md:text-sm text-orange-700 uppercase tracking-wider">
                         {billTitle}
                       </p>
-                      <p
-                        style={{
-                          fontSize: 11,
-                          color: "#ea580c",
-                          fontWeight: 600,
-                        }}
-                      >
+                      <p className="text-[10px] md:text-xs text-orange-600 font-semibold">
                         {hint}
                       </p>
                     </div>
-                    <p
-                      style={{
-                        marginLeft: "auto",
-                        fontSize: 22,
-                        fontWeight: 900,
-                        color: "#c2410c",
-                      }}
-                    >
+                    <p className="text-lg md:text-2xl font-black text-orange-700">
                       {fmt(amountDue(bill))}
                     </p>
                   </div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 0 }}>
-                    <div
-                      style={{
-                        flex: 1,
-                        minWidth: 280,
-                        padding: "20px 24px",
-                        borderRight: "1px dashed #fed7aa",
-                      }}
-                    >
+                  <div className="flex flex-col md:flex-row gap-0">
+                    <div className="flex-1 min-w-0 p-3 md:p-4 md:px-6 border-b md:border-b-0 md:border-r border-dashed border-orange-200">
                       {(bill.items || []).map((item, i) => {
                         const m = getMeta(item.type);
                         const Icon = m.icon;
                         return (
                           <div
                             key={i}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 14,
-                              padding: "12px 16px",
-                              background: "var(--bg-tertiary)",
-                              borderRadius: 16,
-                              marginBottom: 10,
-                              border: "1px solid var(--border-color)",
-                            }}
+                            className="flex items-center gap-2 md:gap-4 p-2 md:p-3 md:px-4 bg-[var(--bg-tertiary)] rounded-xl md:rounded-2xl mb-2 md:mb-3 border border-[var(--border-color)]"
                           >
                             <div
-                              style={{
-                                width: 40,
-                                height: 40,
-                                borderRadius: 12,
-                                background: `${m.color}15`,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                              }}
+                              className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0"
+                              style={{ background: `${m.color}15` }}
                             >
-                              <Icon size={18} color={m.color} />
+                              <Icon size={14} color={m.color} />
                             </div>
-                            <div style={{ flex: 1 }}>
-                              <p
-                                style={{
-                                  fontWeight: 700,
-                                  fontSize: 14,
-                                  color: "var(--text-primary)",
-                                }}
-                              >
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-xs md:text-sm text-[var(--text-primary)] truncate">
                                 {item.description}
                               </p>
-                              <p
-                                style={{
-                                  fontSize: 10,
-                                  fontWeight: 800,
-                                  color: "var(--text-tertiary)",
-                                  textTransform: "uppercase",
-                                }}
-                              >
+                              <p className="text-[9px] md:text-[10px] font-black text-[var(--text-tertiary)] uppercase">
                                 {m.label}
                               </p>
                             </div>
-                            <p
-                              style={{
-                                fontWeight: 900,
-                                fontSize: 15,
-                                color: "var(--text-primary)",
-                              }}
-                            >
+                            <p className="font-black text-xs md:text-sm text-[var(--text-primary)]">
                               {fmt(item.amount)}
                             </p>
                           </div>
                         );
                       })}
                     </div>
-                    <div
-                      style={{
-                        width: "100%",
-                        maxWidth: 180,
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        padding: 20,
-                        background: "var(--bg-tertiary)",
-                      }}
-                    >
-                      <div
-                        style={{
-                          background: "var(--card-bg)",
-                          borderRadius: 20,
-                          padding: 14,
-                          boxShadow: "0 8px 30px rgba(0,0,0,0.1)",
-                          border: "1px solid var(--border-color)",
-                          marginBottom: 10,
-                        }}
-                      >
+                    <div className="w-full md:w-auto md:max-w-44 flex flex-col items-center p-3 md:p-5 bg-[var(--bg-tertiary)]">
+                      <div className="bg-[var(--card-bg)] rounded-xl md:rounded-2xl p-2 md:p-3 shadow-lg border border-[var(--border-color)] mb-2 md:mb-3">
                         <img
                           src={qrUrl(amountDue(bill), [bill._id])}
                           alt="QR"
-                          style={{
-                            width: 120,
-                            height: 120,
-                            objectFit: "contain",
-                          }}
+                          className="w-24 h-24 md:w-32 md:h-32 object-contain"
                         />
                       </div>
-                      <p
-                        style={{
-                          fontSize: 9,
-                          fontWeight: 800,
-                          color: "var(--text-tertiary)",
-                          textTransform: "uppercase",
-                          textAlign: "center",
-                        }}
-                      >
+                      <p className="text-[8px] md:text-[9px] font-black text-[var(--text-tertiary)] uppercase text-center">
                         {t.scanQr}
                       </p>
                     </div>
@@ -806,275 +556,90 @@ export default function Billing() {
 
             {/* PAID HISTORY */}
             <div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  marginBottom: 16,
-                }}
-              >
-                <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 9,
-                    background: "#d1fae5",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <CheckCircle2 size={16} color="#10b981" />
+              <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                <div className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-emerald-100 flex items-center justify-center">
+                  <CheckCircle2 size={12} color="#10b981" />
                 </div>
-                <h3
-                  style={{
-                    fontWeight: 900,
-                    fontSize: 13,
-                    color: "var(--text-primary)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                  }}
-                >
+                <h3 className="font-black text-xs md:text-sm text-[var(--text-primary)] uppercase tracking-wider">
                   {t.paidInvoices}
                 </h3>
-                <div
-                  style={{
-                    flex: 1,
-                    height: 1,
-                    background: "var(--border-color)",
-                    marginLeft: 6,
-                  }}
-                ></div>
+                <div className="flex-1 h-px bg-[var(--border-color)] ml-2" />
               </div>
 
               {sel.paid.length === 0 ? (
-                <div
-                  style={{
-                    background: "var(--card-bg)",
-                    borderRadius: 24,
-                    border: "2px dashed var(--border-color)",
-                    padding: "60px 24px",
-                    textAlign: "center",
-                  }}
-                >
+                <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border-2 border-dashed border-[var(--border-color)] p-8 md:p-16 text-center">
                   <Receipt
-                    size={40}
+                    size={28}
                     strokeWidth={1}
-                    style={{
-                      margin: "0 auto 12px",
-                      color: "var(--border-color)",
-                    }}
+                    className="mx-auto mb-2 md:mb-3 text-[var(--border-color)]"
                   />
-                  <p
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: "var(--text-tertiary)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.15em",
-                    }}
-                  >
+                  <p className="text-[10px] md:text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-wider">
                     {t.noInvoices}
                   </p>
                 </div>
               ) : (
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 14 }}
-                >
+                <div className="flex flex-col gap-3 md:gap-4">
                   {sel.paid.map((bill) => (
                     <div
                       key={bill._id}
-                      style={{
-                        background: "var(--card-bg)",
-                        borderRadius: 20,
-                        border: "1px solid var(--border-color)",
-                        overflow: "hidden",
-                        boxShadow: "0 1px 8px rgba(0,0,0,0.05)",
-                        transition: "box-shadow 0.2s",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.boxShadow =
-                          "0 4px 20px rgba(0,0,0,0.09)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.boxShadow =
-                          "0 1px 8px rgba(0,0,0,0.05)")
-                      }
+                      className="bg-[var(--card-bg)] rounded-xl md:rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                     >
                       {/* Bill header */}
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 14,
-                          padding: "14px 20px",
-                          background:
-                            "linear-gradient(90deg, var(--bg-secondary), var(--card-bg))",
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: 38,
-                            height: 38,
-                            borderRadius: 12,
-                            background: "#10b981",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            boxShadow: "0 3px 10px rgba(16,185,129,0.25)",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <CheckCircle2 size={20} color="#fff" />
+                      <div className="flex items-center gap-2 md:gap-4 p-3 md:p-4 md:px-5 bg-gradient-to-r from-[var(--bg-secondary)] to-[var(--card-bg)]">
+                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-emerald-500 flex items-center justify-center shadow-md shadow-emerald-500/25 flex-shrink-0">
+                          <CheckCircle2 size={14} color="#fff" />
                         </div>
-                        <div style={{ flex: 1 }}>
-                          <p
-                            style={{
-                              fontSize: 10,
-                              fontWeight: 800,
-                              color: "#6ee7b7",
-                              textTransform: "uppercase",
-                              letterSpacing: "0.12em",
-                              lineHeight: 1,
-                            }}
-                          >
+                        <div className="flex-1">
+                          <p className="text-[9px] md:text-[10px] font-black text-emerald-400 uppercase tracking-wider leading-none">
                             {t.successPaid}
                           </p>
-                          <p
-                            style={{
-                              fontSize: 12,
-                              fontWeight: 600,
-                              color: "var(--text-secondary)",
-                              marginTop: 2,
-                            }}
-                          >
+                          <p className="text-[10px] md:text-xs font-semibold text-[var(--text-secondary)] mt-0.5 md:mt-1">
                             {formatDateTime(
                               lang,
                               bill.paidAt || bill.updatedAt,
                             )}
                           </p>
                         </div>
-                        <p
-                          style={{
-                            fontSize: 20,
-                            fontWeight: 900,
-                            color: "var(--text-primary)",
-                            letterSpacing: "-0.02em",
-                          }}
-                        >
+                        <p className="text-base md:text-xl font-black text-[var(--text-primary)] tracking-tight">
                           {fmt(bill.totalAmount)}
                         </p>
                       </div>
 
                       {/* Items */}
-                      <div style={{ padding: "10px 14px 12px" }}>
+                      <div className="p-2 md:p-3 md:px-4">
                         {(bill.items || []).map((item, ii) => {
                           const m = getMeta(item.type);
                           const Icon = m.icon;
                           return (
                             <div
                               key={ii}
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 12,
-                                padding: "9px 10px",
-                                borderRadius: 12,
-                                transition: "background 0.15s",
-                                cursor: "default",
-                              }}
-                              onMouseEnter={(e) =>
-                                (e.currentTarget.style.background =
-                                  "var(--bg-tertiary)")
-                              }
-                              onMouseLeave={(e) =>
-                                (e.currentTarget.style.background =
-                                  "transparent")
-                              }
+                              className="flex items-center gap-2 md:gap-3 p-2 md:p-3 rounded-lg md:rounded-xl transition-colors cursor-default hover:bg-[var(--bg-tertiary)]"
                             >
                               <div
-                                style={{
-                                  width: 34,
-                                  height: 34,
-                                  borderRadius: 10,
-                                  background: `${m.color}12`,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  flexShrink: 0,
-                                }}
+                                className="w-7 h-7 md:w-9 md:h-9 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0"
+                                style={{ background: `${m.color}12` }}
                               >
-                                <Icon size={16} color={m.color} />
+                                <Icon size={12} color={m.color} />
                               </div>
-                              <div style={{ flex: 1 }}>
-                                <p
-                                  style={{
-                                    fontWeight: 700,
-                                    fontSize: 13,
-                                    color: "var(--text-primary)",
-                                    lineHeight: 1.3,
-                                  }}
-                                >
+                              <div className="flex-1 min-w-0">
+                                <p className="font-bold text-xs md:text-sm text-[var(--text-primary)] leading-tight">
                                   {item.description}
                                 </p>
-                                <p
-                                  style={{
-                                    fontSize: 10,
-                                    fontWeight: 700,
-                                    color: "var(--text-tertiary)",
-                                    textTransform: "uppercase",
-                                    letterSpacing: "0.08em",
-                                    marginTop: 2,
-                                  }}
-                                >
+                                <p className="text-[9px] md:text-[10px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider mt-0.5">
                                   {m.label}
                                 </p>
                               </div>
-                              <p
-                                style={{
-                                  fontWeight: 800,
-                                  fontSize: 13,
-                                  color: "var(--text-secondary)",
-                                  marginRight: 10,
-                                }}
-                              >
+                              <p className="font-black text-xs md:text-sm text-[var(--text-secondary)] mr-2">
                                 {fmt(item.amount)}
                               </p>
                               <button
                                 onClick={() => setModal(bill)}
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 5,
-                                  padding: "6px 12px",
-                                  borderRadius: 8,
-                                  background: "var(--bg-tertiary)",
-                                  color: "var(--text-secondary)",
-                                  border: "1px solid var(--border-color)",
-                                  cursor: "pointer",
-                                  fontSize: 11,
-                                  fontWeight: 700,
-                                  whiteSpace: "nowrap",
-                                  transition: "all 0.15s",
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.background =
-                                    "var(--text-primary)";
-                                  e.currentTarget.style.color = "#fff";
-                                  e.currentTarget.style.borderColor =
-                                    "var(--text-primary)";
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.background =
-                                    "var(--bg-tertiary)";
-                                  e.currentTarget.style.color =
-                                    "var(--text-secondary)";
-                                  e.currentTarget.style.borderColor =
-                                    "var(--border-color)";
-                                }}
+                                className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1.5 md:py-2 rounded-lg bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border border-[var(--border-color)] cursor-pointer text-[10px] md:text-xs font-bold whitespace-nowrap transition-all hover:bg-[var(--text-primary)] hover:text-white hover:border-[var(--text-primary)]"
                               >
-                                <FileText size={12} /> {t.receipt}
+                                <FileText size={10} />{" "}
+                                <span className="hidden md:inline">
+                                  {t.receipt}
+                                </span>
                               </button>
                             </div>
                           );
@@ -1091,107 +656,35 @@ export default function Billing() {
 
       {/* ══ RECEIPT MODAL ══ */}
       {modal && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 100,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 24,
-          }}
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6">
           <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: "rgba(15,23,42,0.7)",
-              backdropFilter: "blur(12px)",
-            }}
+            className="absolute inset-0 bg-slate-900/70 backdrop-blur-md"
             onClick={() => setModal(null)}
           />
-          <div
-            style={{
-              position: "relative",
-              background: "var(--card-bg)",
-              width: "100%",
-              maxWidth: 400,
-              borderRadius: 40,
-              overflow: "hidden",
-              boxShadow: "0 50px 100px rgba(0,0,0,0.4)",
-            }}
-          >
+          <div className="relative bg-[var(--card-bg)] w-full max-w-sm md:max-w-md rounded-3xl md:rounded-[40px] overflow-hidden shadow-2xl">
             <button
               onClick={() => setModal(null)}
-              style={{
-                position: "absolute",
-                top: 20,
-                right: 20,
-                width: 40,
-                height: 40,
-                borderRadius: "50%",
-                background: "var(--bg-tertiary)",
-                border: "none",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: 10,
-              }}
+              className="absolute top-4 md:top-5 right-4 md:right-5 w-8 h-8 md:w-10 md:h-10 rounded-full bg-[var(--bg-tertiary)] border-none cursor-pointer flex items-center justify-center z-10"
             >
-              <X size={18} color="var(--text-secondary)" />
+              <X size={14} color="var(--text-secondary)" />
             </button>
-            <div style={{ padding: "48px 40px 36px" }}>
+            <div className="p-6 md:p-10 md:pb-8">
               {/* Header */}
-              <div
-                style={{
-                  textAlign: "center",
-                  marginBottom: 28,
-                  paddingBottom: 24,
-                  borderBottom: "2px dashed var(--border-color)",
-                }}
-              >
+              <div className="text-center mb-6 md:mb-7 pb-5 md:pb-6 border-b-2 border-dashed border-[var(--border-color)]">
                 <img
                   src="/LOGO.png"
                   alt="Logo"
-                  style={{ height: 32, margin: "0 auto 12px" }}
+                  className="h-7 md:h-8 mx-auto mb-2 md:mb-3"
                 />
-                <h3
-                  style={{
-                    fontSize: 18,
-                    fontWeight: 900,
-                    textTransform: "uppercase",
-                    letterSpacing: "-0.01em",
-                    marginBottom: 4,
-                    color: "var(--text-primary)",
-                  }}
-                >
+                <h3 className="text-base md:text-lg font-black uppercase tracking-tight mb-1 text-[var(--text-primary)]">
                   {t.eReceipt}
                 </h3>
-                <p
-                  style={{
-                    fontSize: 11,
-                    color: "var(--text-tertiary)",
-                    fontWeight: 700,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.12em",
-                  }}
-                >
+                <p className="text-[10px] md:text-xs text-[var(--text-tertiary)] font-bold uppercase tracking-wider">
                   MediCare Hospital
                 </p>
               </div>
               {/* Info rows */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10,
-                  marginBottom: 24,
-                  fontSize: 12,
-                  fontWeight: 700,
-                }}
-              >
+              <div className="flex flex-col gap-2 md:gap-3 mb-5 md:mb-6 text-xs md:text-sm font-bold">
                 {[
                   [t.patient, user?.fullName],
                   [t.department, sel?.department],
@@ -1201,81 +694,34 @@ export default function Billing() {
                     formatDateTime(lang, modal.paidAt || modal.updatedAt),
                   ],
                 ].map(([k, v]) => (
-                  <div
-                    key={k}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      gap: 12,
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: "var(--text-tertiary)",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.08em",
-                        fontSize: 10,
-                      }}
-                    >
+                  <div key={k} className="flex justify-between gap-3">
+                    <span className="text-[var(--text-tertiary)] uppercase tracking-wider text-[10px] md:text-xs">
                       {k}
                     </span>
-                    <span
-                      style={{
-                        color: "var(--text-primary)",
-                        textAlign: "right",
-                      }}
-                    >
+                    <span className="text-[var(--text-primary)] text-right truncate">
                       {v}
                     </span>
                   </div>
                 ))}
               </div>
               {/* Items */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10,
-                  marginBottom: 24,
-                }}
-              >
+              <div className="flex flex-col gap-2 md:gap-3 mb-5 md:mb-6">
                 {modal.items?.map((item, i) => {
                   const m = getMeta(item.type);
                   return (
                     <div
                       key={i}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        fontSize: 13,
-                      }}
+                      className="flex justify-between text-xs md:text-sm"
                     >
                       <div>
-                        <p
-                          style={{
-                            fontWeight: 700,
-                            color: "var(--text-primary)",
-                          }}
-                        >
+                        <p className="font-bold text-[var(--text-primary)]">
                           {item.description}
                         </p>
-                        <p
-                          style={{
-                            fontSize: 10,
-                            color: "var(--text-tertiary)",
-                            fontWeight: 800,
-                            textTransform: "uppercase",
-                          }}
-                        >
+                        <p className="text-[10px] text-[var(--text-tertiary)] font-bold uppercase">
                           {m.label}
                         </p>
                       </div>
-                      <p
-                        style={{
-                          fontWeight: 900,
-                          color: "var(--text-primary)",
-                        }}
-                      >
+                      <p className="font-black text-[var(--text-primary)]">
                         {fmt(item.amount)}
                       </p>
                     </div>
@@ -1283,98 +729,34 @@ export default function Billing() {
                 })}
               </div>
               {/* Total */}
-              <div
-                style={{
-                  paddingTop: 20,
-                  borderTop: "2px dashed var(--border-color)",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 16,
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 800,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.08em",
-                      color: "var(--text-secondary)",
-                    }}
-                  >
+              <div className="pt-4 md:pt-5 border-t-2 border-dashed border-[var(--border-color)]">
+                <div className="flex justify-between items-center mb-3 md:mb-4">
+                  <p className="text-[10px] md:text-xs font-black uppercase tracking-wider text-[var(--text-secondary)]">
                     {t.total}
                   </p>
-                  <p
-                    style={{
-                      fontSize: 28,
-                      fontWeight: 900,
-                      color: "var(--text-primary)",
-                      letterSpacing: "-0.03em",
-                    }}
-                  >
+                  <p className="text-xl md:text-2xl font-black text-[var(--text-primary)] tracking-tight">
                     {fmt(modal.totalAmount)}
                   </p>
                 </div>
-                <div
-                  style={{
-                    background: "#10b981",
-                    borderRadius: 16,
-                    padding: "12px 20px",
-                    textAlign: "center",
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 900,
-                      color: "#fff",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.15em",
-                    }}
-                  >
+                <div className="bg-emerald-500 rounded-xl md:rounded-2xl py-2 md:py-3 px-4 md:px-5 text-center">
+                  <p className="text-[10px] md:text-xs font-black text-white uppercase tracking-wider">
                     {t.paidSuccessMsg}
                   </p>
                 </div>
               </div>
-              <div style={{ textAlign: "center", marginTop: 24, opacity: 0.1 }}>
-                <QrCode size={48} style={{ margin: "0 auto 6px" }} />
-                <p
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 900,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.3em",
-                  }}
-                >
+              <div className="text-center mt-5 md:mt-6 opacity-10">
+                <QrCode size={32} className="mx-auto mb-1 md:mb-2" />
+                <p className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em]">
                   MediCare Authentic Receipt
                 </p>
               </div>
             </div>
             {/* Tear edge */}
-            <div
-              style={{
-                display: "flex",
-                height: 18,
-                overflow: "hidden",
-                background: "var(--bg-secondary)",
-              }}
-            >
+            <div className="flex h-4 md:h-5 overflow-hidden bg-[var(--bg-secondary)]">
               {Array.from({ length: 22 }).map((_, i) => (
                 <div
                   key={i}
-                  style={{
-                    width: 28,
-                    height: 28,
-                    background: "var(--card-bg)",
-                    transform: "rotate(45deg)",
-                    flexShrink: 0,
-                    marginTop: -14,
-                    marginRight: 2,
-                  }}
+                  className="w-5 md:w-7 h-5 md:h-7 bg-[var(--card-bg)] rotate-45 flex-shrink-0 -mt-2 md:-mt-3 mr-0.5"
                 />
               ))}
             </div>

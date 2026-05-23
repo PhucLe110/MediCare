@@ -645,13 +645,13 @@ const DoctorDashboard = () => {
       )}
 
       {/* Header Deck */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[var(--card-bg)] p-6 rounded-3xl border border-[var(--border-color)] shadow-sm">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4 bg-[var(--card-bg)] p-4 md:p-6 rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm">
         <div>
-          <h1 className="text-3xl font-black text-[var(--text-primary)] tracking-tight flex items-center gap-3">
-            <Activity className="text-primary animate-pulse" size={32} />
+          <h1 className="text-xl md:text-3xl font-black text-[var(--text-primary)] tracking-tight flex items-center gap-2 md:gap-3">
+            <Activity className="text-primary animate-pulse" size={20} />
             {t.doctorDesk}
           </h1>
-          <p className="text-sm text-[var(--text-secondary)] font-medium mt-1">
+          <p className="text-xs md:text-sm text-[var(--text-secondary)] font-medium mt-1">
             {t.subtitle}
           </p>
         </div>
@@ -685,55 +685,55 @@ const DoctorDashboard = () => {
             };
             fetchData();
           }}
-          className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-primary font-extrabold text-sm border border-blue-100 dark:border-blue-900/30 hover:bg-primary hover:text-white transition-all shadow-sm"
+          className="flex items-center gap-2 px-4 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-primary font-extrabold text-xs md:text-sm border border-blue-100 dark:border-blue-900/30 hover:bg-primary hover:text-white transition-all shadow-sm"
         >
-          <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-          {t.refresh}
+          <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+          <span className="hidden md:inline">{t.refresh}</span>
         </button>
       </div>
 
       {/* Profile Metrics Deck */}
       {profileData && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           {/* Card 1: Doctor profile */}
-          <div className="bg-gradient-to-br from-blue-900 to-indigo-950 text-white p-6 rounded-3xl shadow-lg shadow-indigo-900/10 border border-white/10 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full transform translate-x-8 -translate-y-8" />
-            <p className="text-[11px] font-black text-blue-200 uppercase tracking-widest">
+          <div className="bg-gradient-to-br from-blue-900 to-indigo-950 text-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-lg shadow-indigo-900/10 border border-white/10 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 bg-white/5 rounded-full transform translate-x-8 -translate-y-8" />
+            <p className="text-[10px] md:text-[11px] font-black text-blue-200 uppercase tracking-widest">
               {t.physicianLabel}
             </p>
-            <h3 className="text-2xl font-black mt-2">
+            <h3 className="text-lg md:text-2xl font-black mt-2">
               {profileData.profile?.userId?.fullName}
             </h3>
-            <p className="text-xs text-blue-300 font-bold mt-1">
+            <p className="text-[10px] md:text-xs text-blue-300 font-bold mt-1">
               {profileData.profile?.specialty} •{" "}
               {profileData.profile?.department}
             </p>
           </div>
 
           {/* Card 2: Tổng ca — split Hôm nay / Trong tháng */}
-          <div className="bg-[var(--card-bg)] p-6 rounded-3xl shadow-sm border border-[var(--border-color)] hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-primary flex items-center justify-center border border-blue-100 dark:border-blue-900/30">
-                <Calendar size={20} />
+          <div className="bg-[var(--card-bg)] p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-[var(--border-color)] hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+              <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-primary flex items-center justify-center border border-blue-100 dark:border-blue-900/30">
+                <Calendar size={16} />
               </div>
-              <p className="text-xs text-[var(--text-secondary)] font-extrabold uppercase tracking-wide">
+              <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-extrabold uppercase tracking-wide">
                 {t.totalAppts}
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-blue-50/70 dark:bg-blue-900/30 rounded-2xl p-3 text-center border border-blue-100 dark:border-blue-900/30">
-                <h3 className="text-2xl font-black text-[var(--text-primary)]">
+            <div className="grid grid-cols-2 gap-2 md:gap-3">
+              <div className="bg-blue-50/70 dark:bg-blue-900/30 rounded-xl md:rounded-2xl p-2 md:p-3 text-center border border-blue-100 dark:border-blue-900/30">
+                <h3 className="text-xl md:text-2xl font-black text-[var(--text-primary)]">
                   {todayApptsCount}
                 </h3>
-                <p className="text-[10px] font-black text-blue-500 dark:text-blue-400 uppercase tracking-wider mt-0.5">
+                <p className="text-[9px] md:text-[10px] font-black text-blue-500 dark:text-blue-400 uppercase tracking-wider mt-0.5">
                   {t.today}
                 </p>
               </div>
-              <div className="bg-indigo-50/70 dark:bg-indigo-900/30 rounded-2xl p-3 text-center border border-indigo-100 dark:border-indigo-900/30">
-                <h3 className="text-2xl font-black text-[var(--text-primary)]">
+              <div className="bg-indigo-50/70 dark:bg-indigo-900/30 rounded-xl md:rounded-2xl p-2 md:p-3 text-center border border-indigo-100 dark:border-indigo-900/30">
+                <h3 className="text-xl md:text-2xl font-black text-[var(--text-primary)]">
                   {monthApptsCount}
                 </h3>
-                <p className="text-[10px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-wider mt-0.5">
+                <p className="text-[9px] md:text-[10px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-wider mt-0.5">
                   {t.thisMonth}
                 </p>
               </div>
@@ -741,18 +741,18 @@ const DoctorDashboard = () => {
           </div>
 
           {/* Card 3: Tái khám trong tháng */}
-          <div className="bg-[var(--card-bg)] p-6 rounded-3xl shadow-sm border border-[var(--border-color)] flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-100 dark:border-amber-900/30">
-              <RefreshCw size={22} />
+          <div className="bg-[var(--card-bg)] p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-[var(--border-color)] flex items-center gap-3 md:gap-4 hover:shadow-md transition-shadow">
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-100 dark:border-amber-900/30">
+              <RefreshCw size={18} />
             </div>
             <div>
-              <p className="text-xs text-[var(--text-secondary)] font-extrabold uppercase tracking-wide">
+              <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-extrabold uppercase tracking-wide">
                 {t.followUpMonthTitle}
               </p>
-              <h3 className="text-2xl font-black text-[var(--text-primary)] mt-1">
+              <h3 className="text-xl md:text-2xl font-black text-[var(--text-primary)] mt-1">
                 {monthFollowUpCount}
               </h3>
-              <p className="text-[10px] text-[var(--text-tertiary)] font-bold mt-0.5">
+              <p className="text-[9px] md:text-[10px] text-[var(--text-tertiary)] font-bold mt-0.5">
                 {t.followUpMonthSub}
               </p>
             </div>
@@ -761,17 +761,17 @@ const DoctorDashboard = () => {
       )}
 
       {/* Main Attending Panel */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
         {/* Left column: Registry & Patient cards */}
-        <div className="lg:col-span-5 bg-[var(--card-bg)] rounded-3xl border border-[var(--border-color)] shadow-sm overflow-hidden flex flex-col max-h-[850px]">
-          <div className="p-6 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">
-            <h2 className="text-lg font-black text-[var(--text-primary)] uppercase tracking-tight flex items-center gap-2">
-              <Users size={18} className="text-primary" />
+        <div className="lg:col-span-5 bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm overflow-hidden flex flex-col max-h-[700px] md:max-h-[850px]">
+          <div className="p-4 md:p-6 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">
+            <h2 className="text-base md:text-lg font-black text-[var(--text-primary)] uppercase tracking-tight flex items-center gap-2">
+              <Users size={14} className="text-primary" />
               {t.patientList}
             </h2>
 
             {/* Filter Tabs */}
-            <div className="flex gap-1 bg-[var(--bg-tertiary)] p-1 rounded-xl mt-4">
+            <div className="flex gap-1 bg-[var(--bg-tertiary)] p-1 rounded-xl mt-3 md:mt-4">
               {[
                 {
                   id: "confirmed",
@@ -796,7 +796,7 @@ const DoctorDashboard = () => {
                     setSelectedAppt(null);
                     setWaitingFilter("today");
                   }}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                  className={`flex-1 py-1.5 md:py-2 text-[10px] md:text-xs font-bold rounded-lg transition-all ${
                     activeTab === tab.id
                       ? tab.color
                       : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
@@ -809,10 +809,10 @@ const DoctorDashboard = () => {
 
             {/* Sub-filter: Chờ khám → Hôm nay / Chọn ngày; Đã khám / Đã hủy → Chọn ngày */}
             {activeTab === "confirmed" && (
-              <div className="flex items-center gap-2 mt-3 flex-wrap">
+              <div className="flex items-center gap-2 mt-2 md:mt-3 flex-wrap">
                 <button
                   onClick={() => setWaitingFilter("today")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  className={`px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-bold transition-all ${
                     waitingFilter === "today"
                       ? "bg-primary text-white shadow-sm"
                       : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--border-color)]"
@@ -822,7 +822,7 @@ const DoctorDashboard = () => {
                 </button>
                 <button
                   onClick={() => setWaitingFilter("bydate")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  className={`px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-bold transition-all ${
                     waitingFilter === "bydate"
                       ? "bg-primary text-white shadow-sm"
                       : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--border-color)]"
@@ -835,50 +835,50 @@ const DoctorDashboard = () => {
                     type="date"
                     value={filterDate}
                     onChange={(e) => setFilterDate(e.target.value)}
-                    className="px-2 py-1 rounded-lg border border-[var(--border-color)] text-xs focus:ring-primary focus:border-primary outline-none text-[var(--text-primary)] bg-[var(--card-bg)]"
+                    className="px-2 py-1 rounded-lg border border-[var(--border-color)] text-[10px] md:text-xs focus:ring-primary focus:border-primary outline-none text-[var(--text-primary)] bg-[var(--card-bg)]"
                   />
                 )}
               </div>
             )}
             {(activeTab === "completed" || activeTab === "cancelled") && (
-              <div className="flex items-center gap-2 mt-3">
-                <span className="text-xs font-bold text-[var(--text-tertiary)]">
+              <div className="flex items-center gap-2 mt-2 md:mt-3">
+                <span className="text-[10px] md:text-xs font-bold text-[var(--text-tertiary)]">
                   {t.viewDate}
                 </span>
                 <input
                   type="date"
                   value={filterDate}
                   onChange={(e) => setFilterDate(e.target.value)}
-                  className="px-2 py-1.5 rounded-lg border border-[var(--border-color)] text-xs focus:ring-primary focus:border-primary outline-none text-[var(--text-primary)] bg-[var(--card-bg)]"
+                  className="px-2 py-1 md:py-1.5 rounded-lg border border-[var(--border-color)] text-[10px] md:text-xs focus:ring-primary focus:border-primary outline-none text-[var(--text-primary)] bg-[var(--card-bg)]"
                 />
               </div>
             )}
 
             {/* Search Box */}
-            <div className="relative mt-4">
+            <div className="relative mt-3 md:mt-4">
               <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
-                size={16}
+                className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
+                size={14}
               />
               <input
                 type="text"
                 placeholder={t.searchPatient}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-[var(--border-color)] text-sm focus:ring-primary focus:border-primary bg-[var(--card-bg)] outline-none text-[var(--text-primary)]"
+                className="w-full pl-9 md:pl-11 pr-3 md:pr-4 py-2 md:py-2.5 rounded-xl border border-[var(--border-color)] text-xs md:text-sm focus:ring-primary focus:border-primary bg-[var(--card-bg)] outline-none text-[var(--text-primary)]"
               />
             </div>
           </div>
 
           {/* List of cards */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-3">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-2 md:space-y-3">
             {filteredAppointments.length === 0 ? (
-              <div className="text-center py-12">
+              <div className="text-center py-8 md:py-12">
                 <AlertCircle
                   className="mx-auto text-[var(--text-tertiary)] mb-2"
-                  size={32}
+                  size={24}
                 />
-                <p className="text-sm font-bold text-[var(--text-tertiary)]">
+                <p className="text-xs md:text-sm font-bold text-[var(--text-tertiary)]">
                   {t.noPatient}
                 </p>
               </div>
@@ -889,42 +889,42 @@ const DoctorDashboard = () => {
                   <div
                     key={appt._id}
                     onClick={() => handleSelectAppt(appt)}
-                    className={`p-4 rounded-2xl border transition-all cursor-pointer flex justify-between items-center ${
+                    className={`p-3 md:p-4 rounded-xl md:rounded-2xl border transition-all cursor-pointer flex justify-between items-center ${
                       isSelected
                         ? "bg-blue-50 dark:bg-blue-900/30 border-primary shadow-sm ring-1 ring-primary"
                         : "bg-[var(--card-bg)] border-[var(--border-color)] hover:border-[var(--border-color)] shadow-sm"
                     }`}
                   >
-                    <div className="space-y-1 overflow-hidden pr-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black uppercase tracking-wider bg-blue-100 dark:bg-blue-900/30 text-primary px-2 py-0.5 rounded">
+                    <div className="space-y-0.5 md:space-y-1 overflow-hidden pr-2">
+                      <div className="flex items-center gap-1.5 md:gap-2">
+                        <span className="text-[9px] md:text-[10px] font-black uppercase tracking-wider bg-blue-100 dark:bg-blue-900/30 text-primary px-1.5 md:px-2 py-0.5 rounded">
                           #{appt.queueNumber || "01"}
                         </span>
-                        <span className="text-[10px] font-bold text-[var(--text-tertiary)] font-mono">
+                        <span className="text-[9px] md:text-[10px] font-bold text-[var(--text-tertiary)] font-mono">
                           {appt.ticketNumber}
                         </span>
                       </div>
-                      <h4 className="font-extrabold text-sm text-[var(--text-primary)] truncate">
+                      <h4 className="font-extrabold text-xs md:text-sm text-[var(--text-primary)] truncate">
                         {appt.patient?.fullName}
                       </h4>
                       {appt.parentAppointment && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-900/30 w-fit">
-                          <RefreshCw size={9} />
+                        <span className="inline-flex items-center gap-1 text-[9px] md:text-[10px] font-black uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-1.5 md:px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-900/30 w-fit">
+                          <RefreshCw size={8} />
                           {t.followUpBadge}
                         </span>
                       )}
-                      <p className="text-xs text-[var(--text-secondary)] font-medium">
+                      <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-medium">
                         {appt.time} •{" "}
                         {new Date(appt.date).toLocaleDateString(locale)}
                       </p>
                       {appt.symptoms && (
-                        <p className="text-xs text-[var(--text-tertiary)] truncate italic">
+                        <p className="text-[10px] md:text-xs text-[var(--text-tertiary)] truncate italic">
                           "{appt.symptoms}"
                         </p>
                       )}
                     </div>
                     <ChevronRight
-                      size={16}
+                      size={14}
                       className={
                         isSelected
                           ? "text-primary"
@@ -939,39 +939,39 @@ const DoctorDashboard = () => {
         </div>
 
         {/* Right column: Workspace diagnoses & prescription */}
-        <div className="lg:col-span-7 space-y-6">
+        <div className="lg:col-span-7 space-y-4 md:space-y-6">
           {!selectedAppt ? (
-            <div className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border-color)] p-12 text-center shadow-sm h-full flex flex-col justify-center items-center min-h-[500px]">
-              <div className="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-primary mb-4 animate-bounce-slow">
-                <Clipboard size={32} />
+            <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border border-[var(--border-color)] p-6 md:p-12 text-center shadow-sm h-full flex flex-col justify-center items-center min-h-[400px] md:min-h-[500px]">
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-primary mb-3 md:mb-4 animate-bounce-slow">
+                <Clipboard size={24} />
               </div>
-              <h3 className="text-lg font-black text-[var(--text-primary)] uppercase tracking-tight">
+              <h3 className="text-base md:text-lg font-black text-[var(--text-primary)] uppercase tracking-tight">
                 {t.detailsTitle}
               </h3>
-              <p className="text-sm text-[var(--text-tertiary)] font-medium mt-2 max-w-sm">
+              <p className="text-xs md:text-sm text-[var(--text-tertiary)] font-medium mt-2 max-w-sm">
                 {t.selectToStart}
               </p>
             </div>
           ) : (
-            <div className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border-color)] shadow-sm p-6 space-y-6">
+            <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm p-4 md:p-6 space-y-4 md:space-y-6">
               {/* Patient Quick Header Info */}
-              <div className="bg-[var(--bg-tertiary)] p-6 rounded-2xl border border-[var(--border-color)] space-y-4">
-                <div className="flex justify-between items-start">
+              <div className="bg-[var(--bg-tertiary)] p-4 md:p-6 rounded-xl md:rounded-2xl border border-[var(--border-color)] space-y-3 md:space-y-4">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                   <div>
-                    <h3 className="text-lg font-extrabold text-[var(--text-primary)] flex items-center gap-2 flex-wrap">
+                    <h3 className="text-base md:text-lg font-extrabold text-[var(--text-primary)] flex items-center gap-2 flex-wrap">
                       <UserCheck
                         className="text-emerald-500 dark:text-emerald-400"
-                        size={20}
+                        size={16}
                       />
                       {selectedAppt.patient?.fullName}
                       {selectedAppt.parentAppointment && (
-                        <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-900/30">
-                          <RefreshCw size={11} />
+                        <span className="inline-flex items-center gap-1 text-[10px] md:text-xs font-black uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 md:px-3 py-0.5 md:py-1 rounded-full border border-amber-200 dark:border-amber-900/30">
+                          <RefreshCw size={9} />
                           {t.followUpPatient}
                         </span>
                       )}
                     </h3>
-                    <div className="flex gap-4 text-xs text-[var(--text-secondary)] font-bold mt-2">
+                    <div className="flex flex-wrap gap-2 md:gap-4 text-[10px] md:text-xs text-[var(--text-secondary)] font-bold mt-2">
                       <span>
                         {t.gender}:{" "}
                         <strong className="text-[var(--text-primary)]">
@@ -999,7 +999,7 @@ const DoctorDashboard = () => {
                   {/* Historical medical records search shortcut */}
                   <button
                     onClick={() => setShowHistoryModal(true)}
-                    className="text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-black border border-indigo-100 dark:border-indigo-900/30 px-4 py-2 rounded-xl hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+                    className="text-[10px] md:text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-black border border-indigo-100 dark:border-indigo-900/30 px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
                   >
                     {t.viewHistory}
                   </button>
@@ -1007,11 +1007,11 @@ const DoctorDashboard = () => {
 
                 {/* Patient Symptoms */}
                 {selectedAppt.symptoms && (
-                  <div className="p-3 bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)]">
-                    <p className="text-xs font-bold text-[var(--text-tertiary)] tracking-wider uppercase">
+                  <div className="p-2 md:p-3 bg-[var(--card-bg)] rounded-lg md:rounded-xl border border-[var(--border-color)]">
+                    <p className="text-[10px] md:text-xs font-bold text-[var(--text-tertiary)] tracking-wider uppercase">
                       {t.symptoms}
                     </p>
-                    <p className="text-sm text-[var(--text-primary)] font-bold mt-1">
+                    <p className="text-xs md:text-sm text-[var(--text-primary)] font-bold mt-1">
                       "{selectedAppt.symptoms}"
                     </p>
                   </div>
@@ -1021,17 +1021,17 @@ const DoctorDashboard = () => {
               {activeTab === "confirmed" ? (
                 selectedAppt.status === "examining" ? (
                   // Diagnosis form when in confirmed queue list
-                  <div className="space-y-6">
-                    <div className="border-t border-[var(--border-color)] pt-6">
-                      <h4 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <FileText size={16} className="text-primary" />
+                  <div className="space-y-4 md:space-y-6">
+                    <div className="border-t border-[var(--border-color)] pt-4 md:pt-6">
+                      <h4 className="text-xs md:text-sm font-black text-[var(--text-primary)] uppercase tracking-wider mb-3 md:mb-4 flex items-center gap-2">
+                        <FileText size={12} className="text-primary" />
                         {t.diagnoseTitle}
                       </h4>
 
                       {/* Inputs */}
-                      <div className="space-y-4">
+                      <div className="space-y-3 md:space-y-4">
                         <div>
-                          <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1">
+                          <label className="block text-[10px] md:text-xs font-black text-[var(--text-secondary)] uppercase mb-1">
                             {t.diagnosisLabel}
                           </label>
                           <input
@@ -1040,40 +1040,40 @@ const DoctorDashboard = () => {
                             value={diagnosis}
                             onChange={(e) => setDiagnosis(e.target.value)}
                             placeholder={t.diagnosisPlaceholder}
-                            className="w-full px-4 py-3 rounded-xl border border-[var(--border-color)] text-sm focus:ring-primary focus:border-primary outline-none text-[var(--text-primary)] bg-[var(--card-bg)]"
+                            className="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border border-[var(--border-color)] text-xs md:text-sm focus:ring-primary focus:border-primary outline-none text-[var(--text-primary)] bg-[var(--card-bg)]"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-xs font-black text-[var(--text-secondary)] uppercase mb-1">
+                          <label className="block text-[10px] md:text-xs font-black text-[var(--text-secondary)] uppercase mb-1">
                             {t.adviceLabel}
                           </label>
                           <textarea
-                            rows={3}
+                            rows={2}
                             value={doctorNotes}
                             onChange={(e) => setDoctorNotes(e.target.value)}
                             placeholder={t.advicePlaceholder}
-                            className="w-full px-4 py-3 rounded-xl border border-[var(--border-color)] text-sm focus:ring-primary focus:border-primary outline-none resize-none text-[var(--text-primary)] bg-[var(--card-bg)]"
+                            className="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border border-[var(--border-color)] text-xs md:text-sm focus:ring-primary focus:border-primary outline-none resize-none text-[var(--text-primary)] bg-[var(--card-bg)]"
                           />
                         </div>
                       </div>
                     </div>
 
                     {/* Pharmacological Prescription Section */}
-                    <div className="border-t border-[var(--border-color)] pt-6">
-                      <h4 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <div className="border-t border-[var(--border-color)] pt-4 md:pt-6">
+                      <h4 className="text-xs md:text-sm font-black text-[var(--text-primary)] uppercase tracking-wider mb-3 md:mb-4 flex items-center gap-2">
                         <Pill
-                          size={16}
+                          size={12}
                           className="text-amber-500 dark:text-amber-400"
                         />
                         {t.prescribeTitle}
                       </h4>
 
-                      <div className="bg-[var(--bg-tertiary)] p-4 rounded-2xl border border-[var(--border-color)] space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+                      <div className="bg-[var(--bg-tertiary)] p-3 md:p-4 rounded-xl md:rounded-2xl border border-[var(--border-color)] space-y-3 md:space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-3">
                           {/* Select Medicine */}
                           <div className="md:col-span-5">
-                            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
+                            <label className="block text-[9px] md:text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
                               {t.medTableMed}
                             </label>
                             <input
@@ -1090,7 +1090,7 @@ const DoctorDashboard = () => {
                                 if (found && found.unit) setMedUnit(found.unit);
                               }}
                               placeholder={t.medPlaceholder}
-                              className="w-full px-3 py-2 rounded-xl border border-[var(--border-color)] text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
+                              className="w-full px-2 md:px-3 py-1.5 md:py-2 rounded-xl border border-[var(--border-color)] text-[10px] md:text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
                             />
                             <datalist id="medicine-list">
                               {medicinesList.map((med) => (
@@ -1101,7 +1101,7 @@ const DoctorDashboard = () => {
 
                           {/* Unit */}
                           <div className="md:col-span-3">
-                            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
+                            <label className="block text-[9px] md:text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
                               {t.unitLabel}
                             </label>
                             <input
@@ -1109,41 +1109,41 @@ const DoctorDashboard = () => {
                               value={medUnit}
                               onChange={(e) => setMedUnit(e.target.value)}
                               placeholder={t.unitPlaceholder}
-                              className="w-full px-3 py-2 rounded-xl border border-[var(--border-color)] text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
+                              className="w-full px-2 md:px-3 py-1.5 md:py-2 rounded-xl border border-[var(--border-color)] text-[10px] md:text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
                             />
                           </div>
 
                           {/* Frequency */}
                           <div className="md:col-span-4">
-                            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
+                            <label className="block text-[9px] md:text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
                               {t.frequency}
                             </label>
                             <input
                               type="text"
                               value={medFrequency}
                               onChange={(e) => setMedFrequency(e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-[var(--border-color)] text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
+                              className="w-full px-2 md:px-3 py-1.5 md:py-2 rounded-xl border border-[var(--border-color)] text-[10px] md:text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
                             />
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-3">
                           {/* Duration */}
                           <div className="md:col-span-4">
-                            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
+                            <label className="block text-[9px] md:text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
                               {t.duration}
                             </label>
                             <input
                               type="text"
                               value={medDuration}
                               onChange={(e) => setMedDuration(e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-[var(--border-color)] text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
+                              className="w-full px-2 md:px-3 py-1.5 md:py-2 rounded-xl border border-[var(--border-color)] text-[10px] md:text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
                             />
                           </div>
 
                           {/* Qty */}
                           <div className="md:col-span-3">
-                            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
+                            <label className="block text-[9px] md:text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
                               {t.qty}
                             </label>
                             <input
@@ -1151,7 +1151,7 @@ const DoctorDashboard = () => {
                               min={1}
                               value={medQuantity}
                               onChange={(e) => setMedQuantity(e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-[var(--border-color)] text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
+                              className="w-full px-2 md:px-3 py-1.5 md:py-2 rounded-xl border border-[var(--border-color)] text-[10px] md:text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
                             />
                           </div>
 
@@ -1159,9 +1159,9 @@ const DoctorDashboard = () => {
                             <button
                               type="button"
                               onClick={handleAddMedicine}
-                              className="w-full py-2 bg-amber-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 hover:bg-amber-600 transition-all shadow-md shadow-amber-500/10"
+                              className="w-full py-1.5 md:py-2 bg-amber-500 text-white font-bold rounded-lg md:rounded-xl text-[10px] md:text-xs flex items-center justify-center gap-1 md:gap-1.5 hover:bg-amber-600 transition-all shadow-md shadow-amber-500/10"
                             >
-                              <Plus size={14} />
+                              <Plus size={10} />
                               {t.btnAddMed}
                             </button>
                           </div>
@@ -1169,80 +1169,92 @@ const DoctorDashboard = () => {
 
                         {/* Prescribed Table */}
                         {prescribedMedicines.length > 0 && (
-                          <div className="border border-[var(--border-color)] rounded-xl overflow-hidden bg-[var(--card-bg)]">
-                            <table className="w-full text-left text-xs border-collapse">
-                              <thead>
-                                <tr className="bg-[var(--bg-tertiary)] border-b border-[var(--border-color)] text-[var(--text-secondary)] font-extrabold">
-                                  <th className="p-3">{t.medTableMed}</th>
-                                  <th className="p-3">{t.unitLabel}</th>
-                                  <th className="p-3">{t.medTableQty}</th>
-                                  <th className="p-3 text-right">
-                                    {t.medTableCost}
-                                  </th>
-                                  <th className="p-3 text-center"></th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {prescribedMedicines.map((med, index) => (
-                                  <tr
-                                    key={med.name || index}
-                                    className="border-b border-[var(--border-color)] text-[var(--text-primary)] font-bold hover:bg-[var(--bg-tertiary)]"
-                                  >
-                                    <td className="p-3">
-                                      <p className="font-extrabold">
-                                        {med.name}
-                                      </p>
-                                      <p className="text-[10px] text-[var(--text-tertiary)] font-medium">
-                                        {med.frequency} • {med.duration}
-                                      </p>
-                                    </td>
-                                    <td className="p-3">{med.dosage}</td>
-                                    <td className="p-3">{med.quantity}</td>
-                                    <td className="p-3 text-right">
-                                      {(
-                                        med.unitPrice * med.quantity
-                                      ).toLocaleString("vi-VN")}
-                                      đ
-                                    </td>
-                                    <td className="p-3 text-center">
-                                      <button
-                                        onClick={() =>
-                                          handleRemoveMedicine(med.name)
-                                        }
-                                        className="text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 p-1"
-                                      >
-                                        <Trash2 size={14} />
-                                      </button>
-                                    </td>
+                          <div className="border border-[var(--border-color)] rounded-lg md:rounded-xl overflow-hidden bg-[var(--card-bg)]">
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-left text-[10px] md:text-xs border-collapse">
+                                <thead>
+                                  <tr className="bg-[var(--bg-tertiary)] border-b border-[var(--border-color)] text-[var(--text-secondary)] font-extrabold">
+                                    <th className="p-2 md:p-3">
+                                      {t.medTableMed}
+                                    </th>
+                                    <th className="p-2 md:p-3">
+                                      {t.unitLabel}
+                                    </th>
+                                    <th className="p-2 md:p-3">
+                                      {t.medTableQty}
+                                    </th>
+                                    <th className="p-2 md:p-3 text-right">
+                                      {t.medTableCost}
+                                    </th>
+                                    <th className="p-2 md:p-3 text-center"></th>
                                   </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                                </thead>
+                                <tbody>
+                                  {prescribedMedicines.map((med, index) => (
+                                    <tr
+                                      key={med.name || index}
+                                      className="border-b border-[var(--border-color)] text-[var(--text-primary)] font-bold hover:bg-[var(--bg-tertiary)]"
+                                    >
+                                      <td className="p-2 md:p-3">
+                                        <p className="font-extrabold text-[10px] md:text-xs">
+                                          {med.name}
+                                        </p>
+                                        <p className="text-[9px] md:text-[10px] text-[var(--text-tertiary)] font-medium">
+                                          {med.frequency} • {med.duration}
+                                        </p>
+                                      </td>
+                                      <td className="p-2 md:p-3 text-[10px] md:text-xs">
+                                        {med.dosage}
+                                      </td>
+                                      <td className="p-2 md:p-3 text-[10px] md:text-xs">
+                                        {med.quantity}
+                                      </td>
+                                      <td className="p-2 md:p-3 text-right text-[10px] md:text-xs">
+                                        {(
+                                          med.unitPrice * med.quantity
+                                        ).toLocaleString("vi-VN")}
+                                        đ
+                                      </td>
+                                      <td className="p-2 md:p-3 text-center">
+                                        <button
+                                          onClick={() =>
+                                            handleRemoveMedicine(med.name)
+                                          }
+                                          className="text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 p-1"
+                                        >
+                                          <Trash2 size={10} />
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
                           </div>
                         )}
                       </div>
                     </div>
 
                     {/* Diagnostic Lab Test Orders Section */}
-                    <div className="border-t border-[var(--border-color)] pt-6">
-                      <h4 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <div className="border-t border-[var(--border-color)] pt-4 md:pt-6">
+                      <h4 className="text-xs md:text-sm font-black text-[var(--text-primary)] uppercase tracking-wider mb-3 md:mb-4 flex items-center gap-2">
                         <FileText
-                          size={16}
+                          size={12}
                           className="text-blue-500 dark:text-blue-400"
                         />
                         {t.labRequestTitle}
                       </h4>
 
-                      <div className="bg-[var(--bg-tertiary)] p-4 rounded-2xl border border-[var(--border-color)] space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+                      <div className="bg-[var(--bg-tertiary)] p-3 md:p-4 rounded-xl md:rounded-2xl border border-[var(--border-color)] space-y-3 md:space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-3">
                           <div className="md:col-span-5">
-                            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
+                            <label className="block text-[9px] md:text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
                               {t.labTestType}
                             </label>
                             <select
                               value={newTestType}
                               onChange={(e) => setNewTestType(e.target.value)}
-                              className="w-full px-3 py-2 rounded-xl border border-[var(--border-color)] text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
+                              className="w-full px-2 md:px-3 py-1.5 md:py-2 rounded-xl border border-[var(--border-color)] text-[10px] md:text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
                             >
                               <option value="blood">{t.optBlood}</option>
                               <option value="urine">{t.optUrine}</option>
@@ -1258,7 +1270,7 @@ const DoctorDashboard = () => {
                           </div>
 
                           <div className="md:col-span-7">
-                            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
+                            <label className="block text-[9px] md:text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
                               {t.labTestName}
                             </label>
                             <input
@@ -1266,14 +1278,14 @@ const DoctorDashboard = () => {
                               value={newTestName}
                               onChange={(e) => setNewTestName(e.target.value)}
                               placeholder={t.testNamePh}
-                              className="w-full px-3 py-2 rounded-xl border border-[var(--border-color)] text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
+                              className="w-full px-2 md:px-3 py-1.5 md:py-2 rounded-xl border border-[var(--border-color)] text-[10px] md:text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
                             />
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-3">
                           <div className="md:col-span-8">
-                            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
+                            <label className="block text-[9px] md:text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
                               {t.labTestNotes}
                             </label>
                             <input
@@ -1281,7 +1293,7 @@ const DoctorDashboard = () => {
                               value={testNotes}
                               onChange={(e) => setTestNotes(e.target.value)}
                               placeholder={t.testNotesPh}
-                              className="w-full px-3 py-2 rounded-xl border border-[var(--border-color)] text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
+                              className="w-full px-2 md:px-3 py-1.5 md:py-2 rounded-xl border border-[var(--border-color)] text-[10px] md:text-xs focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] font-bold text-[var(--text-primary)]"
                             />
                           </div>
 
@@ -1289,9 +1301,9 @@ const DoctorDashboard = () => {
                             <button
                               type="button"
                               onClick={handleAddLabTest}
-                              className="w-full py-2 bg-blue-600 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 hover:bg-blue-700 transition-all shadow-md shadow-blue-500/10"
+                              className="w-full py-1.5 md:py-2 bg-blue-600 text-white font-bold rounded-lg md:rounded-xl text-[10px] md:text-xs flex items-center justify-center gap-1 md:gap-1.5 hover:bg-blue-700 transition-all shadow-md shadow-blue-500/10"
                             >
-                              <Plus size={14} />
+                              <Plus size={10} />
                               {t.btnAddTest}
                             </button>
                           </div>
@@ -1299,73 +1311,83 @@ const DoctorDashboard = () => {
 
                         {/* Lab Test Requests list */}
                         {labTests.length > 0 && (
-                          <div className="border border-[var(--border-color)] rounded-xl overflow-hidden bg-[var(--card-bg)]">
-                            <table className="w-full text-left text-xs border-collapse">
-                              <thead>
-                                <tr className="bg-[var(--bg-tertiary)] border-b border-[var(--border-color)] text-[var(--text-secondary)] font-extrabold">
-                                  <th className="p-3">{t.testTableType}</th>
-                                  <th className="p-3">{t.testTableName}</th>
-                                  <th className="p-3">{t.clinicalNotesCol}</th>
-                                  <th className="p-3 text-center"></th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {labTests.map((test, idx) => (
-                                  <tr
-                                    key={idx}
-                                    className="border-b border-[var(--border-color)] text-[var(--text-primary)] font-bold hover:bg-[var(--bg-tertiary)]"
-                                  >
-                                    <td className="p-3 uppercase tracking-wider text-[10px] text-primary">
-                                      {test.testType}
-                                    </td>
-                                    <td className="p-3 text-[var(--text-primary)] font-extrabold">
-                                      {test.testName}
-                                    </td>
-                                    <td className="p-3 text-[var(--text-tertiary)] font-medium">
-                                      {test.clinicalNotes}
-                                    </td>
-                                    <td className="p-3 text-center">
-                                      <button
-                                        onClick={() => handleRemoveLabTest(idx)}
-                                        className="text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 p-1"
-                                      >
-                                        <Trash2 size={14} />
-                                      </button>
-                                    </td>
+                          <div className="border border-[var(--border-color)] rounded-lg md:rounded-xl overflow-hidden bg-[var(--card-bg)]">
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-left text-[10px] md:text-xs border-collapse">
+                                <thead>
+                                  <tr className="bg-[var(--bg-tertiary)] border-b border-[var(--border-color)] text-[var(--text-secondary)] font-extrabold">
+                                    <th className="p-2 md:p-3">
+                                      {t.testTableType}
+                                    </th>
+                                    <th className="p-2 md:p-3">
+                                      {t.testTableName}
+                                    </th>
+                                    <th className="p-2 md:p-3">
+                                      {t.clinicalNotesCol}
+                                    </th>
+                                    <th className="p-2 md:p-3 text-center"></th>
                                   </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                                </thead>
+                                <tbody>
+                                  {labTests.map((test, idx) => (
+                                    <tr
+                                      key={idx}
+                                      className="border-b border-[var(--border-color)] text-[var(--text-primary)] font-bold hover:bg-[var(--bg-tertiary)]"
+                                    >
+                                      <td className="p-2 md:p-3 uppercase tracking-wider text-[9px] md:text-[10px] text-primary">
+                                        {test.testType}
+                                      </td>
+                                      <td className="p-2 md:p-3 text-[var(--text-primary)] font-extrabold text-[10px] md:text-xs">
+                                        {test.testName}
+                                      </td>
+                                      <td className="p-2 md:p-3 text-[var(--text-tertiary)] font-medium text-[10px] md:text-xs">
+                                        {test.clinicalNotes}
+                                      </td>
+                                      <td className="p-2 md:p-3 text-center">
+                                        <button
+                                          onClick={() =>
+                                            handleRemoveLabTest(idx)
+                                          }
+                                          className="text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 p-1"
+                                        >
+                                          <Trash2 size={10} />
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
                           </div>
                         )}
 
                         {labTests.length > 0 && (
-                          <div className="mt-4 flex justify-end">
+                          <div className="mt-3 md:mt-4 flex justify-end">
                             <button
                               type="button"
                               onClick={handleSendLabRequest}
-                              className="px-6 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold rounded-xl text-sm hover:from-teal-600 hover:to-emerald-600 shadow-md shadow-emerald-500/20 flex items-center gap-2 transition-all"
+                              className="px-4 md:px-6 py-1.5 md:py-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold rounded-lg md:rounded-xl text-[10px] md:text-sm hover:from-teal-600 hover:to-emerald-600 shadow-md shadow-emerald-500/20 flex items-center gap-1 md:gap-2 transition-all"
                             >
-                              <Send size={16} />
+                              <Send size={12} />
                               {t.sendLabNow}
                             </button>
                           </div>
                         )}
 
                         {sentRequests.length > 0 && (
-                          <div className="mt-6 border-t border-[var(--border-color)] pt-4">
-                            <div className="flex items-center justify-between mb-3">
-                              <h5 className="text-xs font-bold text-[var(--text-primary)] uppercase">
+                          <div className="mt-4 md:mt-6 border-t border-[var(--border-color)] pt-3 md:pt-4">
+                            <div className="flex items-center justify-between mb-2 md:mb-3">
+                              <h5 className="text-[10px] md:text-xs font-bold text-[var(--text-primary)] uppercase">
                                 {t.sentLabRequests}
                               </h5>
                               <button
                                 onClick={() =>
                                   fetchSentRequests(selectedAppt._id)
                                 }
-                                className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-1 flex items-center gap-1 text-xs font-bold bg-blue-50 dark:bg-blue-900/30 rounded-lg px-2"
+                                className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-1 flex items-center gap-1 text-[10px] md:text-xs font-bold bg-blue-50 dark:bg-blue-900/30 rounded-lg px-2"
                               >
                                 <RefreshCw
-                                  size={12}
+                                  size={10}
                                   className={
                                     loadingRequests ? "animate-spin" : ""
                                   }
@@ -1374,16 +1396,16 @@ const DoctorDashboard = () => {
                               </button>
                             </div>
 
-                            <div className="space-y-3">
+                            <div className="space-y-2 md:space-y-3">
                               {sentRequests.map((req) => (
                                 <div
                                   key={req._id}
-                                  className="border border-[var(--border-color)] rounded-xl p-4 bg-[var(--card-bg)] shadow-sm flex items-start justify-between"
+                                  className="border border-[var(--border-color)] rounded-lg md:rounded-xl p-3 md:p-4 bg-[var(--card-bg)] shadow-sm flex flex-col md:flex-row md:items-start justify-between gap-3"
                                 >
-                                  <div>
-                                    <div className="flex items-center gap-2 mb-2">
+                                  <div className="flex-1">
+                                    <div className="flex flex-wrap items-center gap-1.5 md:gap-2 mb-2">
                                       <span
-                                        className={`px-2 py-0.5 text-[10px] font-bold rounded-md uppercase ${req.status === "completed" ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400" : req.status === "in_progress" ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"}`}
+                                        className={`px-2 py-0.5 text-[9px] md:text-[10px] font-bold rounded-md uppercase ${req.status === "completed" ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400" : req.status === "in_progress" ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"}`}
                                       >
                                         {req.status === "completed"
                                           ? t.labCompleted
@@ -1392,18 +1414,18 @@ const DoctorDashboard = () => {
                                             : t.labPending}
                                       </span>
                                       {req.paymentStatus === "unpaid" && (
-                                        <span className="px-2 py-0.5 text-[10px] font-bold rounded-md uppercase bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400">
+                                        <span className="px-2 py-0.5 text-[9px] md:text-[10px] font-bold rounded-md uppercase bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400">
                                           {t.awaitingLabPay}
                                         </span>
                                       )}
-                                      <span className="text-xs text-[var(--text-secondary)] font-mono flex items-center gap-1">
-                                        <Clock size={10} />{" "}
+                                      <span className="text-[10px] md:text-xs text-[var(--text-secondary)] font-mono flex items-center gap-1">
+                                        <Clock size={8} />{" "}
                                         {new Date(
                                           req.createdAt,
                                         ).toLocaleTimeString(locale)}
                                       </span>
                                     </div>
-                                    <ul className="list-disc pl-4 text-xs text-[var(--text-primary)] font-medium space-y-1">
+                                    <ul className="list-disc pl-4 text-[10px] md:text-xs text-[var(--text-primary)] font-medium space-y-1">
                                       {req.tests?.map((t, i) => (
                                         <li key={i}>
                                           {t.testName}{" "}
@@ -1427,10 +1449,10 @@ const DoctorDashboard = () => {
                                               href={`${API_URL}${f.fileUrl}`}
                                               target="_blank"
                                               rel="noopener noreferrer"
-                                              className="px-3 py-1.5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900/30 rounded-lg text-xs font-bold hover:bg-green-100 dark:hover:bg-green-900/50 flex items-center gap-1.5 transition-colors"
+                                              className="px-2 md:px-3 py-1 md:py-1.5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900/30 rounded-lg text-[10px] md:text-xs font-bold hover:bg-green-100 dark:hover:bg-green-900/50 flex items-center gap-1 md:gap-1.5 transition-colors"
                                               title={f.fileName}
                                             >
-                                              <FileText size={14} />
+                                              <FileText size={10} />
                                               {t.viewResult}{" "}
                                               {req.result.files.length > 1
                                                 ? idx + 1
@@ -1445,10 +1467,10 @@ const DoctorDashboard = () => {
                                         onClick={() =>
                                           openCancelLabConfirm(req)
                                         }
-                                        className="px-3 py-1.5 bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/30 rounded-lg text-xs font-bold hover:bg-rose-100 dark:hover:bg-rose-900/50 flex items-center gap-1.5 transition-colors"
+                                        className="px-2 md:px-3 py-1 md:py-1.5 bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/30 rounded-lg text-[10px] md:text-xs font-bold hover:bg-rose-100 dark:hover:bg-rose-900/50 flex items-center gap-1 md:gap-1.5 transition-colors"
                                         title={t.cancelLabTitleShort}
                                       >
-                                        <Trash2 size={14} />
+                                        <Trash2 size={10} />
                                         {t.cancelLabBtn}
                                       </button>
                                     )}
@@ -1462,8 +1484,8 @@ const DoctorDashboard = () => {
                     </div>
 
                     {/* Follow-up Section */}
-                    <div className="border-t border-[var(--border-color)] pt-6">
-                      <div className="flex items-center gap-3 mb-4">
+                    <div className="border-t border-[var(--border-color)] pt-4 md:pt-6">
+                      <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
                         <input
                           type="checkbox"
                           id="requireFollowUp"
@@ -1473,17 +1495,17 @@ const DoctorDashboard = () => {
                         />
                         <label
                           htmlFor="requireFollowUp"
-                          className="text-sm font-black text-[var(--text-primary)] uppercase tracking-wider cursor-pointer"
+                          className="text-xs md:text-sm font-black text-[var(--text-primary)] uppercase tracking-wider cursor-pointer"
                         >
                           {t.followUpRequire}
                         </label>
                       </div>
 
                       {requireFollowUp && (
-                        <div className="bg-[var(--bg-tertiary)] p-4 rounded-2xl border border-[var(--border-color)] space-y-4 animate-in fade-in slide-in-from-top-2">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-[var(--bg-tertiary)] p-3 md:p-4 rounded-xl md:rounded-2xl border border-[var(--border-color)] space-y-3 md:space-y-4 animate-in fade-in slide-in-from-top-2">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                             <div>
-                              <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
+                              <label className="block text-[9px] md:text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
                                 {t.followUpDate}
                               </label>
                               <input
@@ -1494,11 +1516,11 @@ const DoctorDashboard = () => {
                                 onChange={(e) =>
                                   setFollowUpDate(e.target.value)
                                 }
-                                className="w-full px-3 py-2 rounded-xl border border-[var(--border-color)] text-sm focus:ring-primary focus:border-primary outline-none text-[var(--text-primary)] bg-[var(--card-bg)]"
+                                className="w-full px-2 md:px-3 py-1.5 md:py-2 rounded-xl border border-[var(--border-color)] text-xs md:text-sm focus:ring-primary focus:border-primary outline-none text-[var(--text-primary)] bg-[var(--card-bg)]"
                               />
                             </div>
                             <div>
-                              <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
+                              <label className="block text-[9px] md:text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
                                 {t.followUpTimeLabel}
                               </label>
                               <select
@@ -1508,7 +1530,7 @@ const DoctorDashboard = () => {
                                   setFollowUpTime(e.target.value)
                                 }
                                 disabled={!followUpDate || loadingFollowUpTimes}
-                                className="w-full px-3 py-2 rounded-xl border border-[var(--border-color)] text-sm focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] disabled:bg-[var(--bg-tertiary)] disabled:cursor-not-allowed text-[var(--text-primary)]"
+                                className="w-full px-2 md:px-3 py-1.5 md:py-2 rounded-xl border border-[var(--border-color)] text-xs md:text-sm focus:ring-primary focus:border-primary outline-none bg-[var(--card-bg)] disabled:bg-[var(--bg-tertiary)] disabled:cursor-not-allowed text-[var(--text-primary)]"
                               >
                                 {!followUpDate ? (
                                   <option value="">{t.selectDateFirst}</option>
@@ -1530,15 +1552,15 @@ const DoctorDashboard = () => {
                             </div>
                           </div>
                           <div>
-                            <label className="block text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
+                            <label className="block text-[9px] md:text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">
                               {t.followUpNotes}
                             </label>
                             <textarea
-                              rows={2}
+                              rows={1}
                               value={followUpNotes}
                               onChange={(e) => setFollowUpNotes(e.target.value)}
                               placeholder={t.followUpNotesPh}
-                              className="w-full px-3 py-2 rounded-xl border border-[var(--border-color)] text-sm focus:ring-primary focus:border-primary outline-none resize-none text-[var(--text-primary)] bg-[var(--card-bg)]"
+                              className="w-full px-2 md:px-3 py-1.5 md:py-2 rounded-xl border border-[var(--border-color)] text-xs md:text-sm focus:ring-primary focus:border-primary outline-none resize-none text-[var(--text-primary)] bg-[var(--card-bg)]"
                             />
                           </div>
                         </div>
@@ -1546,58 +1568,58 @@ const DoctorDashboard = () => {
                     </div>
 
                     {/* Submission deck */}
-                    <div className="border-t border-[var(--border-color)] pt-6 flex justify-end gap-3">
+                    <div className="border-t border-[var(--border-color)] pt-4 md:pt-6 flex flex-col md:flex-row justify-end gap-2 md:gap-3">
                       <button
                         onClick={() => setSelectedAppt(null)}
-                        className="px-6 py-3 rounded-2xl bg-[var(--bg-tertiary)] text-[var(--text-secondary)] font-extrabold text-sm hover:bg-[var(--border-color)] transition-all"
+                        className="px-4 md:px-6 py-2 md:py-3 rounded-xl md:rounded-2xl bg-[var(--bg-tertiary)] text-[var(--text-secondary)] font-extrabold text-xs md:text-sm hover:bg-[var(--border-color)] transition-all"
                       >
                         {t.close}
                       </button>
                       {hasOpenLabRequests && (
-                        <p className="text-xs text-amber-700 dark:text-amber-400 font-bold mr-auto max-w-md text-left">
+                        <p className="text-[10px] md:text-xs text-amber-700 dark:text-amber-400 font-bold mr-auto max-w-md text-left">
                           {t.labPendingBlock}
                         </p>
                       )}
                       <button
                         onClick={handleSubmitDiagnosis}
                         disabled={hasOpenLabRequests}
-                        className={`px-6 py-3 rounded-2xl font-extrabold text-sm transition-all shadow-lg flex items-center gap-2 ${
+                        className={`px-4 md:px-6 py-2 md:py-3 rounded-xl md:rounded-2xl font-extrabold text-xs md:text-sm transition-all shadow-lg flex items-center gap-1 md:gap-2 ${
                           hasOpenLabRequests
                             ? "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none"
                             : "bg-primary text-white hover:bg-blue-800 shadow-blue-500/25"
                         }`}
                       >
-                        <CheckCircle2 size={16} />
+                        <CheckCircle2 size={12} />
                         {t.btnSubmitConsult}
                       </button>
                     </div>
                   </div>
                 ) : (
                   // Waiting view
-                  <div className="space-y-6 flex flex-col items-center justify-center py-12 text-center">
-                    <div className="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-primary mb-4">
-                      <Clock size={32} />
+                  <div className="space-y-4 md:space-y-6 flex flex-col items-center justify-center py-8 md:py-12 text-center">
+                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-primary mb-3 md:mb-4">
+                      <Clock size={24} />
                     </div>
-                    <h4 className="text-lg font-black text-[var(--text-primary)] uppercase tracking-wider mb-2">
+                    <h4 className="text-base md:text-lg font-black text-[var(--text-primary)] uppercase tracking-wider mb-1 md:mb-2">
                       {t.waitingExamTitle}
                     </h4>
-                    <p className="text-sm text-[var(--text-secondary)] mb-6 max-w-md">
+                    <p className="text-xs md:text-sm text-[var(--text-secondary)] mb-4 md:mb-6 max-w-md">
                       {t.waitingExamDesc}
                     </p>
                     {isTimeReached(selectedAppt) ? (
                       <button
                         onClick={handleStartExamination}
-                        className="px-8 py-3 rounded-2xl bg-primary text-white font-extrabold text-sm hover:bg-blue-800 transition-all shadow-lg shadow-blue-500/25 flex items-center gap-2"
+                        className="px-6 md:px-8 py-2 md:py-3 rounded-xl md:rounded-2xl bg-primary text-white font-extrabold text-xs md:text-sm hover:bg-blue-800 transition-all shadow-lg shadow-blue-500/25 flex items-center gap-1 md:gap-2"
                       >
-                        <Activity size={18} />
+                        <Activity size={14} />
                         {t.startExam}
                       </button>
                     ) : (
                       <button
                         disabled
-                        className="px-8 py-3 rounded-2xl bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] font-extrabold text-sm flex items-center gap-2 cursor-not-allowed border border-[var(--border-color)]"
+                        className="px-6 md:px-8 py-2 md:py-3 rounded-xl md:rounded-2xl bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] font-extrabold text-xs md:text-sm flex items-center gap-1 md:gap-2 cursor-not-allowed border border-[var(--border-color)]"
                       >
-                        <Clock size={18} />
+                        <Clock size={14} />
                         {t.notTimeYet}
                       </button>
                     )}
@@ -1605,39 +1627,39 @@ const DoctorDashboard = () => {
                 )
               ) : (
                 // Diagnosis summary view when looking at Completed/Cancelled list
-                <div className="space-y-6">
-                  <div className="p-4 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 font-bold text-sm flex items-center gap-2">
-                    <CheckCircle2 size={18} />
+                <div className="space-y-4 md:space-y-6">
+                  <div className="p-3 md:p-4 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-xl md:rounded-2xl border border-emerald-100 dark:border-emerald-900/30 font-bold text-xs md:text-sm flex items-center gap-2">
+                    <CheckCircle2 size={14} />
                     {activeTab === "completed"
                       ? t.completedVisit
                       : t.cancelledVisitShort}
                   </div>
 
                   {loadingHistory ? (
-                    <div className="text-center py-6 text-[var(--text-tertiary)] font-medium">
+                    <div className="text-center py-4 md:py-6 text-[var(--text-tertiary)] font-medium text-xs md:text-sm">
                       {t.loadingRecord}
                     </div>
                   ) : (
                     patientHistory
                       .filter((h) => h.appointment._id === selectedAppt._id)
                       .map((hist, idx) => (
-                        <div key={idx} className="space-y-6">
+                        <div key={idx} className="space-y-4 md:space-y-6">
                           {hist.prescription && (
-                            <div className="bg-[var(--bg-tertiary)] p-6 rounded-2xl border border-[var(--border-color)] space-y-4">
-                              <h4 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
+                            <div className="bg-[var(--bg-tertiary)] p-4 md:p-6 rounded-xl md:rounded-2xl border border-[var(--border-color)] space-y-3 md:space-y-4">
+                              <h4 className="text-xs md:text-sm font-black text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
                                 <FileText
-                                  size={16}
+                                  size={12}
                                   className="text-emerald-500 dark:text-emerald-400"
                                 />
                                 Hồ sơ chẩn đoán & Đơn thuốc
                               </h4>
 
-                              <div className="grid grid-cols-2 gap-4 text-xs font-bold text-[var(--text-secondary)]">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 text-[10px] md:text-xs font-bold text-[var(--text-secondary)]">
                                 <div>
                                   <span className="text-[var(--text-tertiary)] uppercase tracking-wider">
                                     Chẩn đoán:
                                   </span>
-                                  <p className="text-sm text-[var(--text-primary)] font-extrabold mt-1">
+                                  <p className="text-xs md:text-sm text-[var(--text-primary)] font-extrabold mt-1">
                                     {hist.prescription.diagnosis}
                                   </p>
                                 </div>
@@ -1646,7 +1668,7 @@ const DoctorDashboard = () => {
                                     <span className="text-[var(--text-tertiary)] uppercase tracking-wider">
                                       Lời dặn bác sĩ:
                                     </span>
-                                    <p className="text-sm text-[var(--text-primary)] font-extrabold mt-1">
+                                    <p className="text-xs md:text-sm text-[var(--text-primary)] font-extrabold mt-1">
                                       {hist.prescription.doctorNotes}
                                     </p>
                                   </div>
@@ -1655,77 +1677,79 @@ const DoctorDashboard = () => {
 
                               {hist.prescription.medicines &&
                                 hist.prescription.medicines.length > 0 && (
-                                  <div className="border border-[var(--border-color)] rounded-xl overflow-hidden bg-[var(--card-bg)] mt-4">
-                                    <table className="w-full text-left text-xs border-collapse">
-                                      <thead>
-                                        <tr className="bg-[var(--bg-tertiary)] border-b border-[var(--border-color)] text-[var(--text-secondary)] font-extrabold">
-                                          <th className="p-3">
-                                            {t.medTableMed}
-                                          </th>
-                                          <th className="p-3">
-                                            {t.medTableDosage}
-                                          </th>
-                                          <th className="p-3">
-                                            {t.medTableQty}
-                                          </th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        {hist.prescription.medicines.map(
-                                          (med, mIdx) => (
-                                            <tr
-                                              key={mIdx}
-                                              className="border-b border-[var(--border-color)] text-[var(--text-primary)] font-bold"
-                                            >
-                                              <td className="p-3">
-                                                <p className="font-extrabold text-[var(--text-primary)]">
-                                                  {med.name}
-                                                </p>
-                                                <p className="text-[10px] text-[var(--text-tertiary)] font-medium">
-                                                  {med.frequency} •{" "}
-                                                  {med.duration}
-                                                </p>
-                                              </td>
-                                              <td className="p-3">
-                                                {med.dosage}
-                                              </td>
-                                              <td className="p-3">
-                                                {med.quantity}
-                                              </td>
-                                            </tr>
-                                          ),
-                                        )}
-                                      </tbody>
-                                    </table>
+                                  <div className="border border-[var(--border-color)] rounded-lg md:rounded-xl overflow-hidden bg-[var(--card-bg)] mt-3 md:mt-4">
+                                    <div className="overflow-x-auto">
+                                      <table className="w-full text-left text-[10px] md:text-xs border-collapse">
+                                        <thead>
+                                          <tr className="bg-[var(--bg-tertiary)] border-b border-[var(--border-color)] text-[var(--text-secondary)] font-extrabold">
+                                            <th className="p-2 md:p-3">
+                                              {t.medTableMed}
+                                            </th>
+                                            <th className="p-2 md:p-3">
+                                              {t.medTableDosage}
+                                            </th>
+                                            <th className="p-2 md:p-3">
+                                              {t.medTableQty}
+                                            </th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {hist.prescription.medicines.map(
+                                            (med, mIdx) => (
+                                              <tr
+                                                key={mIdx}
+                                                className="border-b border-[var(--border-color)] text-[var(--text-primary)] font-bold"
+                                              >
+                                                <td className="p-2 md:p-3">
+                                                  <p className="font-extrabold text-[10px] md:text-xs text-[var(--text-primary)]">
+                                                    {med.name}
+                                                  </p>
+                                                  <p className="text-[9px] md:text-[10px] text-[var(--text-tertiary)] font-medium">
+                                                    {med.frequency} •{" "}
+                                                    {med.duration}
+                                                  </p>
+                                                </td>
+                                                <td className="p-2 md:p-3 text-[10px] md:text-xs">
+                                                  {med.dosage}
+                                                </td>
+                                                <td className="p-2 md:p-3 text-[10px] md:text-xs">
+                                                  {med.quantity}
+                                                </td>
+                                              </tr>
+                                            ),
+                                          )}
+                                        </tbody>
+                                      </table>
+                                    </div>
                                   </div>
                                 )}
                             </div>
                           )}
 
                           {hist.labRequests && hist.labRequests.length > 0 && (
-                            <div className="bg-[var(--bg-tertiary)] p-6 rounded-2xl border border-[var(--border-color)] space-y-4">
-                              <h4 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
+                            <div className="bg-[var(--bg-tertiary)] p-4 md:p-6 rounded-xl md:rounded-2xl border border-[var(--border-color)] space-y-3 md:space-y-4">
+                              <h4 className="text-xs md:text-sm font-black text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
                                 <FlaskConical
-                                  size={16}
+                                  size={12}
                                   className="text-blue-500 dark:text-blue-400"
                                 />
                                 Chỉ định cận lâm sàng & Kết quả
                               </h4>
 
-                              <div className="space-y-3">
+                              <div className="space-y-2 md:space-y-3">
                                 {hist.labRequests.map((req, rIdx) => (
                                   <div
                                     key={rIdx}
-                                    className="p-4 bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] space-y-2"
+                                    className="p-3 md:p-4 bg-[var(--card-bg)] rounded-lg md:rounded-xl border border-[var(--border-color)] space-y-2"
                                   >
-                                    <div className="flex justify-between items-center mb-2">
-                                      <span className="text-[10px] font-black uppercase tracking-wider bg-blue-50 dark:bg-blue-900/30 text-primary px-2 py-0.5 rounded">
+                                    <div className="flex justify-between items-center mb-1 md:mb-2">
+                                      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-wider bg-blue-50 dark:bg-blue-900/30 text-primary px-2 py-0.5 rounded">
                                         {req.tests?.length
                                           ? `${req.tests.length} Chỉ định`
                                           : "Chỉ định cận lâm sàng"}
                                       </span>
                                       <span
-                                        className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
+                                        className={`text-[9px] md:text-[10px] font-black uppercase px-2 py-0.5 rounded ${
                                           req.status === "completed"
                                             ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
                                             : "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
@@ -1738,7 +1762,7 @@ const DoctorDashboard = () => {
                                     </div>
 
                                     {/* List of tests in this request */}
-                                    <div className="space-y-2">
+                                    <div className="space-y-1 md:space-y-2">
                                       {req.tests &&
                                         req.tests.map((test, tIdx) => (
                                           <div
@@ -1746,15 +1770,15 @@ const DoctorDashboard = () => {
                                             className="pl-2 border-l-2 border-[var(--border-color)]"
                                           >
                                             <div className="flex items-center gap-2">
-                                              <span className="text-[10px] font-bold bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded uppercase text-[var(--text-secondary)]">
+                                              <span className="text-[9px] md:text-[10px] font-bold bg-[var(--bg-tertiary)] px-1 md:px-1.5 py-0.5 rounded uppercase text-[var(--text-secondary)]">
                                                 {test.testType}
                                               </span>
-                                              <h5 className="font-extrabold text-sm text-[var(--text-primary)]">
+                                              <h5 className="font-extrabold text-xs md:text-sm text-[var(--text-primary)]">
                                                 {test.testName}
                                               </h5>
                                             </div>
                                             {test.clinicalNotes && (
-                                              <p className="text-xs text-[var(--text-tertiary)] font-medium mt-1">
+                                              <p className="text-[10px] md:text-xs text-[var(--text-tertiary)] font-medium mt-1">
                                                 Ghi chú: {test.clinicalNotes}
                                               </p>
                                             )}
@@ -1763,22 +1787,22 @@ const DoctorDashboard = () => {
                                     </div>
 
                                     {req.result && (
-                                      <div className="mt-3 pt-3 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)] p-3 rounded-lg space-y-2">
-                                        <p className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-wider flex items-center gap-1">
+                                      <div className="mt-2 md:mt-3 pt-2 md:pt-3 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)] p-2 md:p-3 rounded-lg space-y-1 md:space-y-2">
+                                        <p className="text-[10px] md:text-xs font-black text-[var(--text-secondary)] uppercase tracking-wider flex items-center gap-1">
                                           <Info
-                                            size={12}
+                                            size={10}
                                             className="text-primary"
                                           />
                                           Kết luận / Kết quả xét nghiệm
                                         </p>
-                                        <p className="text-sm text-[var(--text-primary)] font-bold whitespace-pre-wrap">
+                                        <p className="text-xs md:text-sm text-[var(--text-primary)] font-bold whitespace-pre-wrap">
                                           {req.result.notes || "Bình thường"}
                                         </p>
 
                                         {/* Files */}
                                         {req.result.files &&
                                           req.result.files.length > 0 && (
-                                            <div className="mt-2 flex flex-wrap gap-2">
+                                            <div className="mt-1 md:mt-2 flex flex-wrap gap-1 md:gap-2">
                                               {req.result.files.map(
                                                 (file, fIdx) => (
                                                   <a
@@ -1786,9 +1810,9 @@ const DoctorDashboard = () => {
                                                     href={`${API_URL}${file.fileUrl}`}
                                                     target="_blank"
                                                     rel="noreferrer"
-                                                    className="px-3 py-1.5 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg text-xs text-primary font-bold hover:border-primary/50 flex items-center gap-1.5 transition-all shadow-sm"
+                                                    className="px-2 md:px-3 py-1 md:py-1.5 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg text-[10px] md:text-xs text-primary font-bold hover:border-primary/50 flex items-center gap-1 md:gap-1.5 transition-all shadow-sm"
                                                   >
-                                                    <Printer size={12} />
+                                                    <Printer size={10} />
                                                     {file.fileName ||
                                                       `Tải File Kết Quả ${fIdx + 1}`}
                                                   </a>
@@ -1807,10 +1831,10 @@ const DoctorDashboard = () => {
                       ))
                   )}
 
-                  <div className="flex justify-end pt-4 border-t border-[var(--border-color)]">
+                  <div className="flex justify-end pt-3 md:pt-4 border-t border-[var(--border-color)]">
                     <button
                       onClick={() => setSelectedAppt(null)}
-                      className="px-6 py-2.5 rounded-xl bg-[var(--bg-tertiary)] text-[var(--text-secondary)] font-extrabold text-sm hover:bg-[var(--border-color)] transition-all"
+                      className="px-4 md:px-6 py-2 md:py-2.5 rounded-lg md:rounded-xl bg-[var(--bg-tertiary)] text-[var(--text-secondary)] font-extrabold text-xs md:text-sm hover:bg-[var(--border-color)] transition-all"
                     >
                       {t.close}
                     </button>
@@ -1824,34 +1848,34 @@ const DoctorDashboard = () => {
 
       {/* Cancel lab request confirmation */}
       {cancelLabConfirm.show && (
-        <div className="fixed inset-0 w-screen h-screen bg-gray-900/50 backdrop-blur-sm z-[10000] flex items-center justify-center p-4">
-          <div className="bg-[var(--card-bg)] w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-[var(--border-color)] space-y-4 animate-in fade-in zoom-in duration-200">
-            <div className="flex items-center gap-3 text-rose-600 dark:text-rose-400">
-              <AlertCircle size={28} className="shrink-0" />
-              <h3 className="font-black text-lg text-[var(--text-primary)]">
+        <div className="fixed inset-0 w-screen h-screen bg-gray-900/50 backdrop-blur-sm z-[10000] flex items-center justify-center p-3 md:p-4">
+          <div className="bg-[var(--card-bg)] w-full max-w-sm rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-2xl border border-[var(--border-color)] space-y-3 md:space-y-4 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center gap-2 md:gap-3 text-rose-600 dark:text-rose-400">
+              <AlertCircle size={20} className="shrink-0" />
+              <h3 className="font-black text-base md:text-lg text-[var(--text-primary)]">
                 {t.cancelLabTitle}
               </h3>
             </div>
-            <p className="text-sm font-semibold text-[var(--text-secondary)] leading-relaxed">
+            <p className="text-xs md:text-sm font-semibold text-[var(--text-secondary)] leading-relaxed">
               {t.cancelLabMessage}
             </p>
             {cancelLabConfirm.label && (
-              <p className="text-xs font-bold text-[var(--text-primary)] bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl px-3 py-2">
+              <p className="text-[10px] md:text-xs font-bold text-[var(--text-primary)] bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg md:rounded-xl px-2 md:px-3 py-1 md:py-2">
                 {cancelLabConfirm.label}
               </p>
             )}
-            <div className="flex justify-end gap-3 pt-2">
+            <div className="flex justify-end gap-2 md:gap-3 pt-1 md:pt-2">
               <button
                 type="button"
                 onClick={closeCancelLabConfirm}
-                className="px-4 py-2.5 border border-[var(--border-color)] hover:bg-[var(--bg-tertiary)] rounded-xl text-sm font-bold text-[var(--text-primary)] transition-all"
+                className="px-3 md:px-4 py-1.5 md:py-2.5 border border-[var(--border-color)] hover:bg-[var(--bg-tertiary)] rounded-lg md:rounded-xl text-[10px] md:text-sm font-bold text-[var(--text-primary)] transition-all"
               >
                 {t.btnKeepLab}
               </button>
               <button
                 type="button"
                 onClick={confirmCancelLabRequest}
-                className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-rose-600/20 transition-all"
+                className="px-3 md:px-4 py-1.5 md:py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg md:rounded-xl text-[10px] md:text-sm font-bold shadow-lg shadow-rose-600/20 transition-all"
               >
                 {t.btnConfirmCancelLab}
               </button>
@@ -1862,95 +1886,95 @@ const DoctorDashboard = () => {
 
       {/* Full Patient Past Medical History Modal */}
       {showHistoryModal && selectedAppt && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
-          <div className="bg-[var(--card-bg)] rounded-3xl w-full max-w-4xl max-h-[85vh] shadow-2xl overflow-hidden flex flex-col relative animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 md:p-4 bg-gray-900/60 backdrop-blur-sm">
+          <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl w-full max-w-4xl max-h-[90vh] md:max-h-[85vh] shadow-2xl overflow-hidden flex flex-col relative animate-in fade-in zoom-in duration-200">
             <button
               onClick={() => setShowHistoryModal(false)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--border-color)] z-10"
+              className="absolute top-3 md:top-5 right-3 md:right-5 w-7 h-7 md:w-8 md:h-8 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--border-color)] z-10"
             >
-              <X size={18} />
+              <X size={14} />
             </button>
 
             {/* Modal Header */}
-            <div className="p-6 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">
-              <h3 className="text-lg font-black text-[var(--text-primary)] uppercase tracking-tight flex items-center gap-2">
-                <Clipboard size={20} className="text-primary" />
+            <div className="p-4 md:p-6 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">
+              <h3 className="text-base md:text-lg font-black text-[var(--text-primary)] uppercase tracking-tight flex items-center gap-2">
+                <Clipboard size={16} className="text-primary" />
                 {t.historyTitle}:{" "}
-                <span className="text-primary">
+                <span className="text-primary text-xs md:text-sm md:text-base">
                   {selectedAppt.patient?.fullName}
                 </span>
               </h3>
             </div>
 
             {/* Modal Body */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6">
               {loadingHistory ? (
-                <div className="text-center py-12 text-[var(--text-tertiary)] font-medium">
+                <div className="text-center py-8 md:py-12 text-[var(--text-tertiary)] font-medium text-xs md:text-sm">
                   {t.loadingHistory}
                 </div>
               ) : (
                 <>
                   {patientProfile && patientProfile.healthProfile && (
-                    <div className="bg-blue-50/50 dark:bg-blue-900/20 rounded-2xl border border-blue-100 dark:border-blue-900/30 p-5 space-y-4">
-                      <h4 className="text-sm font-black text-blue-900 dark:text-blue-100 uppercase tracking-wider flex items-center gap-2">
+                    <div className="bg-blue-50/50 dark:bg-blue-900/20 rounded-xl md:rounded-2xl border border-blue-100 dark:border-blue-900/30 p-3 md:p-5 space-y-3 md:space-y-4">
+                      <h4 className="text-xs md:text-sm font-black text-blue-900 dark:text-blue-100 uppercase tracking-wider flex items-center gap-2">
                         <UserCheck
-                          size={16}
+                          size={12}
                           className="text-blue-500 dark:text-blue-400"
                         />
                         {t.healthBasic}
                       </h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-                        <div className="bg-white dark:bg-[var(--card-bg)] p-3 rounded-xl border border-blue-50 dark:border-blue-900/30 shadow-sm">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 text-[10px] md:text-xs">
+                        <div className="bg-white dark:bg-[var(--card-bg)] p-2 md:p-3 rounded-lg md:rounded-xl border border-blue-50 dark:border-blue-900/30 shadow-sm">
                           <span className="text-[var(--text-tertiary)] uppercase tracking-wider font-bold block mb-1">
                             {t.bloodType}
                           </span>
-                          <span className="text-[var(--text-primary)] font-black text-sm">
+                          <span className="text-[var(--text-primary)] font-black text-xs md:text-sm">
                             {patientProfile.healthProfile.bloodType || "--"}
                           </span>
                         </div>
-                        <div className="bg-white dark:bg-[var(--card-bg)] p-3 rounded-xl border border-blue-50 dark:border-blue-900/30 shadow-sm">
+                        <div className="bg-white dark:bg-[var(--card-bg)] p-2 md:p-3 rounded-lg md:rounded-xl border border-blue-50 dark:border-blue-900/30 shadow-sm">
                           <span className="text-[var(--text-tertiary)] uppercase tracking-wider font-bold block mb-1">
                             {t.bloodPressure}
                           </span>
-                          <span className="text-[var(--text-primary)] font-black text-sm">
+                          <span className="text-[var(--text-primary)] font-black text-xs md:text-sm">
                             {patientProfile.healthProfile.bloodPressure || "--"}
                           </span>
                         </div>
-                        <div className="bg-white dark:bg-[var(--card-bg)] p-3 rounded-xl border border-blue-50 dark:border-blue-900/30 shadow-sm">
+                        <div className="bg-white dark:bg-[var(--card-bg)] p-2 md:p-3 rounded-lg md:rounded-xl border border-blue-50 dark:border-blue-900/30 shadow-sm">
                           <span className="text-[var(--text-tertiary)] uppercase tracking-wider font-bold block mb-1">
                             {t.height}
                           </span>
-                          <span className="text-[var(--text-primary)] font-black text-sm">
+                          <span className="text-[var(--text-primary)] font-black text-xs md:text-sm">
                             {patientProfile.healthProfile.height
                               ? patientProfile.healthProfile.height + " cm"
                               : "--"}
                           </span>
                         </div>
-                        <div className="bg-white dark:bg-[var(--card-bg)] p-3 rounded-xl border border-blue-50 dark:border-blue-900/30 shadow-sm">
+                        <div className="bg-white dark:bg-[var(--card-bg)] p-2 md:p-3 rounded-lg md:rounded-xl border border-blue-50 dark:border-blue-900/30 shadow-sm">
                           <span className="text-[var(--text-tertiary)] uppercase tracking-wider font-bold block mb-1">
                             {t.weight}
                           </span>
-                          <span className="text-[var(--text-primary)] font-black text-sm">
+                          <span className="text-[var(--text-primary)] font-black text-xs md:text-sm">
                             {patientProfile.healthProfile.weight
                               ? patientProfile.healthProfile.weight + " kg"
                               : "--"}
                           </span>
                         </div>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                        <div className="bg-white dark:bg-[var(--card-bg)] p-3 rounded-xl border border-blue-50 dark:border-blue-900/30 shadow-sm">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 text-[10px] md:text-xs">
+                        <div className="bg-white dark:bg-[var(--card-bg)] p-2 md:p-3 rounded-lg md:rounded-xl border border-blue-50 dark:border-blue-900/30 shadow-sm">
                           <span className="text-[var(--text-tertiary)] uppercase tracking-wider font-bold block mb-1">
                             {t.allergies}
                           </span>
-                          <span className="text-[var(--text-primary)] font-bold">
+                          <span className="text-[var(--text-primary)] font-bold text-[10px] md:text-xs">
                             {patientProfile.healthProfile.allergies || t.none}
                           </span>
                         </div>
-                        <div className="bg-white dark:bg-[var(--card-bg)] p-3 rounded-xl border border-blue-50 dark:border-blue-900/30 shadow-sm">
+                        <div className="bg-white dark:bg-[var(--card-bg)] p-2 md:p-3 rounded-lg md:rounded-xl border border-blue-50 dark:border-blue-900/30 shadow-sm">
                           <span className="text-[var(--text-tertiary)] uppercase tracking-wider font-bold block mb-1">
                             {t.medHistory}
                           </span>
-                          <span className="text-[var(--text-primary)] font-bold">
+                          <span className="text-[var(--text-primary)] font-bold text-[10px] md:text-xs">
                             {patientProfile.healthProfile.medicalHistory ||
                               t.none}
                           </span>
@@ -1959,18 +1983,18 @@ const DoctorDashboard = () => {
                     </div>
                   )}
 
-                  <h4 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2 pt-2">
-                    <Clipboard size={16} className="text-primary" />
+                  <h4 className="text-xs md:text-sm font-black text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2 pt-1 md:pt-2">
+                    <Clipboard size={12} className="text-primary" />
                     {t.consultHistory}
                   </h4>
 
                   {patientHistory.length === 0 ? (
-                    <div className="text-center py-8 border border-dashed border-[var(--border-color)] rounded-2xl">
+                    <div className="text-center py-6 md:py-8 border border-dashed border-[var(--border-color)] rounded-xl md:rounded-2xl">
                       <AlertCircle
-                        className="mx-auto text-[var(--text-tertiary)] mb-2"
-                        size={32}
+                        className="mx-auto text-[var(--text-tertiary)] mb-1 md:mb-2"
+                        size={24}
                       />
-                      <p className="text-sm font-bold text-[var(--text-tertiary)]">
+                      <p className="text-xs md:text-sm font-bold text-[var(--text-tertiary)]">
                         {t.noHistory}
                       </p>
                     </div>
@@ -1978,39 +2002,39 @@ const DoctorDashboard = () => {
                     patientHistory.map((hist, idx) => (
                       <div
                         key={idx}
-                        className="border border-[var(--border-color)] rounded-2xl p-5 space-y-4 hover:border-[var(--border-color)] transition-colors bg-[var(--card-bg)]"
+                        className="border border-[var(--border-color)] rounded-xl md:rounded-2xl p-3 md:p-5 space-y-2 md:space-y-4 hover:border-[var(--border-color)] transition-colors bg-[var(--card-bg)]"
                       >
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-[var(--border-color)] pb-3 gap-2">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-[var(--border-color)] pb-2 md:pb-3 gap-2">
                           <div>
-                            <span className="text-[10px] font-black uppercase tracking-wider bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded">
+                            <span className="text-[9px] md:text-[10px] font-black uppercase tracking-wider bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded">
                               {t.date}:{" "}
                               {new Date(
                                 hist.appointment.date,
                               ).toLocaleDateString(locale)}
                             </span>
-                            <p className="text-xs text-[var(--text-secondary)] font-bold mt-1">
+                            <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-bold mt-1">
                               {t.doctor}:{" "}
                               <strong className="text-[var(--text-primary)]">
                                 {hist.appointment.doctor?.userId?.fullName}
                               </strong>
                             </p>
                           </div>
-                          <span className="text-xs font-mono font-bold text-[var(--text-tertiary)]">
+                          <span className="text-[10px] md:text-xs font-mono font-bold text-[var(--text-tertiary)]">
                             #{hist.appointment.ticketNumber}
                           </span>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-bold text-[var(--text-secondary)]">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 text-[10px] md:text-xs font-bold text-[var(--text-secondary)]">
                           <div>
                             <span className="text-[var(--text-tertiary)] uppercase tracking-wider">
                               {t.treatment}:
                             </span>
-                            <p className="text-sm text-[var(--text-primary)] font-extrabold mt-1">
+                            <p className="text-xs md:text-sm text-[var(--text-primary)] font-extrabold mt-1">
                               {hist.prescription?.diagnosis ||
                                 "Khám chuyên khoa"}
                             </p>
                             {hist.prescription?.doctorNotes && (
-                              <p className="text-xs text-[var(--text-secondary)] font-bold mt-1">
+                              <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-bold mt-1">
                                 Lời dặn: {hist.prescription.doctorNotes}
                               </p>
                             )}
@@ -2022,7 +2046,7 @@ const DoctorDashboard = () => {
                                 <span className="text-[var(--text-tertiary)] uppercase tracking-wider">
                                   {t.medicines}:
                                 </span>
-                                <ul className="list-disc pl-4 mt-1 space-y-1 text-[var(--text-primary)]">
+                                <ul className="list-disc pl-4 mt-1 space-y-1 text-[10px] md:text-xs text-[var(--text-primary)]">
                                   {hist.prescription.medicines.map(
                                     (m, mIdx) => (
                                       <li key={mIdx}>
@@ -2040,17 +2064,17 @@ const DoctorDashboard = () => {
                         </div>
 
                         {hist.labRequests && hist.labRequests.length > 0 && (
-                          <div className="pt-3 border-t border-[var(--border-color)] space-y-2">
-                            <span className="text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-wider">
+                          <div className="pt-2 md:pt-3 border-t border-[var(--border-color)] space-y-1 md:space-y-2">
+                            <span className="text-[10px] md:text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-wider">
                               {t.labResults}:
                             </span>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-2">
                               {hist.labRequests.map((req, rIdx) => (
                                 <div
                                   key={rIdx}
-                                  className="p-3 bg-[var(--bg-tertiary)] rounded-xl border border-[var(--border-color)] text-xs font-bold space-y-1"
+                                  className="p-2 md:p-3 bg-[var(--bg-tertiary)] rounded-lg md:rounded-xl border border-[var(--border-color)] text-[10px] md:text-xs font-bold space-y-1"
                                 >
-                                  <div className="flex justify-between items-center text-[10px]">
+                                  <div className="flex justify-between items-center text-[9px] md:text-[10px]">
                                     <span className="uppercase text-primary font-black">
                                       {req.testType}
                                     </span>
@@ -2060,11 +2084,11 @@ const DoctorDashboard = () => {
                                         : "Đang xử lý"}
                                     </span>
                                   </div>
-                                  <p className="text-[var(--text-primary)] font-extrabold">
+                                  <p className="text-[var(--text-primary)] font-extrabold text-[10px] md:text-xs">
                                     {req.testName}
                                   </p>
                                   {req.result && (
-                                    <p className="text-[var(--text-secondary)] font-medium italic mt-1 bg-[var(--card-bg)] p-2 rounded border border-[var(--border-color)]">
+                                    <p className="text-[var(--text-secondary)] font-medium italic mt-1 bg-[var(--card-bg)] p-1 md:p-2 rounded border border-[var(--border-color)] text-[10px] md:text-xs">
                                       Kết luận: {req.result.conclusion}
                                     </p>
                                   )}
@@ -2075,14 +2099,14 @@ const DoctorDashboard = () => {
                         )}
 
                         {hist.followUpAppointment && (
-                          <div className="pt-3 border-t border-[var(--border-color)] space-y-2">
-                            <span className="text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-wider">
+                          <div className="pt-2 md:pt-3 border-t border-[var(--border-color)] space-y-1 md:space-y-2">
+                            <span className="text-[10px] md:text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-wider">
                               {t.followUpAppt}:
                             </span>
-                            <div className="p-3 bg-indigo-50/50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-900/30 text-xs font-bold space-y-1">
+                            <div className="p-2 md:p-3 bg-indigo-50/50 dark:bg-indigo-900/20 rounded-lg md:rounded-xl border border-indigo-100 dark:border-indigo-900/30 text-[10px] md:text-xs font-bold space-y-1">
                               <p className="text-indigo-900 dark:text-indigo-100 font-extrabold flex items-center gap-1">
                                 <Calendar
-                                  size={12}
+                                  size={10}
                                   className="text-indigo-500 dark:text-indigo-400"
                                 />
                                 {new Date(
@@ -2090,7 +2114,7 @@ const DoctorDashboard = () => {
                                 ).toLocaleDateString(locale)}{" "}
                                 - {hist.followUpAppointment.time}
                               </p>
-                              <p className="text-indigo-700 dark:text-indigo-300 font-medium">
+                              <p className="text-indigo-700 dark:text-indigo-300 font-medium text-[10px] md:text-xs">
                                 {hist.followUpAppointment.symptoms}
                               </p>
                             </div>
@@ -2104,10 +2128,10 @@ const DoctorDashboard = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 bg-[var(--bg-tertiary)] border-t border-[var(--border-color)] flex justify-end">
+            <div className="p-3 md:p-4 bg-[var(--bg-tertiary)] border-t border-[var(--border-color)] flex justify-end">
               <button
                 onClick={() => setShowHistoryModal(false)}
-                className="px-6 py-2.5 rounded-xl bg-[var(--border-color)] text-[var(--text-primary)] font-extrabold text-sm hover:bg-[var(--border-color)] transition-all"
+                className="px-4 md:px-6 py-2 md:py-2.5 rounded-lg md:rounded-xl bg-[var(--border-color)] text-[var(--text-primary)] font-extrabold text-xs md:text-sm hover:bg-[var(--border-color)] transition-all"
               >
                 {t.close}
               </button>

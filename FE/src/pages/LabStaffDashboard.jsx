@@ -135,21 +135,21 @@ const trans = {
 
 const Toast = ({ toast }) => (
   <div
-    className={`fixed top-8 right-8 z-50 transition-all duration-500 transform ${toast.show ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 pointer-events-none"}`}
+    className={`fixed top-4 md:top-8 right-4 md:right-8 z-50 transition-all duration-500 transform ${toast.show ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 pointer-events-none"}`}
   >
     <div
-      className={`bg-[var(--card-bg)] px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3 border ${toast.type === "error" ? "border-red-100 dark:border-red-900/30" : "border-green-100 dark:border-green-900/30"}`}
+      className={`bg-[var(--card-bg)] px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl shadow-xl flex items-center gap-2 md:gap-3 border ${toast.type === "error" ? "border-red-100 dark:border-red-900/30" : "border-green-100 dark:border-green-900/30"}`}
     >
       <div
-        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${toast.type === "error" ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400" : "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"}`}
+        className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center shrink-0 ${toast.type === "error" ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400" : "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"}`}
       >
         {toast.type === "error" ? (
-          <AlertTriangle size={18} />
+          <AlertTriangle size={14} />
         ) : (
-          <CheckCircle2 size={18} />
+          <CheckCircle2 size={14} />
         )}
       </div>
-      <p className="text-sm font-bold text-[var(--text-primary)]">
+      <p className="text-xs md:text-sm font-bold text-[var(--text-primary)]">
         {toast.message}
       </p>
     </div>
@@ -188,52 +188,52 @@ const RequestCard = ({ req, onStart, onComplete }) => {
 
   return (
     <div
-      className={`bg-[var(--card-bg)] rounded-3xl border shadow-sm transition-all ${isUrgent ? "border-red-200 dark:border-red-900/30 ring-1 ring-red-100 dark:ring-red-900/20" : "border-[var(--border-color)]"}`}
+      className={`bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border shadow-sm transition-all ${isUrgent ? "border-red-200 dark:border-red-900/30 ring-1 ring-red-100 dark:ring-red-900/20" : "border-[var(--border-color)]"}`}
     >
       {isUrgent && (
-        <div className="bg-red-500 text-white text-xs font-bold px-5 py-1.5 rounded-t-3xl flex items-center gap-2">
-          <AlertTriangle size={12} /> {t.urgentBadge}
+        <div className="bg-red-500 text-white text-[10px] md:text-xs font-bold px-3 md:px-5 py-1 md:py-1.5 rounded-t-2xl md:rounded-t-3xl flex items-center gap-1 md:gap-2">
+          <AlertTriangle size={10} /> {t.urgentBadge}
         </div>
       )}
-      <div className="p-6">
-        <div className="flex items-start justify-between gap-4">
+      <div className="p-4 md:p-6">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-3 md:gap-4">
           <div className="flex-1">
             {/* Patient Info */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 text-primary rounded-xl flex items-center justify-center font-bold text-lg shrink-0">
+            <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+              <div className="w-9 h-9 md:w-10 md:h-10 bg-blue-100 dark:bg-blue-900/30 text-primary rounded-lg md:rounded-xl flex items-center justify-center font-bold text-sm md:text-lg shrink-0">
                 {req.patient?.fullName?.charAt(0).toUpperCase()}
               </div>
               <div>
-                <h3 className="font-bold text-[var(--text-primary)]">
+                <h3 className="font-bold text-[var(--text-primary)] text-xs md:text-sm">
                   {req.patient?.fullName}
                 </h3>
-                <p className="text-xs text-[var(--text-secondary)] font-mono">
+                <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-mono">
                   {req.patient?.patientId} • {req.patient?.phone}
                 </p>
               </div>
             </div>
 
             {/* Test Info */}
-            <div className="text-sm mb-4">
-              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+            <div className="text-xs md:text-sm mb-3 md:mb-4">
+              <p className="text-[9px] md:text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1 md:mb-2">
                 {t.requestedTests} ({req.tests?.length || 0})
               </p>
-              <div className="space-y-2">
+              <div className="space-y-1.5 md:space-y-2">
                 {req.tests?.map((test, idx) => (
                   <div
                     key={idx}
-                    className="bg-blue-50/50 dark:bg-blue-900/20 p-3 rounded-xl border border-blue-100 dark:border-blue-900/30 flex items-center justify-between"
+                    className="bg-blue-50/50 dark:bg-blue-900/20 p-2 md:p-3 rounded-lg md:rounded-xl border border-blue-100 dark:border-blue-900/30 flex flex-col md:flex-row md:items-center md:justify-between gap-1 md:gap-2"
                   >
                     <div>
-                      <p className="text-[10px] font-bold text-blue-400 dark:text-blue-300 uppercase tracking-wider mb-1">
+                      <p className="text-[9px] md:text-[10px] font-bold text-blue-400 dark:text-blue-300 uppercase tracking-wider mb-0.5 md:mb-1">
                         {t[test.testType] || test.testType}
                       </p>
-                      <p className="font-bold text-[var(--text-primary)]">
+                      <p className="font-bold text-[var(--text-primary)] text-[10px] md:text-sm">
                         {test.testName}
                       </p>
                     </div>
                     {test.clinicalNotes && (
-                      <div className="text-xs text-[var(--text-secondary)] italic max-w-xs text-right">
+                      <div className="text-[10px] md:text-xs text-[var(--text-secondary)] italic max-w-xs text-right">
                         "{test.clinicalNotes}"
                       </div>
                     )}
@@ -243,9 +243,9 @@ const RequestCard = ({ req, onStart, onComplete }) => {
             </div>
 
             {/* Doctor & Time */}
-            <div className="flex items-center gap-4 text-xs text-[var(--text-tertiary)] font-medium animate-in fade-in duration-300">
+            <div className="flex flex-wrap items-center gap-2 md:gap-4 text-[10px] md:text-xs text-[var(--text-tertiary)] font-medium animate-in fade-in duration-300">
               <span className="flex items-center gap-1">
-                <User size={12} /> {getDoctorDisplayName(req.doctor?.fullName)}
+                <User size={10} /> {getDoctorDisplayName(req.doctor?.fullName)}
               </span>
               {req.appointment && (
                 <span className="flex items-center gap-1">
@@ -255,15 +255,15 @@ const RequestCard = ({ req, onStart, onComplete }) => {
                 </span>
               )}
               <span className="flex items-center gap-1">
-                <Clock size={12} /> {formatDateTime(lang, req.createdAt)}
+                <Clock size={10} /> {formatDateTime(lang, req.createdAt)}
               </span>
             </div>
           </div>
 
           {/* Status & Actions */}
-          <div className="flex flex-col items-end gap-2 shrink-0">
+          <div className="flex flex-row md:flex-col items-start md:items-end gap-2 md:gap-2 shrink-0 w-full md:w-auto">
             <span
-              className={`px-3 py-1 text-xs font-bold rounded-full ${
+              className={`px-2 md:px-3 py-0.5 md:py-1 text-[10px] md:text-xs font-bold rounded-full ${
                 req.status === "pending"
                   ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
                   : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
@@ -274,10 +274,10 @@ const RequestCard = ({ req, onStart, onComplete }) => {
 
             {req.status === "pending" && !labPaid && (
               <div className="text-right max-w-[200px]">
-                <span className="px-3 py-1 text-xs font-bold rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 block mb-2">
+                <span className="px-2 md:px-3 py-0.5 md:py-1 text-[10px] md:text-xs font-bold rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 block mb-1 md:mb-2">
                   {t.unpaidLab}
                 </span>
-                <p className="text-[10px] text-orange-600 dark:text-orange-400 leading-snug">
+                <p className="text-[9px] md:text-[10px] text-orange-600 dark:text-orange-400 leading-snug">
                   {t.unpaidLabHint}
                 </p>
               </div>
@@ -286,12 +286,12 @@ const RequestCard = ({ req, onStart, onComplete }) => {
               <button
                 onClick={handleStart}
                 disabled={starting}
-                className="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1.5 shadow-md shadow-blue-500/20"
+                className="px-3 md:px-4 py-1.5 md:py-2 bg-blue-600 text-white text-[10px] md:text-xs font-bold rounded-lg md:rounded-xl hover:bg-blue-700 transition-all flex items-center gap-1 md:gap-1.5 shadow-md shadow-blue-500/20"
               >
                 {starting ? (
-                  <Loader2 size={14} className="animate-spin" />
+                  <Loader2 size={12} className="animate-spin" />
                 ) : (
-                  <FlaskConical size={14} />
+                  <FlaskConical size={12} />
                 )}
                 {t.btnStart}
               </button>
@@ -300,11 +300,11 @@ const RequestCard = ({ req, onStart, onComplete }) => {
             {req.status === "in_progress" && (
               <button
                 onClick={() => setExpanded(!expanded)}
-                className="px-4 py-2 bg-teal-600 text-white text-xs font-bold rounded-xl hover:bg-teal-700 transition-all flex items-center gap-1.5 shadow-md shadow-teal-500/20"
+                className="px-3 md:px-4 py-1.5 md:py-2 bg-teal-600 text-white text-[10px] md:text-xs font-bold rounded-lg md:rounded-xl hover:bg-teal-700 transition-all flex items-center gap-1 md:gap-1.5 shadow-md shadow-teal-500/20"
               >
-                <Send size={14} />
+                <Send size={12} />
                 {t.btnExport}
-                {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
               </button>
             )}
           </div>
@@ -312,34 +312,34 @@ const RequestCard = ({ req, onStart, onComplete }) => {
 
         {/* Upload Result Panel */}
         {expanded && req.status === "in_progress" && (
-          <div className="mt-6 pt-6 border-t border-[var(--border-color)] space-y-4 animate-in slide-in-from-top-2 duration-300">
-            <h4 className="font-bold text-[var(--text-primary)] flex items-center gap-2 text-sm">
-              <Send size={16} className="text-teal-600 dark:text-teal-400" />{" "}
+          <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-[var(--border-color)] space-y-3 md:space-y-4 animate-in slide-in-from-top-2 duration-300">
+            <h4 className="font-bold text-[var(--text-primary)] flex items-center gap-2 text-xs md:text-sm">
+              <Send size={14} className="text-teal-600 dark:text-teal-400" />{" "}
               {t.exportPanelTitle}
             </h4>
 
             <textarea
               rows="2"
-              className="w-full p-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 resize-none text-[var(--text-primary)]"
+              className="w-full p-2 md:p-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg md:rounded-xl text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 resize-none text-[var(--text-primary)]"
               placeholder={t.exportNotesPlaceholder}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />
 
             {files.length > 0 && (
-              <div className="flex flex-col gap-2 mb-2">
+              <div className="flex flex-col gap-1.5 md:gap-2 mb-2">
                 {files.map((f, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between gap-3 bg-[var(--card-bg)] p-2 rounded-lg shadow-sm border border-green-100 dark:border-green-900/30"
+                    className="flex items-center justify-between gap-2 md:gap-3 bg-[var(--card-bg)] p-2 rounded-lg md:rounded-xl shadow-sm border border-green-100 dark:border-green-900/30"
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 md:gap-2">
                       <FileText
-                        size={20}
+                        size={14}
                         className="text-green-600 dark:text-green-400"
                       />
                       <span
-                        className="font-bold text-[var(--text-primary)] text-xs truncate max-w-[200px]"
+                        className="font-bold text-[var(--text-primary)] text-[10px] md:text-xs truncate max-w-[150px] md:max-w-[200px]"
                         title={f.name}
                       >
                         {f.name}
@@ -353,7 +353,7 @@ const RequestCard = ({ req, onStart, onComplete }) => {
                       }}
                       className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-full text-[var(--text-tertiary)] hover:text-red-500 dark:hover:text-red-400"
                     >
-                      <X size={14} />
+                      <X size={12} />
                     </button>
                   </div>
                 ))}
@@ -362,7 +362,7 @@ const RequestCard = ({ req, onStart, onComplete }) => {
 
             {files.length < 5 && (
               <div
-                className="border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all border-[var(--border-color)] hover:border-teal-300 hover:bg-teal-50/30 dark:hover:bg-teal-900/20"
+                className="border-2 border-dashed rounded-lg md:rounded-xl p-3 md:p-5 text-center cursor-pointer transition-all border-[var(--border-color)] hover:border-teal-300 hover:bg-teal-50/30 dark:hover:bg-teal-900/20"
                 onClick={() => fileRef.current.click()}
               >
                 <input
@@ -377,8 +377,10 @@ const RequestCard = ({ req, onStart, onComplete }) => {
                   }}
                 />
                 <div className="flex items-center justify-center gap-2 text-[var(--text-tertiary)]">
-                  <Upload size={20} />
-                  <span className="text-sm font-medium">{t.addFilesHint}</span>
+                  <Upload size={16} />
+                  <span className="text-xs md:text-sm font-medium">
+                    {t.addFilesHint}
+                  </span>
                 </div>
               </div>
             )}
@@ -386,15 +388,15 @@ const RequestCard = ({ req, onStart, onComplete }) => {
             <button
               onClick={handleComplete}
               disabled={files.length === 0 || uploading}
-              className="w-full py-3 bg-gradient-to-r from-teal-600 to-blue-600 text-white font-bold rounded-xl hover:from-teal-700 hover:to-blue-700 transition-all shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed text-sm"
+              className="w-full py-2 md:py-3 bg-gradient-to-r from-teal-600 to-blue-600 text-white font-bold rounded-lg md:rounded-xl hover:from-teal-700 hover:to-blue-700 transition-all shadow-lg shadow-teal-500/20 flex items-center justify-center gap-1 md:gap-2 disabled:opacity-60 disabled:cursor-not-allowed text-xs md:text-sm"
             >
               {uploading ? (
                 <>
-                  <Loader2 size={18} className="animate-spin" /> {t.sendingBtn}
+                  <Loader2 size={14} className="animate-spin" /> {t.sendingBtn}
                 </>
               ) : (
                 <>
-                  <Send size={18} /> {t.btnSendResult}
+                  <Send size={14} /> {t.btnSendResult}
                 </>
               )}
             </button>
@@ -513,19 +515,21 @@ const LabStaffDashboard = () => {
       <Toast toast={toast} />
 
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8 bg-[var(--card-bg)] p-6 rounded-3xl shadow-sm border border-[var(--border-color)]">
-        <div className="w-16 h-16 bg-gradient-to-br from-teal-100 dark:from-teal-900/30 to-blue-100 dark:to-blue-900/30 text-teal-600 dark:text-teal-400 rounded-2xl flex items-center justify-center shadow-inner">
-          <FlaskConical size={32} />
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 md:gap-4 mb-4 md:mb-8 bg-[var(--card-bg)] p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-[var(--border-color)]">
+        <div className="flex items-center gap-3 md:gap-4 w-full sm:w-auto">
+          <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-teal-100 dark:from-teal-900/30 to-blue-100 dark:to-blue-900/30 text-teal-600 dark:text-teal-400 rounded-xl md:rounded-2xl flex items-center justify-center shadow-inner shrink-0">
+            <FlaskConical size={20} />
+          </div>
+          <div className="flex-1">
+            <h1 className="text-lg md:text-2xl font-bold text-[var(--text-primary)]">
+              {t.dashboardTitle}
+            </h1>
+            <p className="text-[var(--text-secondary)] text-xs md:text-sm mt-0.5 md:mt-1">
+              {t.dashboardSubtitle}
+            </p>
+          </div>
         </div>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-[var(--text-primary)]">
-            {t.dashboardTitle}
-          </h1>
-          <p className="text-[var(--text-secondary)] mt-1">
-            {t.dashboardSubtitle}
-          </p>
-        </div>
-        <div className="flex gap-4 text-center items-center">
+        <div className="flex gap-2 md:gap-4 text-center items-center w-full sm:w-auto justify-end">
           <button
             onClick={() => {
               const fetchRequests = async () => {
@@ -555,34 +559,34 @@ const LabStaffDashboard = () => {
               fetchRequests();
             }}
             disabled={loading}
-            className="p-3 bg-teal-50 dark:bg-teal-900/30 border border-teal-100 dark:border-teal-900/30 rounded-2xl hover:bg-teal-100 dark:hover:bg-teal-900/40 hover:border-teal-200 dark:hover:border-teal-900/40 transition-all flex flex-col items-center justify-center h-full min-h-[72px] shadow-sm"
+            className="p-2 md:p-3 bg-teal-50 dark:bg-teal-900/30 border border-teal-100 dark:border-teal-900/30 rounded-xl md:rounded-2xl hover:bg-teal-100 dark:hover:bg-teal-900/40 hover:border-teal-200 dark:hover:border-teal-900/40 transition-all flex flex-col items-center justify-center h-full min-h-[56px] md:min-h-[72px] shadow-sm"
             title={t.refreshTitle}
           >
             <RefreshCw
-              size={20}
+              size={16}
               className={
                 loading
                   ? "animate-spin text-teal-400"
                   : "text-teal-600 dark:text-teal-400"
               }
             />
-            <span className="text-[10px] font-black text-teal-700 dark:text-teal-400 mt-1 uppercase">
+            <span className="text-[9px] md:text-[10px] font-black text-teal-700 dark:text-teal-400 mt-0.5 md:mt-1 uppercase">
               {t.refresh}
             </span>
           </button>
-          <div className="px-5 py-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-100 dark:border-yellow-900/30 rounded-2xl">
-            <p className="text-2xl font-black text-yellow-600 dark:text-yellow-400">
+          <div className="px-3 md:px-5 py-2 md:py-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-100 dark:border-yellow-900/30 rounded-xl md:rounded-2xl">
+            <p className="text-lg md:text-2xl font-black text-yellow-600 dark:text-yellow-400">
               {pending.length}
             </p>
-            <p className="text-xs text-yellow-500 dark:text-yellow-400 font-bold mt-1">
+            <p className="text-[10px] md:text-xs text-yellow-500 dark:text-yellow-400 font-bold mt-0.5 md:mt-1">
               {t.statusPending}
             </p>
           </div>
-          <div className="px-5 py-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-900/30 rounded-2xl">
-            <p className="text-2xl font-black text-blue-600 dark:text-blue-400">
+          <div className="px-3 md:px-5 py-2 md:py-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-900/30 rounded-xl md:rounded-2xl">
+            <p className="text-lg md:text-2xl font-black text-blue-600 dark:text-blue-400">
               {inProgress.length}
             </p>
-            <p className="text-xs text-blue-500 dark:text-blue-400 font-bold mt-1">
+            <p className="text-[10px] md:text-xs text-blue-500 dark:text-blue-400 font-bold mt-0.5 md:mt-1">
               {t.statusInProgress}
             </p>
           </div>
@@ -590,55 +594,55 @@ const LabStaffDashboard = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex gap-2 md:gap-4 mb-4 md:mb-6">
         <button
           onClick={() => setActiveTab("pending")}
-          className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all ${activeTab === "pending" ? "bg-teal-600 text-white shadow-md shadow-teal-500/20" : "bg-[var(--card-bg)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] border border-[var(--border-color)]"}`}
+          className={`px-4 md:px-6 py-2 md:py-3 rounded-xl md:rounded-2xl font-bold text-xs md:text-sm transition-all ${activeTab === "pending" ? "bg-teal-600 text-white shadow-md shadow-teal-500/20" : "bg-[var(--card-bg)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] border border-[var(--border-color)]"}`}
         >
           {t.pendingTab}
         </button>
         <button
           onClick={() => setActiveTab("history")}
-          className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all ${activeTab === "history" ? "bg-teal-600 text-white shadow-md shadow-teal-500/20" : "bg-[var(--card-bg)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] border border-[var(--border-color)]"}`}
+          className={`px-4 md:px-6 py-2 md:py-3 rounded-xl md:rounded-2xl font-bold text-xs md:text-sm transition-all ${activeTab === "history" ? "bg-teal-600 text-white shadow-md shadow-teal-500/20" : "bg-[var(--card-bg)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] border border-[var(--border-color)]"}`}
         >
           {t.historyTab}
         </button>
       </div>
 
       {loading ? (
-        <div className="space-y-4 animate-pulse">
+        <div className="space-y-3 md:space-y-4 animate-pulse">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-52 bg-[var(--bg-tertiary)] rounded-3xl"
+              className="h-40 md:h-52 bg-[var(--bg-tertiary)] rounded-2xl md:rounded-3xl"
             ></div>
           ))}
         </div>
       ) : activeTab === "pending" ? (
         requests.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 bg-[var(--card-bg)] rounded-3xl border border-[var(--border-color)] shadow-sm text-center">
-            <div className="w-24 h-24 bg-green-50 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-6">
+          <div className="flex flex-col items-center justify-center py-16 md:py-24 bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm text-center">
+            <div className="w-16 h-16 md:w-24 md:h-24 bg-green-50 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4 md:mb-6">
               <CheckCircle2
-                size={40}
+                size={24}
                 className="text-green-400 dark:text-green-400"
               />
             </div>
-            <h3 className="text-xl font-bold text-[var(--text-secondary)] mb-2">
+            <h3 className="text-base md:text-xl font-bold text-[var(--text-secondary)] mb-1 md:mb-2">
               {t.noRequestsTitle}
             </h3>
-            <p className="text-[var(--text-tertiary)] text-sm">
+            <p className="text-[var(--text-tertiary)] text-xs md:text-sm">
               {t.noRequestsDesc}
             </p>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             {inProgress.length > 0 && (
               <div>
-                <h2 className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <FlaskConical size={14} /> {t.statusInProgress} (
+                <h2 className="text-xs md:text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-2 md:mb-3 flex items-center gap-1 md:gap-2">
+                  <FlaskConical size={12} /> {t.statusInProgress} (
                   {inProgress.length})
                 </h2>
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   {inProgress.map((req) => (
                     <RequestCard
                       key={req._id}
@@ -652,10 +656,10 @@ const LabStaffDashboard = () => {
             )}
             {pending.length > 0 && (
               <div>
-                <h2 className="text-sm font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Clock size={14} /> {t.statusPending} ({pending.length})
+                <h2 className="text-xs md:text-sm font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider mb-2 md:mb-3 flex items-center gap-1 md:gap-2">
+                  <Clock size={12} /> {t.statusPending} ({pending.length})
                 </h2>
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   {pending.map((req) => (
                     <RequestCard
                       key={req._id}
@@ -670,69 +674,69 @@ const LabStaffDashboard = () => {
           </div>
         )
       ) : completed.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 bg-[var(--card-bg)] rounded-3xl border border-[var(--border-color)] shadow-sm text-center">
-          <div className="w-24 h-24 bg-[var(--bg-tertiary)] rounded-full flex items-center justify-center mb-6">
-            <FileText size={40} className="text-[var(--text-tertiary)]" />
+        <div className="flex flex-col items-center justify-center py-16 md:py-24 bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm text-center">
+          <div className="w-16 h-16 md:w-24 md:h-24 bg-[var(--bg-tertiary)] rounded-full flex items-center justify-center mb-4 md:mb-6">
+            <FileText size={24} className="text-[var(--text-tertiary)]" />
           </div>
-          <h3 className="text-xl font-bold text-[var(--text-secondary)] mb-2">
+          <h3 className="text-base md:text-xl font-bold text-[var(--text-secondary)] mb-1 md:mb-2">
             {t.noHistory}
           </h3>
-          <p className="text-[var(--text-tertiary)] text-sm">
+          <p className="text-[var(--text-tertiary)] text-xs md:text-sm">
             {t.noHistorySub}
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
           {completed.map((req) => (
             <div
               key={req._id}
-              className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border-color)] shadow-sm p-6"
+              className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm p-4 md:p-6"
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-3 md:gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[10px] font-bold rounded-full uppercase">
+                  <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                    <span className="px-2 md:px-3 py-0.5 md:py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[9px] md:text-[10px] font-bold rounded-full uppercase">
                       {t.labDone}
                     </span>
-                    <span className="text-xs text-[var(--text-secondary)] font-mono flex items-center gap-1">
-                      <Clock size={12} /> {formatDateTime(lang, req.createdAt)}
+                    <span className="text-[10px] md:text-xs text-[var(--text-secondary)] font-mono flex items-center gap-1">
+                      <Clock size={10} /> {formatDateTime(lang, req.createdAt)}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 text-primary rounded-xl flex items-center justify-center font-bold text-lg shrink-0">
+                  <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                    <div className="w-9 h-9 md:w-10 md:h-10 bg-blue-100 dark:bg-blue-900/30 text-primary rounded-lg md:rounded-xl flex items-center justify-center font-bold text-sm md:text-lg shrink-0">
                       {req.patient?.fullName?.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <h3 className="font-bold text-[var(--text-primary)]">
+                      <h3 className="font-bold text-[var(--text-primary)] text-xs md:text-sm">
                         {req.patient?.fullName}
                       </h3>
-                      <p className="text-xs text-[var(--text-secondary)] font-mono">
+                      <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-mono">
                         {req.patient?.patientId} • {t.doctorShort}:{" "}
                         {req.doctor?.fullName}
                       </p>
                     </div>
                   </div>
-                  <ul className="list-disc pl-4 text-sm text-[var(--text-primary)] font-medium space-y-1 mb-4">
+                  <ul className="list-disc pl-4 text-xs md:text-sm text-[var(--text-primary)] font-medium space-y-0.5 md:space-y-1 mb-3 md:mb-4">
                     {req.tests?.map((test, i) => (
                       <li key={i}>
                         {test.testName}{" "}
-                        <span className="text-[var(--text-tertiary)] text-xs">
+                        <span className="text-[var(--text-tertiary)] text-[10px] md:text-xs">
                           ({test.testType})
                         </span>
                       </li>
                     ))}
                   </ul>
                   {req.result?.files?.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5 md:gap-2">
                       {req.result.files.map((f, idx) => (
                         <a
                           key={idx}
                           href={`${API_URL}${f.fileUrl}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-3 py-2 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900/30 rounded-xl text-xs font-bold hover:bg-green-100 dark:hover:bg-green-900/40 flex items-center gap-1.5 transition-colors"
+                          className="px-2 md:px-3 py-1.5 md:py-2 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900/30 rounded-lg md:rounded-xl text-[10px] md:text-xs font-bold hover:bg-green-100 dark:hover:bg-green-900/40 flex items-center gap-1 md:gap-1.5 transition-colors"
                         >
-                          <FileText size={14} />
+                          <FileText size={10} />
                           {t.viewResult}{" "}
                           {req.result.files.length > 1 ? idx + 1 : ""}
                         </a>

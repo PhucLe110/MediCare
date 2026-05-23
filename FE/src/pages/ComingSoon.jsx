@@ -16,14 +16,16 @@ const ComingSoon = ({ titleKey = "settingsTitle" }) => {
   const { t } = useTranslation(trans);
   const title = t[titleKey] || titleKey;
   return (
-    <div className="flex flex-col items-center justify-center h-[70vh] text-center">
-      <div className="w-24 h-24 bg-blue-50 dark:bg-blue-900/30 text-blue-300 dark:text-blue-400 rounded-full flex items-center justify-center mb-6">
-        <Construction size={48} />
+    <div className="flex flex-col items-center justify-center h-[60vh] md:h-[70vh] text-center px-4">
+      <div className="w-16 h-16 md:w-24 md:h-24 bg-blue-50 dark:bg-blue-900/30 text-blue-300 dark:text-blue-400 rounded-full flex items-center justify-center mb-4 md:mb-6">
+        <Construction size={32} md={48} />
       </div>
-      <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
+      <h1 className="text-xl md:text-2xl font-bold text-[var(--text-primary)] mb-1.5 md:mb-2">
         {title}
       </h1>
-      <p className="text-[var(--text-secondary)] max-w-md">{t.desc}</p>
+      <p className="text-xs md:text-sm text-[var(--text-secondary)] max-w-md">
+        {t.desc}
+      </p>
     </div>
   );
 };

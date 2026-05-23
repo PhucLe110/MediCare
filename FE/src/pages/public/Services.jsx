@@ -310,36 +310,37 @@ export default function Services() {
   };
 
   return (
-    <div className="bg-[var(--bg-tertiary)] min-h-screen pt-24 pb-32">
+    <div className="bg-[var(--bg-tertiary)] min-h-screen pt-16 md:pt-24 pb-20 md:pb-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-900/30 text-indigo-600 dark:text-indigo-400 mb-4 shadow-sm animate-fade-in">
+        <div className="text-center max-w-3xl mx-auto mb-12 md:mb-20">
+          <div className="inline-flex items-center gap-2 px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-900/30 text-indigo-600 dark:text-indigo-400 mb-3 md:mb-4 shadow-sm animate-fade-in">
             <Heart
-              size={14}
+              size={12}
+              md={14}
               className="fill-indigo-600 dark:fill-indigo-400 animate-pulse"
             />
-            <span className="text-[11px] font-black uppercase tracking-wider">
+            <span className="text-[10px] md:text-[11px] font-black uppercase tracking-wider">
               {t.badge}
             </span>
           </div>
-          <h2 className="text-4xl lg:text-5xl font-black text-[var(--text-primary)] mb-6 leading-[1.1] tracking-tight whitespace-pre-line">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl lg:text-5xl font-black text-[var(--text-primary)] mb-4 md:mb-6 leading-[1.1] tracking-tight whitespace-pre-line">
             {t.title}
           </h2>
-          <p className="text-[var(--text-secondary)] text-lg font-medium leading-relaxed">
+          <p className="text-[var(--text-secondary)] text-sm md:text-base lg:text-lg font-medium leading-relaxed">
             {t.desc}
           </p>
         </div>
 
         {/* 15 Departments Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
           {t.services.map((s, i) => (
             <div
               key={i}
-              className="bg-[var(--card-bg)] rounded-[2.5rem] overflow-hidden border border-[var(--border-color)] shadow-xl shadow-slate-200/30 hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-900/5 transition-all duration-500 cursor-pointer flex flex-col group relative"
+              className="bg-[var(--card-bg)] rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border border-[var(--border-color)] shadow-xl shadow-slate-200/30 hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-900/5 transition-all duration-500 cursor-pointer flex flex-col group relative"
             >
               {/* Image Banner */}
-              <div className="h-60 overflow-hidden relative">
+              <div className="h-48 md:h-60 overflow-hidden relative">
                 <div className="absolute inset-0 bg-[#102A63]/15 z-10 group-hover:bg-[#102A63]/5 transition-colors duration-500"></div>
                 <img
                   src={s.img}
@@ -353,24 +354,24 @@ export default function Services() {
               </div>
 
               {/* Content Body */}
-              <div className="p-8 flex flex-col flex-grow">
-                <h4 className="text-2xl font-black text-[var(--text-primary)] mb-3 group-hover:text-primary transition-colors tracking-tight">
+              <div className="p-5 md:p-8 flex flex-col flex-grow">
+                <h4 className="text-lg md:text-2xl font-black text-[var(--text-primary)] mb-2 md:mb-3 group-hover:text-primary transition-colors tracking-tight">
                   {s.name}
                 </h4>
-                <p className="text-[var(--text-secondary)] font-medium leading-relaxed text-sm mb-6 flex-grow">
+                <p className="text-[var(--text-secondary)] font-medium leading-relaxed text-xs md:text-sm mb-4 md:mb-6 flex-grow">
                   {s.desc}
                 </p>
 
                 {/* Sub-specialties Badges */}
-                <div className="mb-8">
-                  <p className="text-[10px] font-black text-[var(--text-tertiary)] uppercase tracking-widest mb-3">
+                <div className="mb-5 md:mb-8">
+                  <p className="text-[10px] font-black text-[var(--text-tertiary)] uppercase tracking-widest mb-2 md:mb-3">
                     {t.subSpecialties}
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5 md:gap-2">
                     {s.specialties.map((spec, specIdx) => (
                       <span
                         key={specIdx}
-                        className="px-2.5 py-1 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-xs font-bold text-[var(--text-secondary)] hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                        className="px-2 py-0.5 md:px-2.5 md:py-1 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-[10px] md:text-xs font-bold text-[var(--text-secondary)] hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                       >
                         {spec}
                       </span>
@@ -381,13 +382,13 @@ export default function Services() {
                 {/* Book Action Button */}
                 <button
                   onClick={() => handleAction(s.name)}
-                  className="mt-auto flex items-center justify-between border-t border-[var(--border-color)] pt-5 w-full text-left"
+                  className="mt-auto flex items-center justify-between border-t border-[var(--border-color)] pt-3 md:pt-5 w-full text-left"
                 >
-                  <span className="text-xs font-black text-[var(--text-tertiary)] group-hover:text-primary transition-colors uppercase tracking-[0.12em] flex items-center gap-2">
-                    <Calendar size={14} /> {t.btnBook}
+                  <span className="text-[10px] md:text-xs font-black text-[var(--text-tertiary)] group-hover:text-primary transition-colors uppercase tracking-[0.12em] flex items-center gap-1.5 md:gap-2">
+                    <Calendar size={12} md={14} /> {t.btnBook}
                   </span>
-                  <div className="w-10 h-10 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center text-[var(--text-tertiary)] group-hover:bg-primary group-hover:text-white transition-all group-hover:translate-x-1 shadow-sm">
-                    <ChevronRight size={18} />
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center text-[var(--text-tertiary)] group-hover:bg-primary group-hover:text-white transition-all group-hover:translate-x-1 shadow-sm">
+                    <ChevronRight size={14} md={18} />
                   </div>
                 </button>
               </div>

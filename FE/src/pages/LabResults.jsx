@@ -112,48 +112,48 @@ const ResultCard = ({ result, idx, t, lang }) => {
 
   return (
     <div
-      className={`bg-[var(--card-bg)] rounded-3xl border shadow-sm transition-all hover:shadow-md group overflow-hidden ${isNew ? "border-teal-200 ring-1 ring-teal-100" : "border-[var(--border-color)]"}`}
+      className={`bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border shadow-sm transition-all hover:shadow-md group overflow-hidden ${isNew ? "border-teal-200 ring-1 ring-teal-100" : "border-[var(--border-color)]"}`}
     >
       {isNew && (
-        <div className="bg-gradient-to-r from-teal-500 to-blue-500 text-white text-xs font-bold px-4 py-1.5 flex items-center gap-2">
-          <CheckCircle size={12} /> {t.latestResult}
+        <div className="bg-gradient-to-r from-teal-500 to-blue-500 text-white text-[10px] md:text-xs font-bold px-3 md:px-4 py-1 md:py-1.5 flex items-center gap-1 md:gap-2">
+          <CheckCircle size={10} /> {t.latestResult}
         </div>
       )}
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         {/* Header Row */}
-        <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-3 md:gap-4">
           <div className="flex-1">
             {/* Type badges */}
-            <div className="flex items-center gap-2 mb-3 flex-wrap">
+            <div className="flex items-center gap-1.5 md:gap-2 mb-2 md:mb-3 flex-wrap">
               {uniqueTypes.map((type, i) => (
                 <span
                   key={i}
-                  className={`px-3 py-1 text-xs font-bold rounded-xl border ${TYPE_COLOR[type] || TYPE_COLOR.other}`}
+                  className={`px-2 md:px-3 py-0.5 md:py-1 text-[10px] md:text-xs font-bold rounded-lg md:rounded-xl border ${TYPE_COLOR[type] || TYPE_COLOR.other}`}
                 >
                   {t[`type${type.charAt(0).toUpperCase() + type.slice(1)}`] ||
                     type}
                 </span>
               ))}
-              <span className="flex items-center gap-1 text-xs text-[var(--text-tertiary)] font-medium">
-                <Clock size={12} /> {createdDateStr}
+              <span className="flex items-center gap-1 text-[10px] md:text-xs text-[var(--text-tertiary)] font-medium">
+                <Clock size={10} /> {createdDateStr}
               </span>
             </div>
 
             {/* Test count summary */}
-            <h3 className="text-lg font-bold text-[var(--text-primary)] group-hover:text-teal-700 transition-colors mb-1">
+            <h3 className="text-sm md:text-lg font-bold text-[var(--text-primary)] group-hover:text-teal-700 transition-colors mb-1">
               {result.tests?.length === 1
                 ? result.tests[0].testName
                 : `${result.tests?.length || 0} ${t.tests}`}
             </h3>
 
             {/* Performer & appointment */}
-            <p className="text-sm text-[var(--text-secondary)] mb-3">
+            <p className="text-xs md:text-sm text-[var(--text-secondary)] mb-2 md:mb-3">
               {t.performedBy}:{" "}
-              <span className="font-semibold text-[var(--text-primary)]">
+              <span className="font-semibold text-[var(--text-primary)] text-xs md:text-sm">
                 {result.uploadedBy?.fullName || t.labStaff}
               </span>
               {result.appointment && (
-                <span className="ml-3 text-[var(--text-tertiary)]">
+                <span className="ml-2 md:ml-3 text-[var(--text-tertiary] text-[10px] md:text-xs">
                   • {t.linkedAppt} {apptDateStr}
                 </span>
               )}
@@ -161,11 +161,13 @@ const ResultCard = ({ result, idx, t, lang }) => {
 
             {/* Notes */}
             {result.notes && (
-              <div className="p-4 bg-blue-50/50 dark:bg-blue-900/20 rounded-2xl border border-blue-100 dark:border-blue-900/30 text-sm text-[var(--text-primary)] mb-3">
-                <strong className="text-[var(--text-primary)] block mb-1">
+              <div className="p-3 md:p-4 bg-blue-50/50 dark:bg-blue-900/20 rounded-xl md:rounded-2xl border border-blue-100 dark:border-blue-900/30 text-xs md:text-sm text-[var(--text-primary)] mb-2 md:mb-3">
+                <strong className="text-[var(--text-primary)] block mb-1 text-[10px] md:text-xs">
                   {t.staffNote}
                 </strong>
-                <p className="leading-relaxed italic">{result.notes}</p>
+                <p className="leading-relaxed italic text-[10px] md:text-sm">
+                  {result.notes}
+                </p>
               </div>
             )}
 
@@ -173,9 +175,9 @@ const ResultCard = ({ result, idx, t, lang }) => {
             {result.tests?.length > 1 && (
               <button
                 onClick={() => setExpanded(!expanded)}
-                className="flex items-center gap-1.5 text-xs font-bold text-teal-600 hover:text-teal-800 transition-colors"
+                className="flex items-center gap-1 md:gap-1.5 text-[10px] md:text-xs font-bold text-teal-600 hover:text-teal-800 transition-colors"
               >
-                {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                 {expanded ? t.hideDetails : t.viewTests(result.tests.length)}
               </button>
             )}
@@ -183,18 +185,18 @@ const ResultCard = ({ result, idx, t, lang }) => {
             {/* Expanded test list */}
             {(expanded || result.tests?.length === 1) &&
               result.tests?.length > 0 && (
-                <ul className="mt-3 space-y-2">
+                <ul className="mt-2 md:mt-3 space-y-1.5 md:space-y-2">
                   {result.tests.map((test, i) => (
                     <li
                       key={i}
-                      className="flex items-start gap-2 p-2 bg-[var(--bg-tertiary)] rounded-xl border border-[var(--border-color)] text-sm"
+                      className="flex items-start gap-1.5 md:gap-2 p-2 bg-[var(--bg-tertiary)] rounded-lg md:rounded-xl border border-[var(--border-color)] text-[10px] md:text-sm"
                     >
                       <span
-                        className={`px-2 py-0.5 text-[10px] font-bold rounded-md border shrink-0 mt-0.5 ${TYPE_COLOR[test.testType] || TYPE_COLOR.other}`}
+                        className={`px-1.5 md:px-2 py-0.5 text-[9px] md:text-[10px] font-bold rounded-md border shrink-0 mt-0.5 ${TYPE_COLOR[test.testType] || TYPE_COLOR.other}`}
                       >
                         {test.testType?.toUpperCase()}
                       </span>
-                      <span className="font-semibold text-[var(--text-primary)]">
+                      <span className="font-semibold text-[var(--text-primary)] text-[10px] md:text-sm">
                         {test.testName}
                       </span>
                     </li>
@@ -204,37 +206,37 @@ const ResultCard = ({ result, idx, t, lang }) => {
           </div>
 
           {/* Files panel */}
-          <div className="flex flex-col gap-2 shrink-0 w-full md:w-auto md:min-w-[180px]">
+          <div className="flex flex-col gap-1.5 md:gap-2 shrink-0 w-full md:w-auto md:min-w-[180px]">
             {(result.files || []).map((file, fi) => (
               <div
                 key={fi}
-                className="flex flex-col gap-1.5 p-3 bg-[var(--bg-tertiary)] rounded-2xl border border-[var(--border-color)]"
+                className="flex flex-col gap-1 md:gap-1.5 p-2 md:p-3 bg-[var(--bg-tertiary)] rounded-xl md:rounded-2xl border border-[var(--border-color)]"
               >
-                <div className="flex items-center gap-2">
-                  <FileText size={16} className="text-red-500 shrink-0" />
+                <div className="flex items-center gap-1.5 md:gap-2">
+                  <FileText size={12} className="text-red-500 shrink-0" />
                   <p
-                    className="text-xs font-bold text-[var(--text-primary)] truncate max-w-[120px]"
+                    className="text-[10px] md:text-xs font-bold text-[var(--text-primary)] truncate max-w-[100px] md:max-w-[120px]"
                     title={file.fileName}
                   >
                     {file.fileName}
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-1.5 md:gap-2">
                   <button
                     onClick={() =>
                       window.open(`${API_URL}${file.fileUrl}`, "_blank")
                     }
-                    className="flex-1 px-3 py-2 bg-teal-600 text-white text-xs font-bold rounded-xl hover:bg-teal-700 transition-all shadow-sm flex items-center justify-center gap-1.5"
+                    className="flex-1 px-2 md:px-3 py-1.5 md:py-2 bg-teal-600 text-white text-[10px] md:text-xs font-bold rounded-lg md:rounded-xl hover:bg-teal-700 transition-all shadow-sm flex items-center justify-center gap-1 md:gap-1.5"
                   >
-                    <Eye size={13} /> {t.viewResult}{" "}
+                    <Eye size={10} /> {t.viewResult}{" "}
                     {result.files.length > 1 ? fi + 1 : ""}
                   </button>
                   <button
                     onClick={() => handleDownload(file.fileUrl, file.fileName)}
-                    className="px-3 py-2 bg-[var(--card-bg)] border border-[var(--border-color)] text-[var(--text-secondary)] text-xs font-bold rounded-xl hover:border-teal-400 hover:text-teal-600 transition-all flex items-center justify-center"
+                    className="px-2 md:px-3 py-1.5 md:py-2 bg-[var(--card-bg)] border border-[var(--border-color)] text-[var(--text-secondary)] text-[10px] md:text-xs font-bold rounded-lg md:rounded-xl hover:border-teal-400 hover:text-teal-600 transition-all flex items-center justify-center"
                     title={t.download}
                   >
-                    <Download size={13} />
+                    <Download size={10} />
                   </button>
                 </div>
               </div>
@@ -279,27 +281,29 @@ const LabResults = () => {
   return (
     <div className="max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 bg-[var(--card-bg)] p-6 rounded-3xl shadow-sm border border-[var(--border-color)]">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-teal-100 to-blue-100 dark:from-teal-900/30 dark:to-blue-900/30 text-teal-600 dark:text-teal-400 rounded-2xl flex items-center justify-center shadow-inner shrink-0">
-            <FlaskConical size={32} />
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4 mb-4 md:mb-8 bg-[var(--card-bg)] p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-[var(--border-color)]">
+        <div className="flex items-center gap-3 md:gap-4">
+          <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-teal-100 to-blue-100 dark:from-teal-900/30 dark:to-blue-900/30 text-teal-600 dark:text-teal-400 rounded-xl md:rounded-2xl flex items-center justify-center shadow-inner shrink-0">
+            <FlaskConical size={20} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-[var(--text-primary)]">
+            <h1 className="text-lg md:text-2xl font-bold text-[var(--text-primary)]">
               {t.title}
             </h1>
-            <p className="text-[var(--text-secondary)] text-sm mt-1">{t.sub}</p>
+            <p className="text-[var(--text-secondary)] text-xs md:text-sm mt-0.5 md:mt-1">
+              {t.sub}
+            </p>
           </div>
         </div>
         <div className="relative w-full sm:w-auto">
           <Search
-            size={18}
+            size={14}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
           />
           <input
             type="text"
             placeholder={t.searchPlaceholder}
-            className="pl-10 pr-4 py-2.5 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 w-full sm:w-64 text-[var(--text-primary)]"
+            className="pl-9 md:pl-10 pr-3 md:pr-4 py-2 md:py-2.5 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg md:rounded-xl text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 w-full sm:w-64 text-[var(--text-primary)]"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -307,31 +311,31 @@ const LabResults = () => {
       </div>
 
       {loading ? (
-        <div className="space-y-4 animate-pulse">
+        <div className="space-y-3 md:space-y-4 animate-pulse">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-40 bg-[var(--bg-tertiary)] rounded-3xl"
+              className="h-32 md:h-40 bg-[var(--bg-tertiary)] rounded-2xl md:rounded-3xl"
             ></div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 bg-[var(--card-bg)] rounded-3xl border border-[var(--border-color)] shadow-sm text-center">
-          <div className="w-24 h-24 bg-teal-50 dark:bg-teal-900/30 rounded-full flex items-center justify-center mb-6">
+        <div className="flex flex-col items-center justify-center py-16 md:py-24 bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm text-center">
+          <div className="w-16 h-16 md:w-24 md:h-24 bg-teal-50 dark:bg-teal-900/30 rounded-full flex items-center justify-center mb-4 md:mb-6">
             <FlaskConical
-              size={40}
+              size={24}
               className="text-teal-300 dark:text-teal-500"
             />
           </div>
-          <h3 className="text-xl font-bold text-[var(--text-secondary)] mb-2">
+          <h3 className="text-base md:text-xl font-bold text-[var(--text-secondary)] mb-1 md:mb-2">
             {search ? t.noMatch : t.noResult}
           </h3>
-          <p className="text-[var(--text-tertiary)] text-sm max-w-sm">
+          <p className="text-[var(--text-tertiary)] text-xs md:text-sm max-w-sm">
             {search ? t.tryAnotherSearch : t.resultWillShow}
           </p>
         </div>
       ) : (
-        <div className="space-y-5">
+        <div className="space-y-3 md:space-y-5">
           {filtered.map((result, idx) => (
             <ResultCard
               key={result._id}

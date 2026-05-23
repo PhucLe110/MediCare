@@ -575,45 +575,47 @@ const Records = () => {
     <div className="max-w-5xl mx-auto relative">
       {/* Custom Toast Notification */}
       <div
-        className={`fixed top-8 right-8 z-50 transition-all duration-500 transform ${toast.show ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 pointer-events-none"}`}
+        className={`fixed top-4 md:top-8 right-4 md:right-8 z-50 transition-all duration-500 transform ${toast.show ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 pointer-events-none"}`}
       >
         <div
-          className={`bg-[var(--card-bg)] px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3 border ${toast.type === "error" ? "border-red-100 shadow-red-500/10" : "border-green-100 shadow-green-500/10"}`}
+          className={`bg-[var(--card-bg)] px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl shadow-xl flex items-center gap-2 md:gap-3 border ${toast.type === "error" ? "border-red-100 shadow-red-500/10" : "border-green-100 shadow-green-500/10"}`}
         >
           <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${toast.type === "error" ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"}`}
+            className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center shrink-0 ${toast.type === "error" ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"}`}
           >
-            <CheckCircle2 size={18} />
+            <CheckCircle2 size={14} />
           </div>
           <div>
-            <h4 className="font-bold text-[var(--text-primary)] text-sm">
+            <h4 className="font-bold text-[var(--text-primary)] text-xs md:text-sm">
               {toast.type === "error" ? t.errorOccurred : t.toastSaveSuccess}
             </h4>
-            <p className="text-xs text-[var(--text-secondary)]">
+            <p className="text-[10px] md:text-xs text-[var(--text-secondary)]">
               {toast.message}
             </p>
           </div>
         </div>
       </div>
 
-      <div className="flex justify-between items-end mb-8 bg-[var(--card-bg)] p-6 rounded-3xl shadow-sm border border-[var(--border-color)]">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-primary rounded-2xl flex items-center justify-center shadow-inner relative z-10">
-            <FolderHeart size={32} />
+      <div className="flex flex-col md:flex-row justify-between items-end gap-4 md:gap-0 mb-4 md:mb-8 bg-[var(--card-bg)] p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-[var(--border-color)]">
+        <div className="flex items-center gap-3 md:gap-4">
+          <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-primary rounded-xl md:rounded-2xl flex items-center justify-center shadow-inner relative z-10">
+            <FolderHeart size={20} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-[var(--text-primary)] bg-clip-text text-transparent bg-gradient-to-r from-[var(--text-primary)] to-primary">
+            <h1 className="text-lg md:text-2xl font-bold text-[var(--text-primary)] bg-clip-text text-transparent bg-gradient-to-r from-[var(--text-primary)] to-primary">
               {t.title}
             </h1>
-            <p className="text-[var(--text-secondary)] mt-1">{t.sub}</p>
+            <p className="text-[var(--text-secondary)] text-xs md:text-sm mt-0.5 md:mt-1">
+              {t.sub}
+            </p>
           </div>
         </div>
         <button
           onClick={handleExportPDF}
-          className="px-5 py-3 bg-[var(--card-bg)] border border-[var(--border-color)] text-[var(--text-secondary)] rounded-xl hover:border-primary hover:text-primary transition-all flex items-center gap-2 text-sm font-bold shadow-sm group"
+          className="px-3 md:px-5 py-2 md:py-3 bg-[var(--card-bg)] border border-[var(--border-color)] text-[var(--text-secondary)] rounded-lg md:rounded-xl hover:border-primary hover:text-primary transition-all flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-bold shadow-sm group"
         >
           <Download
-            size={16}
+            size={12}
             className="group-hover:-translate-y-0.5 transition-transform"
           />{" "}
           {t.exportPdf}
@@ -621,26 +623,26 @@ const Records = () => {
       </div>
 
       {/* Modern Tabs */}
-      <div className="flex gap-2 mb-8 bg-[var(--card-bg)] p-2 rounded-2xl shadow-sm border border-[var(--border-color)] inline-flex">
+      <div className="flex gap-2 mb-4 md:mb-8 bg-[var(--card-bg)] p-2 rounded-xl md:rounded-2xl shadow-sm border border-[var(--border-color)] inline-flex">
         <button
           onClick={() => setActiveTab("personal")}
-          className={`py-3 px-6 rounded-xl font-bold transition-all flex items-center gap-2 text-sm ${
+          className={`py-2 md:py-3 px-4 md:px-6 rounded-lg md:rounded-xl font-bold transition-all flex items-center gap-1.5 md:gap-2 text-xs md:text-sm ${
             activeTab === "personal"
               ? "bg-primary text-white shadow-md"
               : "bg-transparent text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]"
           }`}
         >
-          <UserCircle size={18} /> {t.tabPersonal}
+          <UserCircle size={14} /> {t.tabPersonal}
         </button>
         <button
           onClick={() => setActiveTab("medical")}
-          className={`py-3 px-6 rounded-xl font-bold transition-all flex items-center gap-2 text-sm ${
+          className={`py-2 md:py-3 px-4 md:px-6 rounded-lg md:rounded-xl font-bold transition-all flex items-center gap-1.5 md:gap-2 text-xs md:text-sm ${
             activeTab === "medical"
               ? "bg-primary text-white shadow-md"
               : "bg-transparent text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]"
           }`}
         >
-          <FileText size={18} /> {t.tabMedical}
+          <FileText size={14} /> {t.tabMedical}
         </button>
       </div>
 
@@ -648,23 +650,23 @@ const Records = () => {
       {activeTab === "personal" && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           {!personalInfo.isFilled && !isEditing && (
-            <div className="bg-gradient-to-r from-orange-50 to-orange-100/50 border border-orange-200 p-6 rounded-3xl mb-8 flex items-start gap-4 shadow-sm relative overflow-hidden">
+            <div className="bg-gradient-to-r from-orange-50 to-orange-100/50 border border-orange-200 p-4 md:p-6 rounded-2xl md:rounded-3xl mb-4 md:mb-8 flex items-start gap-3 md:gap-4 shadow-sm relative overflow-hidden">
               <div className="absolute right-0 top-0 opacity-5 transform translate-x-4 -translate-y-4">
-                <Info size={120} />
+                <Info size={80} />
               </div>
-              <div className="w-12 h-12 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center shrink-0 shadow-inner z-10">
-                <Info size={24} />
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center shrink-0 shadow-inner z-10">
+                <Info size={18} />
               </div>
               <div className="z-10">
-                <h3 className="text-orange-800 font-bold text-lg mb-1">
+                <h3 className="text-orange-800 font-bold text-sm md:text-lg mb-1">
                   {t.notFilled}
                 </h3>
-                <p className="text-orange-700 text-sm mb-4 max-w-2xl leading-relaxed">
+                <p className="text-orange-700 text-xs md:text-sm mb-3 md:mb-4 max-w-2xl leading-relaxed">
                   {t.notFilledSub}
                 </p>
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="px-6 py-2.5 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-all shadow-md hover:shadow-lg"
+                  className="px-4 md:px-6 py-2 md:py-2.5 bg-orange-500 text-white font-bold rounded-lg md:rounded-xl hover:bg-orange-600 transition-all shadow-md hover:shadow-lg text-xs md:text-sm"
                 >
                   {t.updateNow}
                 </button>
@@ -672,14 +674,15 @@ const Records = () => {
             </div>
           )}
 
-          <div className="bg-[var(--card-bg)] rounded-3xl p-8 border border-[var(--border-color)] shadow-xl shadow-gray-200/20 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 dark:bg-blue-900/20 rounded-full blur-3xl -z-10 opacity-50"></div>
+          <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl p-4 md:p-8 border border-[var(--border-color)] shadow-xl shadow-gray-200/20 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-48 h-48 md:w-64 md:h-64 bg-blue-50 dark:bg-blue-900/20 rounded-full blur-3xl -z-10 opacity-50"></div>
 
             {/* Basic User Info Section */}
-            <div className="mb-8 pb-6 border-b border-[var(--border-color)]">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">
-                  <UserCircle className="text-primary" /> Thông tin cá nhân
+            <div className="mb-6 md:mb-8 pb-4 md:pb-6 border-b border-[var(--border-color)]">
+              <div className="flex justify-between items-center mb-3 md:mb-4">
+                <h3 className="text-sm md:text-lg font-bold text-[var(--text-primary)] flex items-center gap-1.5 md:gap-2">
+                  <UserCircle className="text-primary" size={14} /> Thông tin cá
+                  nhân
                 </h3>
                 {!isEditingPersonal ? (
                   <button
@@ -690,36 +693,36 @@ const Records = () => {
                       });
                       setIsEditingPersonal(true);
                     }}
-                    className="px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-primary font-bold rounded-lg hover:bg-primary hover:text-white transition-all flex items-center gap-2 text-sm"
+                    className="px-3 md:px-4 py-1.5 md:py-2 bg-blue-50 dark:bg-blue-900/30 text-primary font-bold rounded-lg hover:bg-primary hover:text-white transition-all flex items-center gap-1.5 md:gap-2 text-xs md:text-sm"
                   >
-                    <Edit3 size={14} /> Chỉnh sửa
+                    <Edit3 size={10} /> Chỉnh sửa
                   </button>
                 ) : (
                   <button
                     onClick={handleSavePersonalInfo}
                     disabled={saving}
-                    className="px-4 py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-all flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 md:px-4 py-1.5 md:py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-all flex items-center gap-1.5 md:gap-2 text-xs md:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving ? (
-                      <Loader2 size={14} className="animate-spin" />
+                      <Loader2 size={10} className="animate-spin" />
                     ) : (
-                      <Save size={14} />
+                      <Save size={10} />
                     )}
                     {saving ? "Đang lưu..." : "Lưu"}
                   </button>
                 )}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-[var(--bg-tertiary)]/80 rounded-xl border border-[var(--border-color)]">
-                  <div className="text-xs font-bold text-[var(--text-secondary)] mb-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                <div className="p-3 md:p-4 bg-[var(--bg-tertiary)]/80 rounded-lg md:rounded-xl border border-[var(--border-color)]">
+                  <div className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] mb-1">
                     Họ và tên
                   </div>
-                  <div className="text-sm font-bold text-[var(--text-primary)]">
+                  <div className="text-xs md:text-sm font-bold text-[var(--text-primary)]">
                     {currentUser?.fullName || t.notUpdated}
                   </div>
                 </div>
-                <div className="p-4 bg-[var(--bg-tertiary)]/80 rounded-xl border border-[var(--border-color)]">
-                  <div className="text-xs font-bold text-[var(--text-secondary)] mb-1">
+                <div className="p-3 md:p-4 bg-[var(--bg-tertiary)]/80 rounded-lg md:rounded-xl border border-[var(--border-color)]">
+                  <div className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] mb-1">
                     Số điện thoại
                   </div>
                   {isEditingPersonal ? (
@@ -732,30 +735,30 @@ const Records = () => {
                           phone: e.target.value,
                         })
                       }
-                      className="w-full p-2 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-primary/20 outline-none transition-all text-[var(--text-primary)] text-sm"
+                      className="w-full p-2 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-primary/20 outline-none transition-all text-[var(--text-primary)] text-xs md:text-sm"
                       placeholder="Nhập số điện thoại"
                     />
                   ) : (
-                    <div className="text-sm font-bold text-[var(--text-primary)]">
+                    <div className="text-xs md:text-sm font-bold text-[var(--text-primary)]">
                       {currentUser?.phone || t.notUpdated}
                     </div>
                   )}
                 </div>
-                <div className="p-4 bg-[var(--bg-tertiary)]/80 rounded-xl border border-[var(--border-color)]">
-                  <div className="text-xs font-bold text-[var(--text-secondary)] mb-1">
+                <div className="p-3 md:p-4 bg-[var(--bg-tertiary)]/80 rounded-lg md:rounded-xl border border-[var(--border-color)]">
+                  <div className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] mb-1">
                     Email
                   </div>
-                  <div className="text-sm font-bold text-[var(--text-primary)]">
+                  <div className="text-xs md:text-sm font-bold text-[var(--text-primary)]">
                     {currentUser?.email || t.notUpdated}
                   </div>
                 </div>
-                <div className="p-4 bg-[var(--bg-tertiary)]/80 rounded-xl border border-[var(--border-color)]">
-                  <div className="text-xs font-bold text-[var(--text-secondary)] mb-1">
+                <div className="p-3 md:p-4 bg-[var(--bg-tertiary)]/80 rounded-lg md:rounded-xl border border-[var(--border-color)]">
+                  <div className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] mb-1">
                     Giới tính
                   </div>
                   {isEditingPersonal ? (
-                    <div className="flex gap-4">
-                      <label className="flex items-center gap-2 cursor-pointer">
+                    <div className="flex gap-3 md:gap-4">
+                      <label className="flex items-center gap-1.5 md:gap-2 cursor-pointer">
                         <input
                           type="radio"
                           name="gender"
@@ -767,13 +770,13 @@ const Records = () => {
                               gender: e.target.value,
                             })
                           }
-                          className="w-4 h-4 text-primary focus:ring-primary"
+                          className="w-3 h-3 md:w-4 md:h-4 text-primary focus:ring-primary"
                         />
-                        <span className="text-sm text-[var(--text-primary)]">
+                        <span className="text-xs md:text-sm text-[var(--text-primary)]">
                           Nam
                         </span>
                       </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
+                      <label className="flex items-center gap-1.5 md:gap-2 cursor-pointer">
                         <input
                           type="radio"
                           name="gender"
@@ -785,15 +788,15 @@ const Records = () => {
                               gender: e.target.value,
                             })
                           }
-                          className="w-4 h-4 text-primary focus:ring-primary"
+                          className="w-3 h-3 md:w-4 md:h-4 text-primary focus:ring-primary"
                         />
-                        <span className="text-sm text-[var(--text-primary)]">
+                        <span className="text-xs md:text-sm text-[var(--text-primary)]">
                           Nữ
                         </span>
                       </label>
                     </div>
                   ) : (
-                    <div className="text-sm font-bold text-[var(--text-primary)]">
+                    <div className="text-xs md:text-sm font-bold text-[var(--text-primary)]">
                       {currentUser?.gender || t.notUpdated}
                     </div>
                   )}
@@ -801,42 +804,43 @@ const Records = () => {
               </div>
             </div>
 
-            <div className="flex justify-between items-center mb-8 pb-6 border-b border-[var(--border-color)]">
-              <h2 className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-3">
-                <HeartPulse className="text-primary" /> {t.healthProfile}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-0 mb-6 md:mb-8 pb-4 md:pb-6 border-b border-[var(--border-color)]">
+              <h2 className="text-base md:text-xl font-bold text-[var(--text-primary)] flex items-center gap-2 md:gap-3">
+                <HeartPulse className="text-primary" size={16} />{" "}
+                {t.healthProfile}
               </h2>
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="px-5 py-2.5 bg-blue-50 dark:bg-blue-900/30 text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all flex items-center gap-2 text-sm"
+                  className="px-3 md:px-5 py-1.5 md:py-2.5 bg-blue-50 dark:bg-blue-900/30 text-primary font-bold rounded-lg md:rounded-xl hover:bg-primary hover:text-white transition-all flex items-center gap-1.5 md:gap-2 text-xs md:text-sm"
                 >
-                  <Edit3 size={16} /> {t.edit}
+                  <Edit3 size={12} /> {t.edit}
                 </button>
               ) : (
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="px-6 py-2.5 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 transition-all flex items-center gap-2 text-sm shadow-md shadow-green-500/20 disabled:opacity-70 disabled:cursor-wait"
+                  className="px-4 md:px-6 py-1.5 md:py-2.5 bg-green-500 text-white font-bold rounded-lg md:rounded-xl hover:bg-green-600 transition-all flex items-center gap-1.5 md:gap-2 text-xs md:text-sm shadow-md shadow-green-500/20 disabled:opacity-70 disabled:cursor-wait"
                 >
                   {saving ? (
-                    <Loader2 size={16} className="animate-spin" />
+                    <Loader2 size={12} className="animate-spin" />
                   ) : (
-                    <Save size={16} />
+                    <Save size={12} />
                   )}
                   {saving ? t.saving : t.save}
                 </button>
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+              <div className="space-y-4 md:space-y-6">
                 <div>
-                  <label className="text-sm font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
-                    <Droplet size={16} className="text-red-500" /> {t.bloodType}
+                  <label className="text-xs md:text-sm font-bold text-[var(--text-primary)] mb-1.5 md:mb-2 flex items-center gap-1.5 md:gap-2">
+                    <Droplet size={12} className="text-red-500" /> {t.bloodType}
                   </label>
                   {isEditing ? (
                     <select
-                      className="w-full p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all text-[var(--text-primary)]"
+                      className="w-full p-2.5 md:p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg md:rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all text-[var(--text-primary)] text-xs md:text-sm"
                       value={personalInfo.bloodType}
                       onChange={(e) =>
                         setPersonalInfo({
@@ -856,23 +860,23 @@ const Records = () => {
                       <option value="AB-">AB-</option>
                     </select>
                   ) : (
-                    <div className="p-4 bg-[var(--bg-tertiary)]/80 rounded-xl border border-[var(--border-color)] flex items-center">
-                      <span className="text-lg font-bold text-[var(--text-primary)]">
+                    <div className="p-2.5 md:p-4 bg-[var(--bg-tertiary)]/80 rounded-lg md:rounded-xl border border-[var(--border-color)] flex items-center">
+                      <span className="text-sm md:text-lg font-bold text-[var(--text-primary)]">
                         {personalInfo.bloodType || t.notUpdated}
                       </span>
                     </div>
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3 md:gap-4">
                   <div>
-                    <label className="text-sm font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
-                      <Ruler size={16} className="text-blue-500" /> {t.height}
+                    <label className="text-xs md:text-sm font-bold text-[var(--text-primary)] mb-1.5 md:mb-2 flex items-center gap-1.5 md:gap-2">
+                      <Ruler size={12} className="text-blue-500" /> {t.height}
                     </label>
                     {isEditing ? (
                       <input
                         type="number"
-                        className="w-full p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all text-[var(--text-primary)]"
+                        className="w-full p-2.5 md:p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg md:rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all text-[var(--text-primary)] text-xs md:text-sm"
                         value={personalInfo.height}
                         onChange={(e) =>
                           setPersonalInfo({
@@ -883,8 +887,8 @@ const Records = () => {
                         placeholder="VD: 165"
                       />
                     ) : (
-                      <div className="p-4 bg-[var(--bg-tertiary)]/80 rounded-xl border border-[var(--border-color)] flex items-center">
-                        <span className="text-lg font-bold text-[var(--text-primary)]">
+                      <div className="p-2.5 md:p-4 bg-[var(--bg-tertiary)]/80 rounded-lg md:rounded-xl border border-[var(--border-color)] flex items-center">
+                        <span className="text-sm md:text-lg font-bold text-[var(--text-primary)]">
                           {personalInfo.height
                             ? `${personalInfo.height} cm`
                             : "--"}
@@ -893,13 +897,13 @@ const Records = () => {
                     )}
                   </div>
                   <div>
-                    <label className="text-sm font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
-                      <Scale size={16} className="text-green-500" /> {t.weight}
+                    <label className="text-xs md:text-sm font-bold text-[var(--text-primary)] mb-1.5 md:mb-2 flex items-center gap-1.5 md:gap-2">
+                      <Scale size={12} className="text-green-500" /> {t.weight}
                     </label>
                     {isEditing ? (
                       <input
                         type="number"
-                        className="w-full p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all text-[var(--text-primary)]"
+                        className="w-full p-2.5 md:p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg md:rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all text-[var(--text-primary)] text-xs md:text-sm"
                         value={personalInfo.weight}
                         onChange={(e) =>
                           setPersonalInfo({
@@ -910,8 +914,8 @@ const Records = () => {
                         placeholder="VD: 55"
                       />
                     ) : (
-                      <div className="p-4 bg-[var(--bg-tertiary)]/80 rounded-xl border border-[var(--border-color)] flex items-center">
-                        <span className="text-lg font-bold text-[var(--text-primary)]">
+                      <div className="p-2.5 md:p-4 bg-[var(--bg-tertiary)]/80 rounded-lg md:rounded-xl border border-[var(--border-color)] flex items-center">
+                        <span className="text-sm md:text-lg font-bold text-[var(--text-primary)]">
                           {personalInfo.weight
                             ? `${personalInfo.weight} kg`
                             : "--"}
@@ -922,14 +926,14 @@ const Records = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
-                    <Activity size={16} className="text-purple-500" />{" "}
+                  <label className="text-xs md:text-sm font-bold text-[var(--text-primary)] mb-1.5 md:mb-2 flex items-center gap-1.5 md:gap-2">
+                    <Activity size={12} className="text-purple-500" />{" "}
                     {t.bloodPressure}
                   </label>
                   {isEditing ? (
                     <input
                       type="text"
-                      className="w-full p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all text-[var(--text-primary)]"
+                      className="w-full p-2.5 md:p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg md:rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all text-[var(--text-primary)] text-xs md:text-sm"
                       value={personalInfo.bloodPressure}
                       onChange={(e) =>
                         setPersonalInfo({
@@ -940,8 +944,8 @@ const Records = () => {
                       placeholder="VD: 110/70"
                     />
                   ) : (
-                    <div className="p-4 bg-[var(--bg-tertiary)]/80 rounded-xl border border-[var(--border-color)] flex items-center">
-                      <span className="text-lg font-bold text-[var(--text-primary)]">
+                    <div className="p-2.5 md:p-4 bg-[var(--bg-tertiary)]/80 rounded-lg md:rounded-xl border border-[var(--border-color)] flex items-center">
+                      <span className="text-sm md:text-lg font-bold text-[var(--text-primary)]">
                         {personalInfo.bloodPressure || t.notUpdated}
                       </span>
                     </div>
@@ -949,15 +953,15 @@ const Records = () => {
                 </div>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 <div>
-                  <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">
+                  <label className="block text-xs md:text-sm font-bold text-[var(--text-primary)] mb-1.5 md:mb-2">
                     {t.allergies}
                   </label>
                   {isEditing ? (
                     <textarea
-                      rows="4"
-                      className="w-full p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl focus:ring-2 focus:ring-primary/20 resize-none outline-none transition-all text-[var(--text-primary)]"
+                      rows="3 md:rows-4"
+                      className="w-full p-2.5 md:p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg md:rounded-xl focus:ring-2 focus:ring-primary/20 resize-none outline-none transition-all text-[var(--text-primary)] text-xs md:text-sm"
                       value={personalInfo.allergies}
                       onChange={(e) =>
                         setPersonalInfo({
@@ -968,13 +972,13 @@ const Records = () => {
                       placeholder={t.allergiesPlaceholder}
                     ></textarea>
                   ) : (
-                    <div className="min-h-[100px] bg-red-50/30 dark:bg-red-900/20 p-5 rounded-2xl border border-red-100 dark:border-red-900/30">
+                    <div className="min-h-[80px] md:min-h-[100px] bg-red-50/30 dark:bg-red-900/20 p-3 md:p-5 rounded-lg md:rounded-2xl border border-red-100 dark:border-red-900/30">
                       {personalInfo.allergies ? (
-                        <p className="text-red-700 dark:text-red-400 font-medium leading-relaxed">
+                        <p className="text-red-700 dark:text-red-400 font-medium leading-relaxed text-xs md:text-sm">
                           {personalInfo.allergies}
                         </p>
                       ) : (
-                        <p className="text-[var(--text-tertiary)] italic text-sm">
+                        <p className="text-[var(--text-tertiary)] italic text-xs md:text-sm">
                           {t.noAllergiesDisplay}
                         </p>
                       )}
@@ -983,13 +987,13 @@ const Records = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">
+                  <label className="block text-xs md:text-sm font-bold text-[var(--text-primary)] mb-1.5 md:mb-2">
                     {t.medicalHistory}
                   </label>
                   {isEditing ? (
                     <textarea
-                      rows="4"
-                      className="w-full p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl focus:ring-2 focus:ring-primary/20 resize-none outline-none transition-all text-[var(--text-primary)]"
+                      rows="3 md:rows-4"
+                      className="w-full p-2.5 md:p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg md:rounded-xl focus:ring-2 focus:ring-primary/20 resize-none outline-none transition-all text-[var(--text-primary)] text-xs md:text-sm"
                       value={personalInfo.medicalHistory}
                       onChange={(e) =>
                         setPersonalInfo({
@@ -1000,13 +1004,13 @@ const Records = () => {
                       placeholder={t.medicalHistoryPlaceholder}
                     ></textarea>
                   ) : (
-                    <div className="min-h-[100px] bg-orange-50/30 dark:bg-orange-900/20 p-5 rounded-2xl border border-orange-100 dark:border-orange-900/30">
+                    <div className="min-h-[80px] md:min-h-[100px] bg-orange-50/30 dark:bg-orange-900/20 p-3 md:p-5 rounded-lg md:rounded-2xl border border-orange-100 dark:border-orange-900/30">
                       {personalInfo.medicalHistory ? (
-                        <p className="text-orange-800 dark:text-orange-400 font-medium leading-relaxed">
+                        <p className="text-orange-800 dark:text-orange-400 font-medium leading-relaxed text-xs md:text-sm">
                           {personalInfo.medicalHistory}
                         </p>
                       ) : (
-                        <p className="text-[var(--text-tertiary)] italic text-sm">
+                        <p className="text-[var(--text-tertiary)] italic text-xs md:text-sm">
                           {t.noMedicalHistoryDisplay}
                         </p>
                       )}
@@ -1022,27 +1026,27 @@ const Records = () => {
       {/* Tab Content 2: Medical Records (Bệnh án) — REAL DATA */}
       {activeTab === "medical" && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="bg-[var(--card-bg)] p-8 rounded-3xl border border-[var(--border-color)] shadow-xl shadow-gray-200/20 relative">
-            <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2">
+          <div className="bg-[var(--card-bg)] p-4 md:p-8 rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-xl shadow-gray-200/20 relative">
+            <h2 className="text-base md:text-xl font-bold text-[var(--text-primary)] mb-1 md:mb-2">
               {t.treatmentHistory}
             </h2>
-            <p className="text-[var(--text-secondary)] text-sm mb-10">
+            <p className="text-[var(--text-secondary)] text-xs md:text-sm mb-6 md:mb-10">
               {t.treatmentHistorySub}
             </p>
 
             {loading ? (
-              <div className="space-y-4 animate-pulse">
+              <div className="space-y-3 md:space-y-4 animate-pulse">
                 {[1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="h-36 bg-[var(--bg-tertiary)] rounded-2xl"
+                    className="h-28 md:h-36 bg-[var(--bg-tertiary)] rounded-xl md:rounded-2xl"
                   ></div>
                 ))}
               </div>
             ) : appointments.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-20 h-20 bg-[var(--bg-tertiary)] rounded-full flex items-center justify-center mb-4">
-                  <FileText size={36} className="text-[var(--text-tertiary)]" />
+              <div className="flex flex-col items-center justify-center py-12 md:py-20 text-center">
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-[var(--bg-tertiary)] rounded-full flex items-center justify-center mb-3 md:mb-4">
+                  <FileText size={28} className="text-[var(--text-tertiary)]" />
                 </div>
                 <h3 className="font-bold text-[var(--text-secondary)] text-lg mb-1">
                   {t.noMedicalHistoryData}
@@ -1053,8 +1057,8 @@ const Records = () => {
               </div>
             ) : (
               <div className="relative">
-                <div className="absolute left-[7px] top-6 bottom-6 w-0.5 bg-[var(--bg-tertiary)] hidden md:block"></div>
-                <div className="space-y-6">
+                <div className="absolute left-[5px] md:left-[7px] top-4 md:top-6 bottom-4 md:bottom-6 w-0.5 bg-[var(--bg-tertiary)] hidden md:block"></div>
+                <div className="space-y-4 md:space-y-6">
                   {[...appointments].reverse().map((appt, idx) => {
                     const isLatest = idx === 0;
                     const statusColor =
@@ -1077,82 +1081,82 @@ const Records = () => {
                     return (
                       <div
                         key={appt._id}
-                        className="relative md:pl-12"
+                        className="relative md:pl-10 md:pl-12"
                         id={`appt-${appt._id}`}
                       >
                         <div
-                          className={`absolute left-[3px] top-6 w-4 h-4 rounded-full ring-4 hidden md:block shadow-sm ${isLatest || isHighlighted ? "bg-primary ring-blue-50" : "bg-gray-300 ring-white"}`}
+                          className={`absolute left-[2px] md:left-[3px] top-4 md:top-6 w-3 h-3 md:w-4 md:h-4 rounded-full ring-3 md:ring-4 hidden md:block shadow-sm ${isLatest || isHighlighted ? "bg-primary ring-blue-50" : "bg-gray-300 ring-white"}`}
                         ></div>
                         <div
-                          className={`p-6 rounded-2xl border transition-all group shadow-sm ${isHighlighted ? "bg-blue-50/30 dark:bg-blue-900/20 border-primary ring-2 ring-primary/20" : isLatest ? "bg-gradient-to-r from-blue-50/50 to-transparent dark:from-blue-900/20 dark:to-transparent border-blue-100 dark:border-blue-900/30 hover:border-primary/30" : "bg-[var(--card-bg)] border-[var(--border-color)] hover:border-[var(--border-color)]"}`}
+                          className={`p-4 md:p-6 rounded-xl md:rounded-2xl border transition-all group shadow-sm ${isHighlighted ? "bg-blue-50/30 dark:bg-blue-900/20 border-primary ring-2 ring-primary/20" : isLatest ? "bg-gradient-to-r from-blue-50/50 to-transparent dark:from-blue-900/20 dark:to-transparent border-blue-100 dark:border-blue-900/30 hover:border-primary/30" : "bg-[var(--card-bg)] border-[var(--border-color)] hover:border-[var(--border-color)]"}`}
                         >
-                          <div className="flex flex-col md:flex-row justify-between items-start mb-5 gap-4">
+                          <div className="flex flex-col md:flex-row justify-between items-start mb-3 md:mb-5 gap-3 md:gap-4">
                             <div>
-                              <h4 className="font-bold text-[var(--text-primary)] text-xl group-hover:text-primary transition-colors">
+                              <h4 className="font-bold text-[var(--text-primary)] text-base md:text-xl group-hover:text-primary transition-colors">
                                 {appt.doctor?.specialty ||
                                   appt.doctor?.department ||
                                   t.generalDept}
                               </h4>
-                              <p className="text-sm text-[var(--text-secondary)] font-medium mt-1">
+                              <p className="text-xs md:text-sm text-[var(--text-secondary)] font-medium mt-0.5 md:mt-1">
                                 {appt.doctor?.department} •{" "}
                                 {getDoctorDisplayName(
                                   appt.doctor?.userId?.fullName,
                                 )}
                               </p>
                             </div>
-                            <div className="flex items-center gap-2 shrink-0">
+                            <div className="flex flex-row md:flex-col items-start md:items-end gap-2 md:gap-2 shrink-0 w-full md:w-auto">
                               <span
-                                className={`px-3 py-1 text-xs font-bold text-white rounded-full ${statusColor}`}
+                                className={`px-2 md:px-3 py-0.5 md:py-1 text-[10px] md:text-xs font-bold text-white rounded-full ${statusColor}`}
                               >
                                 {statusLabel}
                               </span>
-                              <span className="px-4 py-2 bg-[var(--card-bg)] border border-[var(--border-color)] text-[var(--text-secondary)] text-sm font-bold rounded-xl flex items-center gap-2 shadow-sm">
-                                <Calendar size={14} className="text-primary" />
+                              <span className="px-3 md:px-4 py-1.5 md:py-2 bg-[var(--card-bg)] border border-[var(--border-color)] text-[var(--text-secondary)] text-[10px] md:text-sm font-bold rounded-lg md:rounded-xl flex items-center gap-1.5 md:gap-2 shadow-sm">
+                                <Calendar size={10} className="text-primary" />
                                 {formatDate(lang, appt.date)} • {appt.time}
                               </span>
                             </div>
                           </div>
 
                           <div
-                            className={`p-5 rounded-2xl border mb-5 text-sm text-[var(--text-primary)] space-y-3 ${isLatest ? "bg-[var(--card-bg)] border-[var(--border-color)] shadow-sm" : "bg-[var(--bg-tertiary)] border-transparent"}`}
+                            className={`p-3 md:p-5 rounded-lg md:rounded-2xl border mb-3 md:mb-5 text-xs md:text-sm text-[var(--text-primary)] space-y-2 md:space-y-3 ${isLatest ? "bg-[var(--card-bg)] border-[var(--border-color)] shadow-sm" : "bg-[var(--bg-tertiary)] border-transparent"}`}
                           >
-                            <div className="flex gap-3">
-                              <strong className="text-[var(--text-secondary)] shrink-0 w-36">
+                            <div className="flex gap-2 md:gap-3">
+                              <strong className="text-[var(--text-secondary)] shrink-0 w-24 md:w-36">
                                 {t.ticketCode}
                               </strong>
-                              <span className="font-mono font-bold text-primary">
+                              <span className="font-mono font-bold text-primary text-xs md:text-sm">
                                 {appt.ticketNumber || "N/A"}
                               </span>
                             </div>
                             <div className="h-px w-full bg-[var(--border-color)]"></div>
-                            <div className="flex gap-3">
-                              <strong className="text-[var(--text-secondary)] shrink-0 w-36">
+                            <div className="flex gap-2 md:gap-3">
+                              <strong className="text-[var(--text-secondary)] shrink-0 w-24 md:w-36">
                                 {t.queueNo}
                               </strong>
-                              <span className="font-bold text-orange-500">
+                              <span className="font-bold text-orange-500 text-xs md:text-sm">
                                 #{appt.queueNumber || "--"}
                               </span>
                             </div>
                             {appt.symptoms && (
                               <>
                                 <div className="h-px w-full bg-[var(--border-color)]"></div>
-                                <div className="flex gap-3">
-                                  <strong className="text-[var(--text-secondary)] shrink-0 w-36">
+                                <div className="flex gap-2 md:gap-3">
+                                  <strong className="text-[var(--text-secondary)] shrink-0 w-24 md:w-36">
                                     {t.symptoms}
                                   </strong>
-                                  <span className="text-[var(--text-primary)] italic">
+                                  <span className="text-[var(--text-primary)] italic text-xs md:text-sm">
                                     {appt.symptoms}
                                   </span>
                                 </div>
                               </>
                             )}
                             <div className="h-px w-full bg-[var(--border-color)]"></div>
-                            <div className="flex gap-3">
-                              <strong className="text-[var(--text-secondary)] shrink-0 w-36">
+                            <div className="flex gap-2 md:gap-3">
+                              <strong className="text-[var(--text-secondary)] shrink-0 w-24 md:w-36">
                                 {t.billingStatus}
                               </strong>
                               <span
-                                className={`font-bold ${appt.paymentStatus === "paid" ? "text-green-600" : "text-orange-500"}`}
+                                className={`font-bold text-xs md:text-sm ${appt.paymentStatus === "paid" ? "text-green-600" : "text-orange-500"}`}
                               >
                                 {appt.paymentStatus === "paid"
                                   ? t.paid
@@ -1162,21 +1166,21 @@ const Records = () => {
                           </div>
 
                           {appt.status === "completed" ? (
-                            <div className="mt-5 flex justify-end">
+                            <div className="mt-3 md:mt-5 flex justify-end">
                               <button
                                 onClick={() =>
                                   navigate(`/dashboard/appointment/${appt._id}`)
                                 }
-                                className="px-5 py-2.5 bg-primary text-white font-bold rounded-xl flex items-center gap-2 hover:bg-primary-dark transition-all shadow-md shadow-primary/20"
+                                className="px-4 md:px-5 py-2 md:py-2.5 bg-primary text-white font-bold rounded-lg md:rounded-xl flex items-center gap-1.5 md:gap-2 hover:bg-primary-dark transition-all shadow-md shadow-primary/20 text-xs md:text-sm"
                               >
-                                {t.viewDetails} <ChevronRight size={16} />
+                                {t.viewDetails} <ChevronRight size={12} />
                               </button>
                             </div>
                           ) : (
-                            <div className="flex gap-3">
-                              <span className="px-4 py-3 w-full text-[var(--text-secondary)] bg-[var(--bg-tertiary)]/80 border border-[var(--border-color)] text-sm font-medium rounded-xl flex items-center justify-center gap-2">
+                            <div className="flex gap-2 md:gap-3">
+                              <span className="px-3 md:px-4 py-2 md:py-3 w-full text-[var(--text-secondary)] bg-[var(--bg-tertiary)]/80 border border-[var(--border-color)] text-[10px] md:text-sm font-medium rounded-lg md:rounded-xl flex items-center justify-center gap-1.5 md:gap-2">
                                 <Info
-                                  size={16}
+                                  size={12}
                                   className="text-[var(--text-tertiary)]"
                                 />{" "}
                                 {t.futureRecordsMsg}

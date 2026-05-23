@@ -94,46 +94,46 @@ export default function About() {
   const { t } = useTranslation(trans);
 
   return (
-    <div className="bg-[var(--bg-primary)] min-h-screen py-24">
+    <div className="bg-[var(--bg-primary)] min-h-screen py-16 md:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-24">
-          <div className="relative">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center mb-16 md:mb-24">
+          <div className="relative order-2 lg:order-1">
             <div className="absolute -inset-4 bg-primary/5 rounded-[3rem] transform -rotate-3 z-0"></div>
             <img
               src="https://i.pinimg.com/1200x/d4/5b/29/d45b297559f95af7511287bebbf3b4fe.jpg"
               alt="About MediCare"
-              className="rounded-[2rem] shadow-xl relative z-10 w-full object-cover h-[500px]"
+              className="rounded-[2rem] shadow-xl relative z-10 w-full object-cover h-[300px] md:h-[400px] lg:h-[500px]"
             />
           </div>
 
-          <div>
-            <h2 className="text-sm font-black text-primary uppercase tracking-[0.2em] mb-4">
+          <div className="order-1 lg:order-2">
+            <h2 className="text-xs md:text-sm font-black text-primary uppercase tracking-[0.2em] mb-3 md:mb-4">
               {t.storySubtitle}
             </h2>
-            <h3 className="text-4xl lg:text-5xl font-black text-[var(--text-primary)] mb-8 leading-[1.1] whitespace-pre-line">
+            <h3 className="text-2xl md:text-3xl lg:text-4xl lg:text-5xl font-black text-[var(--text-primary)] mb-6 md:mb-8 leading-[1.1] whitespace-pre-line">
               {t.storyTitle}
             </h3>
-            <p className="text-[var(--text-secondary)] mb-6 leading-relaxed text-lg font-medium">
+            <p className="text-[var(--text-secondary)] mb-4 md:mb-6 leading-relaxed text-sm md:text-base lg:text-lg font-medium">
               {t.storyDesc1}
             </p>
-            <p className="text-[var(--text-secondary)] mb-10 leading-relaxed text-lg font-medium">
+            <p className="text-[var(--text-secondary)] mb-6 md:mb-10 leading-relaxed text-sm md:text-base lg:text-lg font-medium">
               {t.storyDesc2}
             </p>
 
-            <div className="grid grid-cols-2 gap-8 pt-8 border-t border-[var(--border-color)]">
+            <div className="grid grid-cols-2 gap-4 md:gap-8 pt-6 md:pt-8 border-t border-[var(--border-color)]">
               <div>
-                <h4 className="text-5xl font-black text-[var(--text-primary)] mb-2">
+                <h4 className="text-3xl md:text-4xl lg:text-5xl font-black text-[var(--text-primary)] mb-1 md:mb-2">
                   15+
                 </h4>
-                <p className="text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-wider">
+                <p className="text-[10px] md:text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-wider">
                   {t.yearsLabel}
                 </p>
               </div>
               <div>
-                <h4 className="text-5xl font-black text-[var(--text-primary)] mb-2">
+                <h4 className="text-3xl md:text-4xl lg:text-5xl font-black text-[var(--text-primary)] mb-1 md:mb-2">
                   2M+
                 </h4>
-                <p className="text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-wider">
+                <p className="text-[10px] md:text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-wider">
                   {t.trustLabel}
                 </p>
               </div>
@@ -141,27 +141,27 @@ export default function About() {
           </div>
         </div>
 
-        <div className="bg-[var(--bg-tertiary)] rounded-[3rem] p-12 lg:p-20 mb-24">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h3 className="text-3xl font-black text-[var(--text-primary)] mb-4">
+        <div className="bg-[var(--bg-tertiary)] rounded-[3rem] p-8 md:p-12 lg:p-20 mb-16 md:mb-24">
+          <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
+            <h3 className="text-2xl md:text-3xl font-black text-[var(--text-primary)] mb-3 md:mb-4">
               {t.valuesTitle}
             </h3>
-            <p className="text-[var(--text-secondary)] font-medium">
+            <p className="text-sm md:text-base text-[var(--text-secondary)] font-medium">
               {t.valuesDesc}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             {t.values.map((v, i) => (
-              <div key={i} className="flex items-start gap-4">
+              <div key={i} className="flex items-start gap-3 md:gap-4">
                 <div className="mt-1 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
                   <CheckCircle2 size={16} />
                 </div>
                 <div>
-                  <h4 className="text-xl font-bold text-[var(--text-primary)] mb-2">
+                  <h4 className="text-lg md:text-xl font-bold text-[var(--text-primary)] mb-2">
                     {v.t}
                   </h4>
-                  <p className="text-[var(--text-secondary)] leading-relaxed">
+                  <p className="text-sm md:text-base text-[var(--text-secondary)] leading-relaxed">
                     {v.d}
                   </p>
                 </div>
@@ -171,18 +171,18 @@ export default function About() {
         </div>
 
         {/* Vision & Mission */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center">
           <div className="order-2 lg:order-1">
-            <h2 className="text-sm font-black text-primary uppercase tracking-[0.2em] mb-4">
+            <h2 className="text-xs md:text-sm font-black text-primary uppercase tracking-[0.2em] mb-3 md:mb-4">
               {t.visionSubtitle}
             </h2>
-            <h3 className="text-4xl font-black text-[var(--text-primary)] mb-6 leading-tight whitespace-pre-line">
+            <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)] mb-4 md:mb-6 leading-tight whitespace-pre-line">
               {t.visionTitle}
             </h3>
-            <p className="text-[var(--text-secondary)] mb-6 leading-relaxed text-lg font-medium">
+            <p className="text-[var(--text-secondary)] mb-4 md:mb-6 leading-relaxed text-sm md:text-base lg:text-lg font-medium">
               {t.visionDesc}
             </p>
-            <ul className="space-y-4 text-[var(--text-secondary)] font-medium">
+            <ul className="space-y-3 md:space-y-4 text-sm md:text-base text-[var(--text-secondary)] font-medium">
               {t.visionItems.map((item, idx) => (
                 <li key={idx} className="flex items-center gap-3">
                   <span className="w-2 h-2 rounded-full bg-primary"></span>
@@ -195,13 +195,13 @@ export default function About() {
             <img
               src="https://atpro.com.vn/wp-content/uploads/2025/12/y-te-thong-minh-la-gi-3.jpg"
               alt="Vision"
-              className="rounded-[3rem] shadow-2xl w-full object-cover h-[400px]"
+              className="rounded-[3rem] shadow-2xl w-full object-cover h-[250px] md:h-[300px] lg:h-[400px]"
             />
-            <div className="absolute top-1/2 -left-10 transform -translate-y-1/2 bg-[var(--card-bg)] p-6 rounded-3xl shadow-xl z-20 w-64 border border-[var(--border-color)] hidden md:block">
-              <p className="font-bold text-[var(--text-primary)] mb-2">
+            <div className="absolute top-1/2 -left-6 md:-left-10 transform -translate-y-1/2 bg-[var(--card-bg)] p-4 md:p-6 rounded-3xl shadow-xl z-20 w-56 md:w-64 border border-[var(--border-color)] hidden md:block">
+              <p className="font-bold text-sm md:text-base text-[var(--text-primary)] mb-2">
                 {t.commitmentTitle}
               </p>
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+              <p className="text-xs md:text-sm text-[var(--text-secondary)] leading-relaxed">
                 {t.commitmentDesc}
               </p>
             </div>

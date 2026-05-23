@@ -152,49 +152,50 @@ export default function Doctors() {
   }, {});
 
   return (
-    <div className="bg-[var(--bg-primary)] min-h-screen pt-24 pb-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8 relative">
+    <div className="bg-[var(--bg-primary)] min-h-screen pt-16 md:pt-24 pb-16 md:pb-32">
+      <div className="max-w-7xl mx-auto px-3 md:px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 md:mb-12 gap-4 md:gap-8 relative">
           <div className="max-w-2xl">
-            <h2 className="text-sm font-black text-primary uppercase tracking-[0.2em] mb-4">
+            <h2 className="text-[10px] md:text-sm font-black text-primary uppercase tracking-[0.15em] md:tracking-[0.2em] mb-2 md:mb-4">
               {t.subtitle}
             </h2>
-            <h3 className="text-4xl lg:text-5xl font-black text-[var(--text-primary)] leading-[1.1] whitespace-pre-line">
+            <h3 className="text-2xl md:text-4xl lg:text-5xl font-black text-[var(--text-primary)] leading-[1.1] whitespace-pre-line">
               {t.title}
             </h3>
           </div>
 
-          <div className="flex gap-4 relative">
+          <div className="flex gap-2 md:gap-4 relative">
             <div className="relative">
               <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
-                size={18}
+                className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
+                size={14}
+                md={18}
               />
               <input
                 type="text"
                 placeholder={t.searchPlaceholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 pr-6 py-4 bg-[var(--bg-tertiary)] border-none rounded-2xl text-sm font-bold w-64 focus:ring-2 focus:ring-primary/20 outline-none text-[var(--text-primary)]"
+                className="pl-9 md:pl-12 pr-4 md:pr-6 py-2 md:py-4 bg-[var(--bg-tertiary)] border-none rounded-xl md:rounded-2xl text-xs md:text-sm font-bold w-48 md:w-64 focus:ring-2 focus:ring-primary/20 outline-none text-[var(--text-primary)]"
               />
             </div>
             <button
               onClick={() => setShowFilter(!showFilter)}
-              className={`px-6 py-4 rounded-2xl transition-colors flex items-center justify-center ${showFilter ? "bg-[#102A63] text-white shadow-lg" : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--border-color)]"}`}
+              className={`px-3 md:px-6 py-2 md:py-4 rounded-xl md:rounded-2xl transition-colors flex items-center justify-center ${showFilter ? "bg-[#102A63] text-white shadow-lg" : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--border-color)]"}`}
             >
-              <Filter size={20} />
+              <Filter size={16} md={20} />
             </button>
 
             {/* Filter Panel */}
             {showFilter && (
-              <div className="absolute top-full right-0 mt-4 w-80 bg-[var(--card-bg)] border border-[var(--border-color)] shadow-2xl rounded-3xl p-6 z-50">
-                <h4 className="font-black text-[var(--text-primary)] mb-4 border-b border-[var(--border-color)] pb-3">
+              <div className="absolute top-full right-0 mt-2 md:mt-4 w-72 md:w-80 bg-[var(--card-bg)] border border-[var(--border-color)] shadow-2xl rounded-2xl md:rounded-3xl p-4 md:p-6 z-50">
+                <h4 className="font-black text-[var(--text-primary)] mb-3 md:mb-4 border-b border-[var(--border-color)] pb-2 md:pb-3 text-xs md:text-sm">
                   {t.filterTitle}
                 </h4>
 
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   <div>
-                    <label className="text-xs font-bold text-[var(--text-secondary)] uppercase mb-2 block">
+                    <label className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] uppercase mb-1.5 md:mb-2 block">
                       {t.deptLabel}
                     </label>
                     <select
@@ -203,7 +204,7 @@ export default function Doctors() {
                         setFilters({ ...filters, department: e.target.value });
                         if (e.target.value) setActiveTab("Tất cả");
                       }}
-                      className="w-full p-3 bg-[var(--bg-tertiary)] rounded-xl border-none outline-none text-sm font-medium text-[var(--text-primary)]"
+                      className="w-full p-2 md:p-3 bg-[var(--bg-tertiary)] rounded-lg md:rounded-xl border-none outline-none text-xs md:text-sm font-medium text-[var(--text-primary)]"
                     >
                       <option value="">{t.allDepts}</option>
                       {departments.map((d) => (
@@ -215,7 +216,7 @@ export default function Doctors() {
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-[var(--text-secondary)] uppercase mb-2 block">
+                    <label className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] uppercase mb-1.5 md:mb-2 block">
                       {t.specialtyLabel}
                     </label>
                     <select
@@ -223,7 +224,7 @@ export default function Doctors() {
                       onChange={(e) =>
                         setFilters({ ...filters, specialty: e.target.value })
                       }
-                      className="w-full p-3 bg-[var(--bg-tertiary)] rounded-xl border-none outline-none text-sm font-medium text-[var(--text-primary)]"
+                      className="w-full p-2 md:p-3 bg-[var(--bg-tertiary)] rounded-lg md:rounded-xl border-none outline-none text-xs md:text-sm font-medium text-[var(--text-primary)]"
                     >
                       <option value="">{t.allSpecialties}</option>
                       {specialties.map((s) => (
@@ -235,7 +236,7 @@ export default function Doctors() {
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-[var(--text-secondary)] uppercase mb-2 block">
+                    <label className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] uppercase mb-1.5 md:mb-2 block">
                       {t.expLabel}
                     </label>
                     <select
@@ -243,7 +244,7 @@ export default function Doctors() {
                       onChange={(e) =>
                         setFilters({ ...filters, experience: e.target.value })
                       }
-                      className="w-full p-3 bg-[var(--bg-tertiary)] rounded-xl border-none outline-none text-sm font-medium text-[var(--text-primary)]"
+                      className="w-full p-2 md:p-3 bg-[var(--bg-tertiary)] rounded-lg md:rounded-xl border-none outline-none text-xs md:text-sm font-medium text-[var(--text-primary)]"
                     >
                       <option value="">{t.allExperience}</option>
                       <option value="0-5">{t.expUnder5}</option>
@@ -253,7 +254,7 @@ export default function Doctors() {
                   </div>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-[var(--border-color)] flex justify-end">
+                <div className="mt-4 md:mt-6 pt-3 md:pt-4 border-t border-[var(--border-color)] flex justify-end gap-2">
                   <button
                     onClick={() =>
                       setFilters({
@@ -262,13 +263,13 @@ export default function Doctors() {
                         experience: "",
                       })
                     }
-                    className="text-sm font-bold text-[var(--text-tertiary)] hover:text-[var(--text-primary)] px-4"
+                    className="text-xs md:text-sm font-bold text-[var(--text-tertiary)] hover:text-[var(--text-primary)] px-3 md:px-4"
                   >
                     {t.clearFilter}
                   </button>
                   <button
                     onClick={() => setShowFilter(false)}
-                    className="px-4 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:bg-blue-600"
+                    className="px-3 md:px-4 py-1.5 md:py-2 bg-primary text-white text-xs md:text-sm font-bold rounded-lg md:rounded-xl hover:bg-blue-600"
                   >
                     {t.applyFilter}
                   </button>
@@ -279,10 +280,10 @@ export default function Doctors() {
         </div>
 
         {/* Tabs Tất cả và Chọn chuyên khoa */}
-        <div className="flex gap-4 mb-12 border-b border-[var(--border-color)] pb-4">
+        <div className="flex gap-2 md:gap-4 mb-6 md:mb-12 border-b border-[var(--border-color)] pb-3 md:pb-4 overflow-x-auto">
           <button
             onClick={() => setActiveTab("Tất cả")}
-            className={`px-6 py-2.5 rounded-full font-bold text-sm transition-all duration-300 ${
+            className={`px-4 md:px-6 py-2 md:py-2.5 rounded-full font-bold text-xs md:text-sm transition-all duration-300 whitespace-nowrap ${
               activeTab === "Tất cả"
                 ? "bg-[#102A63] text-white shadow-lg shadow-blue-900/20"
                 : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--border-color)]"
@@ -295,7 +296,7 @@ export default function Doctors() {
             <select
               value={activeTab !== "Tất cả" ? activeTab : ""}
               onChange={(e) => setActiveTab(e.target.value)}
-              className={`appearance-none px-6 py-2.5 rounded-full font-bold text-sm outline-none cursor-pointer border-none transition-all duration-300 pr-10 ${
+              className={`appearance-none px-4 md:px-6 py-2 md:py-2.5 rounded-full font-bold text-xs md:text-sm outline-none cursor-pointer border-none transition-all duration-300 pr-8 md:pr-10 whitespace-nowrap ${
                 activeTab !== "Tất cả"
                   ? "bg-[#102A63] text-white shadow-lg shadow-blue-900/20"
                   : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--border-color)]"
@@ -311,34 +312,35 @@ export default function Doctors() {
               ))}
             </select>
             <ChevronRight
-              size={14}
-              className={`absolute right-4 top-1/2 -translate-y-1/2 rotate-90 pointer-events-none ${activeTab !== "Tất cả" ? "text-white" : "text-[var(--text-tertiary)]"}`}
+              size={10}
+              md={14}
+              className={`absolute right-3 md:right-4 top-1/2 -translate-y-1/2 rotate-90 pointer-events-none ${activeTab !== "Tất cả" ? "text-white" : "text-[var(--text-tertiary)]"}`}
             />
           </div>
         </div>
 
         {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <div className="flex justify-center items-center py-12 md:py-20">
+            <div className="animate-spin rounded-full h-8 w-8 md:h-12 md:w-12 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="space-y-16">
+          <div className="space-y-8 md:space-y-16">
             {Object.keys(filteredGrouped).length === 0 ? (
-              <div className="text-center py-20 text-[var(--text-secondary)] font-medium">
+              <div className="text-center py-12 md:py-20 text-[var(--text-secondary)] font-medium text-xs md:text-sm">
                 {t.noResults}
               </div>
             ) : (
               Object.entries(filteredGrouped).map(
                 ([department, deptDoctors], deptIndex) => (
-                  <div key={deptIndex} className="mb-12">
-                    <h3 className="text-2xl font-black text-[var(--text-primary)] mb-8 pb-4 border-b-2 border-[var(--border-color)] flex items-center gap-3">
-                      <span className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-primary flex items-center justify-center text-sm">
+                  <div key={deptIndex} className="mb-8 md:mb-12">
+                    <h3 className="text-lg md:text-2xl font-black text-[var(--text-primary)] mb-4 md:mb-8 pb-3 md:pb-4 border-b-2 border-[var(--border-color)] flex items-center gap-2 md:gap-3">
+                      <span className="w-6 h-6 md:w-8 md:h-8 rounded-lg md:rounded-xl bg-blue-100 dark:bg-blue-900/30 text-primary flex items-center justify-center text-[10px] md:text-sm">
                         {deptIndex + 1}
                       </span>
                       {getDeptTranslation(department)}
                     </h3>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
                       {deptDoctors.map((d, i) => {
                         const name = d.userId?.fullName || "Bác sĩ";
                         const doctorImages = [
@@ -376,7 +378,7 @@ export default function Doctors() {
                             key={i}
                             className="group relative flex flex-col items-center"
                           >
-                            <div className="w-full h-80 rounded-[3rem] overflow-hidden mb-8 relative shadow-lg">
+                            <div className="w-full h-56 md:h-80 rounded-[2rem] md:rounded-[3rem] overflow-hidden mb-4 md:mb-8 relative shadow-lg">
                               <div className="absolute inset-0 bg-gray-100 animate-pulse"></div>
                               <img
                                 src={avatar}
@@ -389,15 +391,15 @@ export default function Doctors() {
                               />
                             </div>
 
-                            <div className="text-center w-full px-4">
-                              <span className="text-xs font-black tracking-widest text-primary uppercase mb-3 block">
+                            <div className="text-center w-full px-2 md:px-4">
+                              <span className="text-[10px] md:text-xs font-black tracking-widest text-primary uppercase mb-2 md:mb-3 block">
                                 {getSpecialtyTranslation(d.specialty) ||
                                   getDeptTranslation(department)}
                               </span>
-                              <h4 className="text-2xl font-black text-[#102A63] mb-2">
+                              <h4 className="text-lg md:text-2xl font-black text-[#102A63] mb-1 md:mb-2">
                                 {name}
                               </h4>
-                              <p className="text-gray-500 font-medium mb-6">
+                              <p className="text-gray-500 font-medium mb-4 md:mb-6 text-xs md:text-sm">
                                 {t.yearsExperience.replace(
                                   "{exp}",
                                   d.experience,
@@ -412,7 +414,7 @@ export default function Doctors() {
                                     }),
                                   )
                                 }
-                                className="w-full py-4 bg-[var(--card-bg)] border-2 border-[var(--border-color)] text-[var(--text-primary)] font-bold rounded-2xl hover:border-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm hover:shadow-md"
+                                className="w-full py-2.5 md:py-4 bg-[var(--card-bg)] border-2 border-[var(--border-color)] text-[var(--text-primary)] font-bold rounded-xl md:rounded-2xl hover:border-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm hover:shadow-md text-xs md:text-sm"
                               >
                                 {t.btnBookNow}
                               </button>
@@ -429,33 +431,39 @@ export default function Doctors() {
         )}
 
         {/* Stats Section to make page longer */}
-        <div className="mt-32 bg-primary rounded-[3rem] p-12 lg:p-20 text-white relative overflow-hidden">
+        <div className="mt-16 md:mt-32 bg-primary rounded-[2rem] md:rounded-[3rem] p-6 md:p-12 lg:p-20 text-white relative overflow-hidden">
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/20 to-transparent pointer-events-none"></div>
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12 text-center">
             <div>
-              <div className="w-16 h-16 mx-auto bg-white/10 rounded-2xl flex items-center justify-center mb-6">
-                <Users size={32} className="text-blue-200" />
+              <div className="w-12 h-12 md:w-16 md:h-16 mx-auto bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-6">
+                <Users size={20} md={32} className="text-blue-200" />
               </div>
-              <h4 className="text-5xl font-black mb-2">{t.statTitle1}</h4>
-              <p className="text-blue-200 font-medium uppercase tracking-widest text-sm">
+              <h4 className="text-3xl md:text-5xl font-black mb-1 md:mb-2">
+                {t.statTitle1}
+              </h4>
+              <p className="text-blue-200 font-medium uppercase tracking-widest text-[10px] md:text-sm">
                 {t.statLabel1}
               </p>
             </div>
             <div>
-              <div className="w-16 h-16 mx-auto bg-white/10 rounded-2xl flex items-center justify-center mb-6">
-                <Award size={32} className="text-blue-200" />
+              <div className="w-12 h-12 md:w-16 md:h-16 mx-auto bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-6">
+                <Award size={20} md={32} className="text-blue-200" />
               </div>
-              <h4 className="text-5xl font-black mb-2">{t.statTitle2}</h4>
-              <p className="text-blue-200 font-medium uppercase tracking-widest text-sm">
+              <h4 className="text-3xl md:text-5xl font-black mb-1 md:mb-2">
+                {t.statTitle2}
+              </h4>
+              <p className="text-blue-200 font-medium uppercase tracking-widest text-[10px] md:text-sm">
                 {t.statLabel2}
               </p>
             </div>
             <div>
-              <div className="w-16 h-16 mx-auto bg-white/10 rounded-2xl flex items-center justify-center mb-6">
-                <Activity size={32} className="text-blue-200" />
+              <div className="w-12 h-12 md:w-16 md:h-16 mx-auto bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-6">
+                <Activity size={20} md={32} className="text-blue-200" />
               </div>
-              <h4 className="text-5xl font-black mb-2">{t.statTitle3}</h4>
-              <p className="text-blue-200 font-medium uppercase tracking-widest text-sm">
+              <h4 className="text-3xl md:text-5xl font-black mb-1 md:mb-2">
+                {t.statTitle3}
+              </h4>
+              <p className="text-blue-200 font-medium uppercase tracking-widest text-[10px] md:text-sm">
                 {t.statLabel3}
               </p>
             </div>

@@ -141,7 +141,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const u = getStoredUser();
-    if (!u) return navigate("/login");
+    if (!u) return navigate("/");
 
     // Check if user needs to complete profile (first-time Google users)
     if (u.profileCompleted === false) {
@@ -249,16 +249,19 @@ export default function Dashboard() {
       <div
         style={{
           background: "linear-gradient(135deg, #1e3a5f 0%, #1a56db 100%)",
-          borderRadius: 28,
-          padding: "36px 40px",
-          marginBottom: 28,
+          borderRadius: 20,
+          padding: "24px 20px",
+          marginBottom: 20,
           display: "flex",
-          alignItems: "center",
+          flexDirection: "column",
+          alignItems: "flex-start",
           justifyContent: "space-between",
           boxShadow: "0 16px 48px rgba(26,86,219,0.2)",
           position: "relative",
           overflow: "hidden",
+          gap: 16,
         }}
+        className="md:!flex-row md:!items-center md:!padding-[36px_40px] md:!marginBottom-28 md:!gap-0"
       >
         <div
           style={{
@@ -285,34 +288,37 @@ export default function Dashboard() {
         <div>
           <p
             style={{
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: 700,
               color: "rgba(255,255,255,0.6)",
               textTransform: "uppercase",
               letterSpacing: "0.18em",
-              marginBottom: 8,
+              marginBottom: 6,
             }}
+            className="md:!fontSize-12 md:!marginBottom-8"
           >
             {formattedDate}
           </p>
           <h1
             style={{
-              fontSize: 32,
+              fontSize: 24,
               fontWeight: 900,
               color: "#fff",
               letterSpacing: "-0.02em",
-              marginBottom: 10,
+              marginBottom: 8,
               lineHeight: 1.2,
             }}
+            className="md:!fontSize-32 md:!marginBottom-10"
           >
             {t.welcome}, {user?.fullName?.split(" ").slice(-1)[0]} 👋
           </h1>
           <p
             style={{
-              fontSize: 14,
+              fontSize: 13,
               color: "rgba(255,255,255,0.65)",
               fontWeight: 500,
             }}
+            className="md:!fontSize-14"
           >
             {upcoming.length > 0
               ? t.upcomingCount(upcoming.length)
@@ -325,19 +331,21 @@ export default function Dashboard() {
             style={{
               background: "rgba(255,255,255,0.12)",
               backdropFilter: "blur(12px)",
-              borderRadius: 20,
-              padding: "18px 24px",
+              borderRadius: 16,
+              padding: "14px 18px",
               cursor: "pointer",
               border: "1px solid rgba(255,255,255,0.2)",
               flexShrink: 0,
+              width: "100%",
             }}
+            className="md:!borderRadius-20 md:!padding-[18px_24px] md:!width-auto"
           >
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 10,
-                marginBottom: 6,
+                gap: 8,
+                marginBottom: 4,
               }}
             >
               <div
@@ -351,25 +359,30 @@ export default function Dashboard() {
               />
               <p
                 style={{
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: 800,
                   color: "#fca5a5",
                   textTransform: "uppercase",
                   letterSpacing: "0.1em",
                 }}
+                className="md:!fontSize-11"
               >
                 {t.apptSoon}
               </p>
             </div>
-            <p style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>
+            <p
+              style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}
+              className="md:!fontSize-20"
+            >
               {soonAppts[0].time}
             </p>
             <p
               style={{
-                fontSize: 12,
+                fontSize: 11,
                 color: "rgba(255,255,255,0.7)",
                 marginTop: 2,
               }}
+              className="md:!fontSize-12"
             >
               {getDoctorDisplayName(soonAppts[0].doctor?.userId?.fullName)}
             </p>
@@ -381,43 +394,50 @@ export default function Dashboard() {
             style={{
               background: "rgba(255,255,255,0.12)",
               backdropFilter: "blur(12px)",
-              borderRadius: 20,
-              padding: "18px 24px",
+              borderRadius: 16,
+              padding: "14px 18px",
               cursor: "pointer",
               border: "1px solid rgba(255,165,0,0.4)",
               flexShrink: 0,
+              width: "100%",
             }}
+            className="md:!borderRadius-20 md:!padding-[18px_24px] md:!width-auto"
           >
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 8,
-                marginBottom: 6,
+                gap: 6,
+                marginBottom: 4,
               }}
             >
-              <AlertCircle size={14} color="#fbbf24" />
+              <AlertCircle size={12} color="#fbbf24" className="md:!size-14" />
               <p
                 style={{
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: 800,
                   color: "#fbbf24",
                   textTransform: "uppercase",
                   letterSpacing: "0.1em",
                 }}
+                className="md:!fontSize-11"
               >
                 {t.unpaidAlert(unpaidBills.length)}
               </p>
             </div>
-            <p style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>
+            <p
+              style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}
+              className="md:!fontSize-20"
+            >
               {fmt(unpaidBills.reduce((s, b) => s + b.totalAmount, 0))}
             </p>
             <p
               style={{
-                fontSize: 12,
+                fontSize: 11,
                 color: "rgba(255,255,255,0.6)",
                 marginTop: 2,
               }}
+              className="md:!fontSize-12"
             >
               {t.payNow}
             </p>
@@ -429,10 +449,11 @@ export default function Dashboard() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(4,1fr)",
-          gap: 16,
-          marginBottom: 28,
+          gridTemplateColumns: "repeat(2,1fr)",
+          gap: 12,
+          marginBottom: 20,
         }}
+        className="md:!gridTemplateColumns-[repeat(4,1fr)] md:!gap-16 md:!marginBottom-28"
       >
         {STATS.map((s) => (
           <div
@@ -524,7 +545,8 @@ export default function Dashboard() {
 
       {/* ── MAIN GRID ── */}
       <div
-        style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 20 }}
+        style={{ display: "grid", gridTemplateColumns: "1fr", gap: 20 }}
+        className="md:!gridTemplateColumns-[1fr_380px]"
       >
         {/* Appointments */}
         <div
@@ -870,10 +892,11 @@ export default function Dashboard() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(4,1fr)",
-          gap: 14,
+          gridTemplateColumns: "repeat(2,1fr)",
+          gap: 12,
           marginTop: 20,
         }}
+        className="md:!gridTemplateColumns-[repeat(4,1fr)] md:!gap-14"
       >
         {[
           {

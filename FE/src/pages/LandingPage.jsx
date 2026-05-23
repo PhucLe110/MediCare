@@ -216,7 +216,7 @@ const LandingPage = () => {
     <>
       {/* Hero Section */}
       <section
-        className="relative pt-20 pb-32 overflow-hidden"
+        className="relative pt-16 pb-20 md:pt-20 md:pb-32 overflow-hidden"
         style={{
           backgroundImage:
             "url(https://i.pinimg.com/1200x/b4/9f/ce/b49fce1ac413733758fb3bd8419e3fb5.jpg)",
@@ -229,27 +229,27 @@ const LandingPage = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-primary)] via-[var(--bg-primary)]/80 to-transparent z-0"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
             {/* Left Content */}
-            <div className="max-w-xl">
-              <h1 className="text-5xl lg:text-6xl font-extrabold text-[var(--text-primary)] leading-tight mb-4">
+            <div className="max-w-xl order-2 lg:order-1">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-[var(--text-primary)] leading-tight mb-4">
                 {t.heroTitle1} <br />
                 <span className="text-primary">{t.heroTitle2}</span>
               </h1>
-              <p className="text-lg text-[var(--text-secondary)] mb-8 leading-relaxed">
+              <p className="text-base md:text-lg text-[var(--text-secondary)] mb-6 md:mb-8 leading-relaxed">
                 {t.heroDesc}
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 mb-12">
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-8 md:mb-12">
                 <button
                   onClick={() =>
                     document.dispatchEvent(
                       new CustomEvent("open-auth", { detail: "login" }),
                     )
                   }
-                  className="flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-white font-medium rounded-lg hover:bg-primary-light transition-all shadow-md"
+                  className="flex items-center justify-center gap-2 px-5 py-3 md:px-6 md:py-3.5 bg-primary text-white font-medium rounded-lg hover:bg-primary-light transition-all shadow-md text-sm md:text-base"
                 >
-                  <Calendar size={20} />
+                  <Calendar size={18} md={20} />
                   {t.btnBook}
                 </button>
                 <button
@@ -258,20 +258,20 @@ const LandingPage = () => {
                       new CustomEvent("open-auth", { detail: "login" }),
                     )
                   }
-                  className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[var(--card-bg)] text-primary border border-primary font-medium rounded-lg hover:bg-primary-pale transition-all shadow-sm"
+                  className="flex items-center justify-center gap-2 px-5 py-3 md:px-6 md:py-3.5 bg-[var(--card-bg)] text-primary border border-primary font-medium rounded-lg hover:bg-primary-pale transition-all shadow-sm text-sm md:text-base"
                 >
-                  <Bot size={20} />
+                  <Bot size={18} md={20} />
                   {t.btnAI}
                 </button>
               </div>
 
               {/* Bottom features */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-6 md:mt-8">
                 <div className="flex flex-col gap-2">
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-primary">
                     <Activity size={20} />
                   </div>
-                  <span className="text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
+                  <span className="text-[10px] md:text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
                     {t.featAI}
                   </span>
                 </div>
@@ -279,7 +279,7 @@ const LandingPage = () => {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-primary">
                     <Calendar size={20} />
                   </div>
-                  <span className="text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
+                  <span className="text-[10px] md:text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
                     {t.featBooking}
                   </span>
                 </div>
@@ -287,7 +287,7 @@ const LandingPage = () => {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-primary">
                     <ShieldCheck size={20} />
                   </div>
-                  <span className="text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
+                  <span className="text-[10px] md:text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
                     {t.featShield}
                   </span>
                 </div>
@@ -295,7 +295,7 @@ const LandingPage = () => {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-primary">
                     <FileText size={20} />
                   </div>
-                  <span className="text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
+                  <span className="text-[10px] md:text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
                     {t.featRecord}
                   </span>
                 </div>
@@ -303,8 +303,8 @@ const LandingPage = () => {
             </div>
 
             {/* Right Content - Stacked Action Cards */}
-            <div className="relative flex justify-center lg:justify-end">
-              <div className="w-full max-w-md space-y-4">
+            <div className="relative flex justify-center lg:justify-end order-1 lg:order-2 mb-8 lg:mb-0">
+              <div className="w-full max-w-md space-y-3 md:space-y-4">
                 {[
                   {
                     icon: Calendar,
@@ -338,35 +338,36 @@ const LandingPage = () => {
                         new CustomEvent("open-auth", { detail: "login" }),
                       )
                     }
-                    className={`flex items-center p-5 rounded-2xl cursor-pointer transition-all duration-300 transform hover:-translate-y-1 shadow-lg ${
+                    className={`flex items-center p-4 md:p-5 rounded-2xl cursor-pointer transition-all duration-300 transform hover:-translate-y-1 shadow-lg ${
                       item.primary
                         ? "bg-primary text-white border border-primary-light shadow-primary/20"
                         : "bg-[var(--card-bg)]/90 backdrop-blur-sm border border-[var(--border-color)] hover:bg-[var(--card-bg)] text-[var(--text-primary)]"
                     }`}
                   >
                     <div
-                      className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 ${
+                      className={`w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center shrink-0 ${
                         item.primary
                           ? "bg-white/20"
                           : "bg-blue-50 dark:bg-blue-900/30 text-primary"
                       }`}
                     >
-                      <item.icon size={28} />
+                      <item.icon size={24} md={28} />
                     </div>
-                    <div className="ml-5 flex-1">
+                    <div className="ml-3 md:ml-5 flex-1">
                       <h3
-                        className={`font-black text-lg ${item.primary ? "text-white" : "text-[var(--text-primary)]"}`}
+                        className={`font-black text-base md:text-lg ${item.primary ? "text-white" : "text-[var(--text-primary)]"}`}
                       >
                         {item.title}
                       </h3>
                       <p
-                        className={`text-sm mt-0.5 ${item.primary ? "text-blue-100" : "text-[var(--text-secondary)]"}`}
+                        className={`text-xs md:text-sm mt-0.5 ${item.primary ? "text-blue-100" : "text-[var(--text-secondary)]"}`}
                       >
                         {item.desc}
                       </p>
                     </div>
                     <ChevronRight
-                      size={20}
+                      size={18}
+                      md={20}
                       className={
                         item.primary
                           ? "text-white/70"
@@ -384,49 +385,49 @@ const LandingPage = () => {
       {/* About Section */}
       <section
         id="about"
-        className="py-24 bg-[var(--bg-secondary)] relative overflow-hidden"
+        className="py-16 md:py-24 bg-[var(--bg-secondary)] relative overflow-hidden"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="relative">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center">
+            <div className="relative order-2 lg:order-1">
               <div className="absolute -inset-4 bg-primary/10 rounded-[3rem] transform -rotate-3 z-0"></div>
               <img
                 src="https://i.pinimg.com/1200x/d4/5b/29/d45b297559f95af7511287bebbf3b4fe.jpg"
                 alt="About MediCare"
-                className="rounded-3xl shadow-2xl relative z-10 w-full object-cover h-[500px]"
+                className="rounded-3xl shadow-2xl relative z-10 w-full object-cover h-[300px] md:h-[400px] lg:h-[500px]"
               />
 
               <div
-                className="absolute -bottom-8 -right-8 bg-[var(--card-bg)] p-6 rounded-3xl shadow-xl z-20 flex items-center gap-4 animate-bounce"
+                className="absolute -bottom-4 -right-4 md:-bottom-8 md:-right-8 bg-[var(--card-bg)] p-4 md:p-6 rounded-3xl shadow-xl z-20 flex items-center gap-3 md:gap-4 animate-bounce"
                 style={{ animationDuration: "3s" }}
               >
-                <div className="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary flex items-center justify-center">
-                  <Award size={32} />
+                <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary flex items-center justify-center">
+                  <Award size={24} md={32} />
                 </div>
                 <div>
-                  <h4 className="text-3xl font-black text-[var(--text-primary)]">
+                  <h4 className="text-2xl md:text-3xl font-black text-[var(--text-primary)]">
                     15+
                   </h4>
-                  <p className="text-sm font-bold text-[var(--text-secondary)] uppercase">
+                  <p className="text-[10px] md:text-sm font-bold text-[var(--text-secondary)] uppercase">
                     {t.aboutExp}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div>
-              <h2 className="text-sm font-bold text-primary uppercase tracking-widest mb-2">
+            <div className="order-1 lg:order-2">
+              <h2 className="text-xs md:text-sm font-bold text-primary uppercase tracking-widest mb-2">
                 {t.aboutSubtitle}
               </h2>
-              <h3 className="text-3xl md:text-4xl font-black text-[var(--text-primary)] mb-6 leading-tight">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)] mb-4 md:mb-6 leading-tight">
                 {t.aboutTitle1} <br />
                 {t.aboutTitle2}
               </h3>
-              <p className="text-[var(--text-secondary)] mb-6 leading-relaxed text-lg">
+              <p className="text-[var(--text-secondary)] mb-4 md:mb-6 leading-relaxed text-sm md:text-base lg:text-lg">
                 {t.aboutDesc}
               </p>
 
-              <div className="space-y-4 mb-8">
+              <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
                 {[
                   t.aboutPoint1,
                   t.aboutPoint2,
@@ -437,23 +438,27 @@ const LandingPage = () => {
                     <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
                       <CheckCircle2 size={14} />
                     </div>
-                    <span className="text-[var(--text-primary)] font-medium">
+                    <span className="text-sm md:text-base text-[var(--text-primary)] font-medium">
                       {item}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div className="grid grid-cols-2 gap-6 pt-6 border-t border-[var(--border-color)]">
+              <div className="grid grid-cols-2 gap-4 md:gap-6 pt-4 md:pt-6 border-t border-[var(--border-color)]">
                 <div>
-                  <h4 className="text-4xl font-black text-primary mb-1">2M+</h4>
-                  <p className="text-sm font-bold text-[var(--text-secondary)] uppercase">
+                  <h4 className="text-3xl md:text-4xl font-black text-primary mb-1">
+                    2M+
+                  </h4>
+                  <p className="text-[10px] md:text-sm font-bold text-[var(--text-secondary)] uppercase">
                     {t.aboutTrust}
                   </p>
                 </div>
                 <div>
-                  <h4 className="text-4xl font-black text-primary mb-1">98%</h4>
-                  <p className="text-sm font-bold text-[var(--text-secondary)] uppercase">
+                  <h4 className="text-3xl md:text-4xl font-black text-primary mb-1">
+                    98%
+                  </h4>
+                  <p className="text-[10px] md:text-sm font-bold text-[var(--text-secondary)] uppercase">
                     {t.aboutSatisfied}
                   </p>
                 </div>
@@ -464,18 +469,21 @@ const LandingPage = () => {
       </section>
 
       {/* Services Section */}
-      <section id="services" className="py-24 bg-[var(--bg-primary)] relative">
+      <section
+        id="services"
+        className="py-16 md:py-24 bg-[var(--bg-primary)] relative"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h3 className="text-3xl md:text-4xl font-black text-[var(--text-primary)]">
+          <div className="text-center max-w-2xl mx-auto mb-12 md:mb-16">
+            <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)]">
               {t.servicesTitle}
             </h3>
-            <p className="mt-4 text-[var(--text-secondary)]">
+            <p className="mt-4 text-sm md:text-base text-[var(--text-secondary)]">
               {t.servicesDesc}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {[
               {
                 img: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=500&q=80",
@@ -528,7 +536,7 @@ const LandingPage = () => {
                 onClick={() => navigate("/services")}
                 className="bg-[var(--card-bg)] rounded-[2rem] overflow-hidden border border-[var(--border-color)] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-1.5 group cursor-pointer flex flex-col"
               >
-                <div className="h-48 overflow-hidden relative">
+                <div className="h-40 md:h-48 overflow-hidden relative">
                   <div className="absolute inset-0 bg-primary/20 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <img
                     src={s.img}
@@ -536,14 +544,14 @@ const LandingPage = () => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                 </div>
-                <div className="p-6 flex flex-col flex-grow text-left">
-                  <h4 className="text-xl font-black text-[var(--text-primary)] mb-3 group-hover:text-primary transition-colors">
+                <div className="p-4 md:p-6 flex flex-col flex-grow text-left">
+                  <h4 className="text-lg md:text-xl font-black text-[var(--text-primary)] mb-2 md:mb-3 group-hover:text-primary transition-colors">
                     {s.name}
                   </h4>
-                  <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-6">
+                  <p className="text-[var(--text-secondary)] text-xs md:text-sm leading-relaxed mb-4 md:mb-6">
                     {s.desc}
                   </p>
-                  <div className="mt-auto flex items-center justify-between text-sm font-bold text-[var(--text-tertiary)] group-hover:text-primary transition-colors border-t border-[var(--border-color)] pt-4">
+                  <div className="mt-auto flex items-center justify-between text-xs md:text-sm font-bold text-[var(--text-tertiary)] group-hover:text-primary transition-colors border-t border-[var(--border-color)] pt-3 md:pt-4">
                     <span>{t.learnMore}</span>
                     <div className="w-8 h-8 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
                       <ChevronRight size={14} />
@@ -559,30 +567,30 @@ const LandingPage = () => {
       {/* Doctors Section */}
       <section
         id="doctors"
-        className="py-24 bg-[var(--bg-secondary)] relative overflow-hidden"
+        className="py-16 md:py-24 bg-[var(--bg-secondary)] relative overflow-hidden"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 gap-4 md:gap-6">
             <div className="max-w-2xl">
-              <h2 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest mb-2">
+              <h2 className="text-xs md:text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest mb-2">
                 {t.doctorsSubtitle}
               </h2>
-              <h3 className="text-3xl md:text-4xl font-black text-[var(--text-primary)]">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)]">
                 {t.doctorsTitle}
               </h3>
-              <p className="mt-4 text-[var(--text-secondary)]">
+              <p className="mt-3 md:mt-4 text-sm md:text-base text-[var(--text-secondary)]">
                 {t.doctorsDesc}
               </p>
             </div>
             <button
               onClick={() => navigate("/doctors")}
-              className="w-max px-6 py-3 bg-[var(--card-bg)] border border-[var(--border-color)] text-[var(--text-primary)] font-bold rounded-xl hover:bg-[var(--bg-tertiary)] transition-colors shadow-sm"
+              className="w-max px-5 py-2.5 md:px-6 md:py-3 bg-[var(--card-bg)] border border-[var(--border-color)] text-[var(--text-primary)] font-bold rounded-xl hover:bg-[var(--bg-tertiary)] transition-colors shadow-sm text-sm md:text-base"
             >
               {t.btnViewAllDocs}
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {doctors.map((d, i) => {
               const name = d.userId?.fullName || "Bác sĩ";
               const doctorImages = [
@@ -614,7 +622,7 @@ const LandingPage = () => {
                   key={i}
                   className="bg-[var(--card-bg)] rounded-[2rem] overflow-hidden shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-[var(--border-color)] hover:-translate-y-1 transition-all duration-300 group flex flex-col"
                 >
-                  <div className="h-64 relative bg-[var(--bg-tertiary)] overflow-hidden">
+                  <div className="h-48 md:h-64 relative bg-[var(--bg-tertiary)] overflow-hidden">
                     <img
                       src={avatar}
                       alt={name}
@@ -625,14 +633,14 @@ const LandingPage = () => {
                       className="w-full h-full object-cover relative z-10 group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
-                  <div className="p-6 flex flex-col flex-grow">
-                    <div className="text-[10px] font-black tracking-wider text-[var(--text-primary)] bg-[var(--bg-tertiary)] w-max px-3 py-1.5 rounded-full mb-4 uppercase">
+                  <div className="p-4 md:p-6 flex flex-col flex-grow">
+                    <div className="text-[10px] font-black tracking-wider text-[var(--text-primary)] bg-[var(--bg-tertiary)] w-max px-3 py-1.5 rounded-full mb-3 md:mb-4 uppercase">
                       {getDeptTranslation(d.department)}
                     </div>
-                    <h4 className="text-lg font-black text-[var(--text-primary)] mb-1">
+                    <h4 className="text-base md:text-lg font-black text-[var(--text-primary)] mb-1">
                       {name}
                     </h4>
-                    <p className="text-sm text-[var(--text-secondary)] font-medium mb-6">
+                    <p className="text-xs md:text-sm text-[var(--text-secondary)] font-medium mb-4 md:mb-6">
                       {t.experience}: {d.experience} {t.years}
                     </p>
 
@@ -643,7 +651,7 @@ const LandingPage = () => {
                             new CustomEvent("open-auth", { detail: "login" }),
                           )
                         }
-                        className="w-full py-3 bg-[var(--bg-tertiary)] text-[var(--text-primary)] font-bold rounded-xl hover:bg-primary hover:text-white transition-colors"
+                        className="w-full py-2.5 md:py-3 bg-[var(--bg-tertiary)] text-[var(--text-primary)] font-bold rounded-xl hover:bg-primary hover:text-white transition-colors text-sm md:text-base"
                       >
                         {t.btnBookNow}
                       </button>
@@ -657,21 +665,26 @@ const LandingPage = () => {
       </section>
 
       {/* Work Process Section */}
-      <section id="process" className="py-24 bg-[var(--bg-primary)] relative">
+      <section
+        id="process"
+        className="py-16 md:py-24 bg-[var(--bg-primary)] relative"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-sm font-bold text-primary uppercase tracking-widest mb-2">
+          <div className="text-center max-w-2xl mx-auto mb-12 md:mb-16">
+            <h2 className="text-xs md:text-sm font-bold text-primary uppercase tracking-widest mb-2">
               {t.processSubtitle}
             </h2>
-            <h3 className="text-3xl md:text-4xl font-black text-[var(--text-primary)]">
+            <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)]">
               {t.processTitle}
             </h3>
-            <p className="mt-4 text-[var(--text-secondary)]">{t.processDesc}</p>
+            <p className="mt-3 md:mt-4 text-sm md:text-base text-[var(--text-secondary)]">
+              {t.processDesc}
+            </p>
           </div>
 
           <div className="relative">
             <div className="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-blue-50 dark:bg-blue-900/30 transform -translate-y-1/2"></div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 relative z-10">
               {[
                 {
                   step: "01",
@@ -700,18 +713,18 @@ const LandingPage = () => {
               ].map((p, i) => (
                 <div
                   key={i}
-                  className="bg-[var(--card-bg)] p-6 rounded-3xl shadow-sm border border-[var(--border-color)] hover:shadow-xl hover:border-primary transition-all group relative text-center"
+                  className="bg-[var(--card-bg)] p-5 md:p-6 rounded-3xl shadow-sm border border-[var(--border-color)] hover:shadow-xl hover:border-primary transition-all group relative text-center"
                 >
-                  <div className="absolute -top-4 -right-4 w-12 h-12 rounded-full bg-primary text-white font-black text-xl flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
+                  <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary text-white font-black text-lg md:text-xl flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
                     {p.step}
                   </div>
-                  <div className="w-20 h-20 mx-auto rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-                    <p.icon size={32} />
+                  <div className="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-primary mb-4 md:mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+                    <p.icon size={24} md={32} />
                   </div>
-                  <h4 className="text-xl font-bold text-[var(--text-primary)] mb-3">
+                  <h4 className="text-lg md:text-xl font-bold text-[var(--text-primary)] mb-2 md:mb-3">
                     {p.title}
                   </h4>
-                  <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
+                  <p className="text-[var(--text-secondary)] text-xs md:text-sm leading-relaxed">
                     {p.desc}
                   </p>
                 </div>

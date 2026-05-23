@@ -1,0 +1,430 @@
+/* Responsive Styles for MediCare Project */
+/* Mobile First Approach - Keeping laptop/desktop structure intact */
+
+/* ============================================
+   MOBILE BREAKPOINTS (< 768px)
+   ============================================ */
+
+/* Hide elements on mobile */
+.mobile-hidden {
+  display: none !important;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 767px) {
+  /* Header adjustments */
+  .header-container {
+    padding: 0.75rem 1rem !important;
+  }
+
+  .header-height {
+    height: 64px !important;
+  }
+
+  /* Logo size on mobile */
+  .mobile-logo {
+    height: 40px !important;
+  }
+
+  /* Navigation - Mobile Menu */
+  .mobile-menu {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-primary);
+    z-index: 40;
+    padding: 1rem;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    overflow-y: auto;
+  }
+
+  .mobile-menu.open {
+    transform: translateX(0);
+  }
+
+  .mobile-menu-overlay {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 35;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .mobile-menu-overlay.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Mobile nav items */
+  .mobile-nav-item {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  /* Auth buttons on mobile */
+  .mobile-auth-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+
+  .mobile-auth-buttons button {
+    width: 100%;
+  }
+
+  /* Theme/Language controls on mobile */
+  .mobile-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  /* Footer adjustments */
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+
+  .footer-social {
+    justify-content: center;
+  }
+
+  .footer-bottom {
+    flex-direction: column !important;
+    text-align: center;
+    gap: 1rem !important;
+  }
+
+  /* Sidebar - Mobile Collapsible */
+  .sidebar-mobile {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .sidebar-mobile.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 45;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .sidebar-overlay.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Main content with mobile sidebar */
+  .main-content-mobile {
+    margin-left: 0 !important;
+    padding: 1rem !important;
+  }
+
+  /* Top bar for mobile */
+  .mobile-top-bar {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+
+  /* Hamburger button */
+  .hamburger-button {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  /* Cards and containers */
+  .card-mobile {
+    margin: 0 -1rem;
+    border-radius: 0 !important;
+  }
+
+  /* Tables - horizontal scroll on mobile */
+  .table-container-mobile {
+    overflow-x: auto;
+    margin: 0 -1rem;
+    padding: 0 1rem;
+  }
+
+  /* Forms on mobile */
+  .form-mobile {
+    padding: 1rem;
+  }
+
+  .form-row-mobile {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  /* Grid adjustments */
+  .grid-mobile-1 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .grid-mobile-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Text adjustments */
+  .text-mobile-sm {
+    font-size: 0.875rem !important;
+  }
+
+  .text-mobile-xs {
+    font-size: 0.75rem !important;
+  }
+
+  /* Hide desktop-only elements */
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* Show mobile-only elements */
+  .mobile-only {
+    display: flex !important;
+  }
+}
+
+/* ============================================
+   TABLET BREAKPOINTS (768px - 1024px)
+   ============================================ */
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  /* Header adjustments for tablet */
+  .header-container {
+    padding: 0.75rem 1.5rem !important;
+  }
+
+  /* Navigation - adjust spacing */
+  .nav-tablet {
+    gap: 1rem !important;
+  }
+
+  .nav-tablet a {
+    font-size: 0.875rem !important;
+    padding: 0.5rem !important;
+  }
+
+  /* Footer - 3 columns on tablet */
+  .footer-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .footer-grid > div:nth-child(4),
+  .footer-grid > div:nth-child(5) {
+    grid-column: span 1;
+  }
+
+  /* Sidebar - slightly narrower on tablet */
+  .sidebar-tablet {
+    width: 220px !important;
+  }
+
+  /* Main content with tablet sidebar */
+  .main-content-tablet {
+    margin-left: 220px !important;
+    padding: 1.5rem !important;
+  }
+
+  /* Cards - 2 columns on tablet */
+  .card-grid-tablet {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Tables - adjust padding */
+  .table-container-tablet {
+    padding: 0 1.5rem;
+  }
+
+  /* Forms - 2 columns on tablet */
+  .form-row-tablet {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Hide mobile-only elements */
+  .mobile-only {
+    display: none !important;
+  }
+
+  /* Hide mobile menu and overlay on tablet */
+  .mobile-menu {
+    display: none !important;
+  }
+
+  .mobile-menu-overlay {
+    display: none !important;
+  }
+
+  .hamburger-button {
+    display: none !important;
+  }
+
+  /* Hide mobile top bar on tablet */
+  .mobile-top-bar {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   DESKTOP (> 1024px) - Keep original structure
+   ============================================ */
+
+@media (min-width: 1025px) {
+  /* Hide mobile-specific elements */
+  .mobile-only {
+    display: none !important;
+  }
+
+  .hamburger-button {
+    display: none !important;
+  }
+
+  .mobile-menu {
+    display: none !important;
+  }
+
+  .mobile-menu-overlay {
+    display: none !important;
+  }
+
+  .sidebar-overlay {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Show/hide utilities */
+.show-mobile {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .show-mobile {
+    display: flex !important;
+  }
+}
+
+.hide-mobile {
+  display: flex;
+}
+
+@media (max-width: 767px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+.show-tablet {
+  display: none;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .show-tablet {
+    display: flex !important;
+  }
+}
+
+.hide-tablet {
+  display: flex;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .hide-tablet {
+    display: none !important;
+  }
+}
+
+/* Touch-friendly tap targets */
+@media (max-width: 767px) {
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Smooth scrolling for mobile menus */
+.mobile-menu,
+.sidebar-mobile {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent body scroll when menu is open */
+body.menu-open {
+  overflow: hidden;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.mobile-menu.animate-in {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+.sidebar-mobile.animate-in {
+  animation: slideInLeft 0.3s ease-out;
+}

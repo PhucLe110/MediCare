@@ -314,9 +314,9 @@ export default function AdminShifts() {
 
       {/* Pending banner */}
       {pendingCount > 0 && (
-        <div className="flex items-center gap-3 px-5 py-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-900/30 rounded-2xl text-yellow-800 dark:text-yellow-100 text-sm font-bold">
+        <div className="flex items-center gap-2 md:gap-3 px-3 md:px-5 py-2 md:py-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-900/30 rounded-2xl text-yellow-800 dark:text-yellow-100 text-xs md:text-sm font-bold">
           <AlertCircle
-            size={18}
+            size={16}
             className="text-yellow-500 dark:text-yellow-400 shrink-0"
           />
           {t.pendingBanner(pendingCount)}
@@ -324,27 +324,27 @@ export default function AdminShifts() {
       )}
 
       {/* Search */}
-      <div className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border-color)] shadow-sm p-4">
-        <div className="relative w-80">
+      <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm p-3 md:p-4">
+        <div className="relative w-full md:w-80">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
-            size={18}
+            size={16}
           />
           <input
             type="text"
             placeholder={t.searchPlaceholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-4 py-2 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-full text-[var(--text-primary)]"
+            className="pl-9 md:pl-10 pr-3 md:pr-4 py-2 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-full text-[var(--text-primary)]"
           />
         </div>
       </div>
 
       {/* Grouped by doctor */}
       {groupedList.length === 0 ? (
-        <div className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border-color)] shadow-sm text-center py-16 text-[var(--text-tertiary)]">
-          <AlertCircle size={40} className="mx-auto mb-3 opacity-20" />
-          <p className="font-semibold text-sm">{t.noRequests}</p>
+        <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm text-center py-12 md:py-16 text-[var(--text-tertiary)]">
+          <AlertCircle size={32} className="mx-auto mb-3 opacity-20" />
+          <p className="font-semibold text-xs md:text-sm">{t.noRequests}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -360,33 +360,33 @@ export default function AdminShifts() {
               >
                 {/* Doctor header */}
                 <div
-                  className="flex items-center justify-between p-5 cursor-pointer hover:bg-[var(--bg-tertiary)] transition-colors"
+                  className="flex flex-col md:flex-row md:items-center md:justify-between p-4 md:p-5 cursor-pointer hover:bg-[var(--bg-tertiary)] transition-colors gap-3"
                   onClick={() =>
                     setExpandedDoctor(isExpanded ? null : group.doctorId)
                   }
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-sm">
+                  <div className="flex items-center gap-3 md:gap-4">
+                    <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-xs md:text-sm shrink-0">
                       {group.doctorName.charAt(
                         group.doctorName.lastIndexOf(" ") + 1,
                       ) || "?"}
                     </div>
                     <div>
-                      <p className="font-bold text-[var(--text-primary)]">
+                      <p className="font-bold text-[var(--text-primary)] text-xs md:text-sm">
                         BS. {group.doctorName}
                       </p>
-                      <p className="text-xs text-[var(--text-secondary)] font-medium">
+                      <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-medium">
                         {group.department}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 md:gap-3 flex-wrap">
                     {pendingInGroup > 0 && (
-                      <span className="px-2.5 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 text-xs font-black rounded-full">
+                      <span className="px-2 md:px-2.5 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 text-[10px] md:text-xs font-black rounded-full">
                         {t.pendingCount(pendingInGroup)}
                       </span>
                     )}
-                    <span className="px-2.5 py-1 bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-xs font-bold rounded-full">
+                    <span className="px-2 md:px-2.5 py-1 bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-[10px] md:text-xs font-bold rounded-full">
                       {t.requestCount(group.requests.length)}
                     </span>
                     <button
@@ -394,18 +394,19 @@ export default function AdminShifts() {
                         e.stopPropagation();
                         openPreview(group.doctorId, group.doctorName);
                       }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+                      className="flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1 md:py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] md:text-xs font-bold rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
                     >
-                      <Eye size={14} /> {t.viewSchedule}
+                      <Eye size={12} />{" "}
+                      <span className="hidden md:inline">{t.viewSchedule}</span>
                     </button>
                     {isExpanded ? (
                       <ChevronUp
-                        size={18}
+                        size={16}
                         className="text-[var(--text-tertiary)]"
                       />
                     ) : (
                       <ChevronDown
-                        size={18}
+                        size={16}
                         className="text-[var(--text-tertiary)]"
                       />
                     )}
@@ -418,17 +419,17 @@ export default function AdminShifts() {
                     {group.requests.map((r) => (
                       <div
                         key={r._id}
-                        className="flex items-center justify-between px-5 py-3 hover:bg-[var(--bg-tertiary)] transition-colors"
+                        className="flex flex-col md:flex-row md:items-center md:justify-between px-4 md:px-5 py-3 hover:bg-[var(--bg-tertiary)] transition-colors gap-2 md:gap-4"
                       >
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 md:gap-4">
                           <span
-                            className={`px-2.5 py-1 rounded-lg text-xs font-bold ${r.type === "add" ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400" : "bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400"}`}
+                            className={`px-2 md:px-2.5 py-1 rounded-lg text-[10px] md:text-xs font-bold ${r.type === "add" ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400" : "bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400"}`}
                           >
                             {r.type === "add" ? t.addShift : t.cancelShift}
                           </span>
-                          <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)] font-medium">
+                          <div className="flex items-center gap-2 text-[10px] md:text-sm text-[var(--text-secondary)] font-medium">
                             <Calendar
-                              size={14}
+                              size={12}
                               className="text-[var(--text-tertiary)]"
                             />
                             {new Date(r.date).toLocaleDateString(locale, {
@@ -437,13 +438,13 @@ export default function AdminShifts() {
                               month: "2-digit",
                             })}
                           </div>
-                          <div className="flex flex-wrap gap-1.5">
+                          <div className="flex flex-wrap gap-1 md:gap-1.5">
                             {(r.times || []).map((t) => (
                               <span
                                 key={t}
-                                className={`px-2 py-0.5 rounded-md text-[11px] font-bold border flex items-center gap-0.5 ${r.type === "add" ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/30" : "bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-900/30"}`}
+                                className={`px-1.5 md:px-2 py-0.5 rounded-md text-[10px] md:text-[11px] font-bold border flex items-center gap-0.5 ${r.type === "add" ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/30" : "bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-900/30"}`}
                               >
-                                <Clock size={9} />
+                                <Clock size={8} />
                                 {t}
                               </span>
                             ))}
@@ -451,17 +452,17 @@ export default function AdminShifts() {
                         </div>
                         <div className="flex items-center gap-2">
                           {r.status === "pending" && (
-                            <span className="text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30 px-2.5 py-1 rounded-lg text-xs font-bold border border-yellow-100 dark:border-yellow-900/30">
+                            <span className="text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30 px-2 md:px-2.5 py-1 rounded-lg text-[10px] md:text-xs font-bold border border-yellow-100 dark:border-yellow-900/30">
                               {t.statusPending}
                             </span>
                           )}
                           {r.status === "approved" && (
-                            <span className="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-lg text-xs font-bold border border-emerald-100 dark:border-emerald-900/30">
+                            <span className="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 md:px-2.5 py-1 rounded-lg text-[10px] md:text-xs font-bold border border-emerald-100 dark:border-emerald-900/30">
                               {t.statusApproved}
                             </span>
                           )}
                           {r.status === "rejected" && (
-                            <span className="text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 px-2.5 py-1 rounded-lg text-xs font-bold border border-rose-100 dark:border-rose-900/30">
+                            <span className="text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 px-2 md:px-2.5 py-1 rounded-lg text-[10px] md:text-xs font-bold border border-rose-100 dark:border-rose-900/30">
                               {t.statusRejected}
                             </span>
                           )}
@@ -469,17 +470,17 @@ export default function AdminShifts() {
                             <>
                               <button
                                 onClick={() => updateStatus(r._id, "approved")}
-                                className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-lg transition-colors"
+                                className="p-1 md:p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-lg transition-colors"
                                 title={t.approveTitle}
                               >
-                                <CheckCircle size={18} />
+                                <CheckCircle size={14} />
                               </button>
                               <button
                                 onClick={() => updateStatus(r._id, "rejected")}
-                                className="p-1.5 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/30 rounded-lg transition-colors"
+                                className="p-1 md:p-1.5 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/30 rounded-lg transition-colors"
                                 title={t.rejectTitle}
                               >
-                                <XCircle size={18} />
+                                <XCircle size={14} />
                               </button>
                             </>
                           )}
@@ -523,27 +524,27 @@ export default function AdminShifts() {
 
           return (
             <div
-              className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[9998] flex items-center justify-center p-4"
+              className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[9998] flex items-center justify-center p-3 md:p-4"
               onClick={closePreview}
             >
               <div
-                className="bg-[var(--card-bg)] rounded-3xl shadow-2xl border border-[var(--border-color)] w-full max-w-2xl max-h-[88vh] flex flex-col"
+                className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl shadow-2xl border border-[var(--border-color)] w-full max-w-2xl max-h-[90vh] md:max-h-[88vh] flex flex-col"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Modal header */}
-                <div className="p-6 border-b border-[var(--border-color)] flex items-center justify-between">
+                <div className="p-4 md:p-6 border-b border-[var(--border-color)] flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-black text-[var(--text-primary)]">
+                    <h3 className="text-base md:text-lg font-black text-[var(--text-primary)]">
                       {t.scheduleTitle(previewDoctor.doctorName)}
                     </h3>
                     {previewSchedule && (
-                      <p className="text-xs text-[var(--text-secondary)] font-medium mt-0.5">
+                      <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-medium mt-0.5">
                         {t.shiftPattern}{" "}
                         <span className="font-bold text-indigo-600 dark:text-indigo-400">
                           {previewSchedule.doctor?.shiftPattern || t.fullWeek}
                         </span>
                         {pendingReqs.length > 0 && (
-                          <span className="ml-3 text-yellow-600 dark:text-yellow-400 font-bold">
+                          <span className="ml-2 md:ml-3 text-yellow-600 dark:text-yellow-400 font-bold">
                             {t.pendingInMonth(pendingReqs.length)}
                           </span>
                         )}
@@ -552,58 +553,58 @@ export default function AdminShifts() {
                   </div>
                   <button
                     onClick={closePreview}
-                    className="p-2 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-xl transition-colors"
+                    className="p-1.5 md:p-2 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-xl transition-colors"
                   >
-                    <X size={20} />
+                    <X size={18} />
                   </button>
                 </div>
 
                 {/* Month nav */}
-                <div className="flex items-center justify-between px-6 py-3 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">
+                <div className="flex items-center justify-between px-4 md:px-6 py-2 md:py-3 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">
                   <button
                     onClick={() => changeMonth(-1)}
-                    className="p-2 hover:bg-[var(--border-color)] rounded-lg transition-colors text-[var(--text-secondary)] font-bold"
+                    className="p-1.5 md:p-2 hover:bg-[var(--border-color)] rounded-lg transition-colors text-[var(--text-secondary)] font-bold"
                   >
                     ‹
                   </button>
-                  <span className="font-black text-[var(--text-primary)]">
+                  <span className="font-black text-xs md:text-sm text-[var(--text-primary)]">
                     {t.months[previewMonth.month]} {previewMonth.year}
                   </span>
                   <button
                     onClick={() => changeMonth(1)}
-                    className="p-2 hover:bg-[var(--border-color)] rounded-lg transition-colors text-[var(--text-secondary)] font-bold"
+                    className="p-1.5 md:p-2 hover:bg-[var(--border-color)] rounded-lg transition-colors text-[var(--text-secondary)] font-bold"
                   >
                     ›
                   </button>
                 </div>
 
                 {/* Legend */}
-                <div className="flex items-center gap-4 px-6 py-2.5 bg-[var(--bg-tertiary)] border-b border-[var(--border-color)] text-[11px] font-bold">
-                  <span className="flex items-center gap-1.5 text-[var(--text-secondary)]">
-                    <span className="w-3 h-3 rounded-sm bg-[var(--card-bg)] border border-[var(--border-color)] inline-block"></span>
+                <div className="flex items-center gap-2 md:gap-4 px-4 md:px-6 py-2 md:py-2.5 bg-[var(--bg-tertiary)] border-b border-[var(--border-color)] text-[10px] md:text-[11px] font-bold flex-wrap">
+                  <span className="flex items-center gap-1 md:gap-1.5 text-[var(--text-secondary)]">
+                    <span className="w-2.5 md:w-3 h-2.5 md:h-3 rounded-sm bg-[var(--card-bg)] border border-[var(--border-color)] inline-block"></span>
                     {t.legendShift}
                   </span>
-                  <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
-                    <span className="w-3 h-3 rounded-sm bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-900/30 inline-block"></span>
+                  <span className="flex items-center gap-1 md:gap-1.5 text-emerald-600 dark:text-emerald-400">
+                    <span className="w-2.5 md:w-3 h-2.5 md:h-3 rounded-sm bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-900/30 inline-block"></span>
                     {t.legendPendingAdd}
                   </span>
-                  <span className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400">
-                    <span className="w-3 h-3 rounded-sm bg-rose-100 dark:bg-rose-900/30 border border-rose-300 dark:border-rose-900/30 inline-block"></span>
+                  <span className="flex items-center gap-1 md:gap-1.5 text-rose-600 dark:text-rose-400">
+                    <span className="w-2.5 md:w-3 h-2.5 md:h-3 rounded-sm bg-rose-100 dark:bg-rose-900/30 border border-rose-300 dark:border-rose-900/30 inline-block"></span>
                     {t.legendPendingCancel}
                   </span>
                 </div>
 
                 {/* Schedule content */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-5">
+                <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 md:space-y-5">
                   {previewLoading ? (
-                    <div className="flex justify-center py-10">
-                      <div className="animate-spin h-8 w-8 border-b-2 border-indigo-500 rounded-full" />
+                    <div className="flex justify-center py-8 md:py-10">
+                      <div className="animate-spin h-6 w-6 md:h-8 md:w-8 border-b-2 border-indigo-500 rounded-full" />
                     </div>
                   ) : (
                     <>
                       {previewSchedule?.schedule?.length > 0 ||
                       pendingOnlyDates.length > 0 ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3">
                           {/* Days with approved schedule */}
                           {(previewSchedule?.schedule || []).map((s) => {
                             const dateObj = parseDate(s.date);
@@ -616,26 +617,26 @@ export default function AdminShifts() {
                             return (
                               <div
                                 key={s.date}
-                                className={`p-3 border rounded-xl transition-all ${hasPending ? "border-yellow-300 dark:border-yellow-900/30 bg-yellow-50/40 dark:bg-yellow-900/20" : isToday ? "border-indigo-400 dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30" : "border-[var(--border-color)] bg-[var(--bg-tertiary)]"}`}
+                                className={`p-2 md:p-3 border rounded-xl transition-all ${hasPending ? "border-yellow-300 dark:border-yellow-900/30 bg-yellow-50/40 dark:bg-yellow-900/20" : isToday ? "border-indigo-400 dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30" : "border-[var(--border-color)] bg-[var(--bg-tertiary)]"}`}
                               >
-                                <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center justify-between mb-1.5 md:mb-2">
                                   <span
-                                    className={`text-xs font-black ${isToday ? "text-indigo-600 dark:text-indigo-400" : "text-[var(--text-secondary)]"}`}
+                                    className={`text-[10px] md:text-xs font-black ${isToday ? "text-indigo-600 dark:text-indigo-400" : "text-[var(--text-secondary)]"}`}
                                   >
                                     {t.days[s.dayOfWeek]}
                                   </span>
                                   <span
-                                    className={`text-xs font-bold px-2 py-0.5 rounded-md ${isToday ? "bg-indigo-500 text-white" : "bg-[var(--card-bg)] text-[var(--text-secondary)] border border-[var(--border-color)]"}`}
+                                    className={`text-[10px] md:text-xs font-bold px-1.5 md:px-2 py-0.5 rounded-md ${isToday ? "bg-indigo-500 text-white" : "bg-[var(--card-bg)] text-[var(--text-secondary)] border border-[var(--border-color)]"}`}
                                   >
                                     {dateObj.getDate()}/{dateObj.getMonth() + 1}
                                   </span>
                                 </div>
                                 {/* Current approved times */}
-                                <div className="flex flex-wrap gap-1 mb-1.5">
+                                <div className="flex flex-wrap gap-1 mb-1 md:mb-1.5">
                                   {s.times.map((t) => (
                                     <span
                                       key={t}
-                                      className="px-1.5 py-0.5 text-[10px] font-bold bg-[var(--card-bg)] border border-[var(--border-color)] rounded-md text-[var(--text-secondary)]"
+                                      className="px-1 md:px-1.5 py-0.5 text-[10px] font-bold bg-[var(--card-bg)] border border-[var(--border-color)] rounded-md text-[var(--text-secondary)]"
                                     >
                                       {t}
                                     </span>
@@ -645,7 +646,7 @@ export default function AdminShifts() {
                                 {pendingForDay.map((pr) => (
                                   <div
                                     key={pr._id}
-                                    className={`mt-1 pt-1.5 border-t ${pr.type === "add" ? "border-emerald-200 dark:border-emerald-900/30" : "border-rose-200 dark:border-rose-900/30"}`}
+                                    className={`mt-1 pt-1 md:pt-1.5 border-t ${pr.type === "add" ? "border-emerald-200 dark:border-emerald-900/30" : "border-rose-200 dark:border-rose-900/30"}`}
                                   >
                                     <p
                                       className={`text-[10px] font-black uppercase mb-1 ${pr.type === "add" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}
@@ -660,13 +661,13 @@ export default function AdminShifts() {
                                       {(pr.times || []).map((t) => (
                                         <span
                                           key={t}
-                                          className={`px-1.5 py-0.5 text-[10px] font-bold rounded-md border ${pr.type === "add" ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-900/30" : "bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border-rose-300 dark:border-rose-900/30"}`}
+                                          className={`px-1 md:px-1.5 py-0.5 text-[10px] font-bold rounded-md border ${pr.type === "add" ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-900/30" : "bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border-rose-300 dark:border-rose-900/30"}`}
                                         >
                                           {t}
                                         </span>
                                       ))}
                                     </div>
-                                    <div className="flex gap-1 mt-1.5">
+                                    <div className="flex gap-1 mt-1 md:mt-1.5">
                                       <button
                                         onClick={() =>
                                           updateStatus(pr._id, "approved")
@@ -699,13 +700,13 @@ export default function AdminShifts() {
                             return (
                               <div
                                 key={dateStr}
-                                className="p-3 border border-yellow-300 dark:border-yellow-900/30 bg-yellow-50/60 dark:bg-yellow-900/30 rounded-xl"
+                                className="p-2 md:p-3 border border-yellow-300 dark:border-yellow-900/30 bg-yellow-50/60 dark:bg-yellow-900/30 rounded-xl"
                               >
-                                <div className="flex items-center justify-between mb-2">
-                                  <span className="text-xs font-black text-yellow-700 dark:text-yellow-400">
+                                <div className="flex items-center justify-between mb-1.5 md:mb-2">
+                                  <span className="text-[10px] md:text-xs font-black text-yellow-700 dark:text-yellow-400">
                                     {t.days[dow]}
                                   </span>
-                                  <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-900/30">
+                                  <span className="text-[10px] md:text-xs font-bold px-1.5 md:px-2 py-0.5 rounded-md bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-900/30">
                                     {dateObj.getDate()}/{dateObj.getMonth() + 1}
                                   </span>
                                 </div>
@@ -720,11 +721,11 @@ export default function AdminShifts() {
                                     <p className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase mb-1">
                                       {t.waitingAddShift}
                                     </p>
-                                    <div className="flex flex-wrap gap-1 mb-1.5">
+                                    <div className="flex flex-wrap gap-1 mb-1 md:mb-1.5">
                                       {(pr.times || []).map((t) => (
                                         <span
                                           key={t}
-                                          className="px-1.5 py-0.5 text-[10px] font-bold rounded-md border bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-900/30"
+                                          className="px-1 md:px-1.5 py-0.5 text-[10px] font-bold rounded-md border bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-900/30"
                                         >
                                           {t}
                                         </span>
@@ -755,12 +756,12 @@ export default function AdminShifts() {
                           })}
                         </div>
                       ) : (
-                        <div className="text-center py-12 text-[var(--text-tertiary)]">
+                        <div className="text-center py-8 md:py-12 text-[var(--text-tertiary)]">
                           <Calendar
-                            size={40}
+                            size={32}
                             className="mx-auto mb-3 opacity-20"
                           />
-                          <p className="font-medium text-sm">
+                          <p className="font-medium text-xs md:text-sm">
                             {t.noDaysInMonth}
                           </p>
                         </div>

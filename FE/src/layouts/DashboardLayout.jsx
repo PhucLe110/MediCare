@@ -15,6 +15,8 @@ import {
   LogOut,
   Sun,
   Moon,
+  Menu,
+  X,
 } from "lucide-react";
 
 const DashboardLayout = () => {
@@ -24,6 +26,7 @@ const DashboardLayout = () => {
   const [notifCount, setNotifCount] = useState(0);
   const [lang, setLang] = useState(localStorage.getItem("lang") || "vi");
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -80,6 +83,14 @@ const DashboardLayout = () => {
     return () =>
       window.removeEventListener("language-change", handleLangChange);
   }, [lang]);
+
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.classList.add("menu-open");
+    } else {
+      document.body.classList.remove("menu-open");
+    }
+  }, [sidebarOpen]);
 
   const handleLogout = async () => {
     await logoutAuth();
@@ -180,8 +191,16 @@ const DashboardLayout = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans transition-colors duration-200">
+      {/* Mobile Sidebar Overlay */}
+      <div
+        className={`sidebar-overlay ${sidebarOpen ? "open" : ""}`}
+        onClick={() => setSidebarOpen(false)}
+      ></div>
+
       {/* Sidebar */}
-      <aside className="w-64 bg-primary text-white flex flex-col fixed h-full z-20 shadow-xl shadow-blue-900/10">
+      <aside
+        className={`w-64 bg-primary text-white flex flex-col fixed h-full z-20 shadow-xl shadow-blue-900/10 sidebar-mobile ${sidebarOpen ? "open" : ""}`}
+      >
         <div className="p-6">
           <Link
             to="/dashboard"
@@ -296,7 +315,27 @@ const DashboardLayout = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 p-8 bg-[var(--bg-primary)]">
+      <main className="flex-1 ml-64 p-4 md:p-8 bg-[var(--bg-primary)] main-content-mobile">
+        {/* Mobile Top Bar */}
+        <div className="mobile-top-bar md:hidden mb-4">
+          <button
+            className="hamburger-button"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Menu size={24} />
+          </button>
+          <div className="flex items-center gap-2">
+            <img
+              src="/LOGO.png"
+              alt="MediCare"
+              className="h-8 w-auto object-contain drop-shadow-md no-invert"
+            />
+            <span className="font-black text-primary tracking-widest uppercase text-sm">
+              MediCare
+            </span>
+          </div>
+          <div className="w-10"></div>
+        </div>
         <Outlet />
       </main>
     </div>

@@ -260,11 +260,11 @@ const DoctorShifts = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="max-w-4xl mx-auto space-y-4 md:space-y-8 animate-in fade-in duration-500">
       {/* Toast Notification */}
       {toast && (
         <div
-          className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border animate-in fade-in slide-in-from-top-4 duration-300 ${
+          className={`fixed top-4 md:top-6 right-4 md:right-6 z-50 flex items-center gap-2 md:gap-3 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl shadow-2xl border animate-in fade-in slide-in-from-top-4 duration-300 ${
             toast.type === "success"
               ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-100 border-emerald-200 dark:border-emerald-900/30"
               : toast.type === "warning"
@@ -275,45 +275,50 @@ const DoctorShifts = () => {
           {toast.type === "success" ? (
             <CheckCircle
               className="text-emerald-500 dark:text-emerald-400 shrink-0"
-              size={20}
+              size={16}
+              md={20}
             />
           ) : toast.type === "warning" ? (
             <AlertCircle
               className="text-yellow-500 dark:text-yellow-400 shrink-0"
-              size={20}
+              size={16}
+              md={20}
             />
           ) : (
             <XCircle
               className="text-rose-500 dark:text-rose-400 shrink-0"
-              size={20}
+              size={16}
+              md={20}
             />
           )}
-          <span className="font-bold text-sm">{toast.message}</span>
+          <span className="font-bold text-xs md:text-sm">{toast.message}</span>
         </div>
       )}
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black text-[var(--text-primary)] tracking-tight">
+          <h1 className="text-xl md:text-3xl font-black text-[var(--text-primary)] tracking-tight">
             {t.title}
           </h1>
-          <p className="text-[var(--text-secondary)] mt-2">{t.subtitle}</p>
+          <p className="text-xs md:text-sm text-[var(--text-secondary)] mt-1 md:mt-2">
+            {t.subtitle}
+          </p>
         </div>
       </div>
 
       {/* Create Request Form */}
-      <div className="bg-[var(--card-bg)] p-8 rounded-[32px] shadow-sm border border-[var(--border-color)]">
-        <h2 className="text-xl font-bold mb-6 text-[var(--text-primary)]">
+      <div className="bg-[var(--card-bg)] p-4 md:p-8 rounded-2xl md:rounded-[32px] shadow-sm border border-[var(--border-color)]">
+        <h2 className="text-base md:text-xl font-bold mb-4 md:mb-6 text-[var(--text-primary)]">
           {t.newRequest}
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div>
-              <label className="block text-xs font-bold text-[var(--text-tertiary)] uppercase mb-2">
+              <label className="block text-[10px] md:text-xs font-bold text-[var(--text-tertiary)] uppercase mb-1 md:mb-2">
                 {t.requestType}
               </label>
               <select
-                className="w-full p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-bold text-[var(--text-primary)]"
+                className="w-full p-2 md:p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl md:rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-bold text-xs md:text-sm text-[var(--text-primary)]"
                 value={type}
                 onChange={(e) => {
                   setType(e.target.value);
@@ -325,12 +330,12 @@ const DoctorShifts = () => {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-[var(--text-tertiary)] uppercase mb-2">
+              <label className="block text-[10px] md:text-xs font-bold text-[var(--text-tertiary)] uppercase mb-1 md:mb-2">
                 {t.dateLabel}
               </label>
               <input
                 type="date"
-                className="w-full p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-bold text-[var(--text-primary)]"
+                className="w-full p-2 md:p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl md:rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-bold text-xs md:text-sm text-[var(--text-primary)]"
                 value={date}
                 onChange={(e) => {
                   setDate(e.target.value);
@@ -342,17 +347,19 @@ const DoctorShifts = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[var(--text-tertiary)] uppercase mb-3">
+            <label className="block text-[10px] md:text-xs font-bold text-[var(--text-tertiary)] uppercase mb-2 md:mb-3">
               {t.timeSlots}{" "}
-              <span className="text-primary normal-case">{t.multiSelect}</span>
+              <span className="text-primary normal-case text-[10px] md:text-xs">
+                {t.multiSelect}
+              </span>
             </label>
-            <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3">
               {ALL_TIMES.map((t) => (
                 <button
                   key={t}
                   type="button"
                   onClick={() => toggleTime(t)}
-                  className={`py-3 rounded-xl text-sm font-black border-2 transition-all ${
+                  className={`py-2 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-black border-2 transition-all ${
                     selectedTimes.includes(t)
                       ? type === "add"
                         ? "border-emerald-500 dark:border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 shadow-sm shadow-emerald-200 dark:shadow-emerald-900/20"
@@ -365,9 +372,9 @@ const DoctorShifts = () => {
               ))}
             </div>
             {selectedTimes.length > 0 && (
-              <p className="mt-3 text-xs text-[var(--text-secondary)] font-medium">
+              <p className="mt-2 md:mt-3 text-[10px] md:text-xs text-[var(--text-secondary)] font-medium">
                 {t.selected}{" "}
-                <span className="font-bold text-primary">
+                <span className="font-bold text-primary text-[10px] md:text-xs">
                   {selectedTimes.sort().join(", ")}
                 </span>
               </p>
@@ -377,7 +384,7 @@ const DoctorShifts = () => {
           <button
             type="submit"
             disabled={submitting || selectedTimes.length === 0 || !date}
-            className={`w-full py-4 rounded-2xl font-bold transition-all flex justify-center items-center gap-2 shadow-lg ${
+            className={`w-full py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-xs md:text-sm transition-all flex justify-center items-center gap-1 md:gap-2 shadow-lg ${
               submitting || selectedTimes.length === 0 || !date
                 ? "bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] cursor-not-allowed shadow-none"
                 : type === "add"
@@ -387,12 +394,12 @@ const DoctorShifts = () => {
           >
             {submitting ? (
               <>
-                <div className="animate-spin h-5 w-5 border-b-2 border-white rounded-full" />{" "}
+                <div className="animate-spin h-4 w-4 md:h-5 md:w-5 border-b-2 border-white rounded-full" />{" "}
                 {t.sending}
               </>
             ) : (
               <>
-                <Send size={18} />{" "}
+                <Send size={14} md={18} />{" "}
                 {selectedTimes.length > 0
                   ? t.sendN(selectedTimes.length)
                   : t.sendRequest}
@@ -403,39 +410,39 @@ const DoctorShifts = () => {
       </div>
 
       {/* 30-day Schedule */}
-      <div className="bg-[var(--card-bg)] p-8 rounded-[32px] shadow-sm border border-[var(--border-color)]">
-        <h2 className="text-xl font-bold mb-2 text-[var(--text-primary)]">
+      <div className="bg-[var(--card-bg)] p-4 md:p-8 rounded-2xl md:rounded-[32px] shadow-sm border border-[var(--border-color)]">
+        <h2 className="text-base md:text-xl font-bold mb-1 md:mb-2 text-[var(--text-primary)]">
           {t.schedule30}
         </h2>
-        <p className="text-sm text-[var(--text-secondary)] mb-6 font-medium">
+        <p className="text-xs md:text-sm text-[var(--text-secondary)] mb-4 md:mb-6 font-medium">
           {t.basePattern}{" "}
-          <span className="font-bold text-primary">
+          <span className="font-bold text-primary text-xs md:text-sm">
             {profile?.shiftPattern || t.fullWeek}
           </span>
         </p>
 
         {loading ? (
-          <div className="text-center py-6">
-            <div className="animate-spin h-6 w-6 border-b-2 border-primary rounded-full mx-auto" />
+          <div className="text-center py-4 md:py-6">
+            <div className="animate-spin h-5 w-5 md:h-6 md:w-6 border-b-2 border-primary rounded-full mx-auto" />
           </div>
         ) : schedule.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
             {schedule.map((s, idx) => {
               const isToday =
                 new Date().toDateString() === s.date.toDateString();
               return (
                 <div
                   key={idx}
-                  className={`p-4 border rounded-2xl transition-all shadow-sm ${isToday ? "border-primary bg-primary/5 shadow-primary/10" : "border-[var(--border-color)] bg-[var(--card-bg)] hover:border-primary/30 hover:shadow-md"}`}
+                  className={`p-2 md:p-4 border rounded-xl md:rounded-2xl transition-all shadow-sm ${isToday ? "border-primary bg-primary/5 shadow-primary/10" : "border-[var(--border-color)] bg-[var(--card-bg)] hover:border-primary/30 hover:shadow-md"}`}
                 >
-                  <div className="flex items-center justify-between mb-3 border-b border-[var(--border-color)] pb-2">
+                  <div className="flex items-center justify-between mb-2 md:mb-3 border-b border-[var(--border-color)] pb-1 md:pb-2">
                     <p
-                      className={`text-sm font-black ${isToday ? "text-primary" : "text-[var(--text-primary)]"}`}
+                      className={`text-xs md:text-sm font-black ${isToday ? "text-primary" : "text-[var(--text-primary)]"}`}
                     >
                       {s.date.toLocaleDateString(locale, { weekday: "short" })}
                     </p>
                     <p
-                      className={`text-xs font-bold ${isToday ? "bg-primary text-white" : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)"} px-2 py-1 rounded-md`}
+                      className={`text-[10px] md:text-xs font-bold ${isToday ? "bg-primary text-white" : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)"} px-1.5 md:px-2 py-0.5 md:py-1 rounded-md`}
                     >
                       {s.date.toLocaleDateString(locale, {
                         day: "2-digit",
@@ -443,18 +450,18 @@ const DoctorShifts = () => {
                       })}
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-1 md:gap-1.5">
                     {s.times.length > 0 ? (
                       s.times.map((t) => (
                         <span
                           key={t}
-                          className="px-2 py-1 text-[11px] font-bold bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)]"
+                          className="px-1.5 md:px-2 py-0.5 md:py-1 text-[9px] md:text-[11px] font-bold bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)]"
                         >
                           {t}
                         </span>
                       ))
                     ) : (
-                      <span className="text-xs font-medium text-[var(--text-tertiary)] italic">
+                      <span className="text-[10px] md:text-xs font-medium text-[var(--text-tertiary)] italic">
                         {t.off}
                       </span>
                     )}
@@ -464,57 +471,68 @@ const DoctorShifts = () => {
             })}
           </div>
         ) : (
-          <div className="text-center py-6 text-[var(--text-tertiary)] text-sm font-medium">
+          <div className="text-center py-4 md:py-6 text-[var(--text-tertiary)] text-xs md:text-sm font-medium">
             {t.noShifts30}
           </div>
         )}
       </div>
 
       {/* Request History */}
-      <div className="bg-[var(--card-bg)] p-8 rounded-[32px] shadow-sm border border-[var(--border-color)]">
-        <h2 className="text-xl font-bold mb-6 text-[var(--text-primary)]">
+      <div className="bg-[var(--card-bg)] p-4 md:p-8 rounded-2xl md:rounded-[32px] shadow-sm border border-[var(--border-color)]">
+        <h2 className="text-base md:text-xl font-bold mb-4 md:mb-6 text-[var(--text-primary)]">
           {t.history}
         </h2>
         {loading ? (
-          <div className="text-center py-10">
-            <div className="animate-spin h-8 w-8 border-b-2 border-primary rounded-full mx-auto" />
+          <div className="text-center py-6 md:py-10">
+            <div className="animate-spin h-6 w-6 md:h-8 md:w-8 border-b-2 border-primary rounded-full mx-auto" />
           </div>
         ) : requests.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-2 md:space-y-3">
             {requests.map((req) => (
               <div
                 key={req._id}
-                className="flex items-center justify-between p-4 border border-[var(--border-color)] rounded-2xl hover:border-primary/20 hover:shadow-sm transition-all"
+                className="flex flex-col md:flex-row md:items-center justify-between p-3 md:p-4 border border-[var(--border-color)] rounded-xl md:rounded-2xl hover:border-primary/20 hover:shadow-sm transition-all gap-3"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 md:gap-4">
                   <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center ${req.type === "add" ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" : "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400"}`}
+                    className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center ${req.type === "add" ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" : "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400"}`}
                   >
                     {req.type === "add" ? (
-                      <Plus size={20} />
+                      <Plus size={14} md={20} />
                     ) : (
-                      <Trash2 size={20} />
+                      <Trash2 size={14} md={20} />
                     )}
                   </div>
                   <div>
-                    <h3 className="font-bold text-[var(--text-primary)] text-sm">
+                    <h3 className="font-bold text-[var(--text-primary)] text-xs md:text-sm">
                       {req.type === "add" ? t.reqAdd : t.reqCancel}
                     </h3>
-                    <p className="text-xs text-[var(--text-secondary)] font-medium flex items-center gap-2 mt-0.5">
-                      <Calendar size={12} />{" "}
+                    <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-medium flex items-center gap-1 md:gap-2 mt-0.5">
+                      <Calendar size={10} md={12} />{" "}
                       {new Date(req.date).toLocaleDateString(locale)}
-                      <Clock size={12} className="ml-1" /> {req.time}
+                      <Clock
+                        size={10}
+                        md={12}
+                        className="ml-0.5 md:ml-1"
+                      />{" "}
+                      {req.time}
                     </p>
                   </div>
                 </div>
-                <div>{getStatusBadge(req.status)}</div>
+                <div className="flex md:block justify-end">
+                  {getStatusBadge(req.status)}
+                </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 text-[var(--text-tertiary)]">
-            <AlertCircle size={48} className="mx-auto mb-4 opacity-20" />
-            <p className="font-medium text-sm">{t.noHistory}</p>
+          <div className="text-center py-8 md:py-12 text-[var(--text-tertiary)]">
+            <AlertCircle
+              size={32}
+              md={48}
+              className="mx-auto mb-2 md:mb-4 opacity-20"
+            />
+            <p className="font-medium text-xs md:text-sm">{t.noHistory}</p>
           </div>
         )}
       </div>

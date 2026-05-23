@@ -143,9 +143,9 @@ export async function authFetch(url, options = {}) {
         clearAuthSession();
         if (
           typeof window !== "undefined" &&
-          !window.location.pathname.startsWith("/login")
+          !window.location.pathname.startsWith("/")
         ) {
-          window.location.href = "/login";
+          window.location.href = "/";
         }
         throw new Error("SESSION_EXPIRED");
       }

@@ -221,29 +221,29 @@ export default function AdminBilling() {
 
       {/* Confirmation Modal */}
       {confirmDialog.show && (
-        <div className="fixed inset-0 w-screen h-screen bg-slate-900/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-          <div className="bg-[var(--card-bg)] w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-[var(--border-color)] space-y-4">
-            <div className="flex items-center gap-3 text-indigo-600 dark:text-indigo-400">
-              <ShieldAlert size={28} />
-              <h3 className="font-black text-lg text-[var(--text-primary)]">
+        <div className="fixed inset-0 w-screen h-screen bg-slate-900/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-3 md:p-4">
+          <div className="bg-[var(--card-bg)] w-full max-w-sm rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-2xl border border-[var(--border-color)] space-y-3 md:space-y-4">
+            <div className="flex items-center gap-2 md:gap-3 text-indigo-600 dark:text-indigo-400">
+              <ShieldAlert size={24} md={28} />
+              <h3 className="font-black text-base md:text-lg text-[var(--text-primary)]">
                 {t.confirmTitle}
               </h3>
             </div>
-            <p className="text-sm font-semibold text-[var(--text-secondary)] leading-relaxed">
+            <p className="text-xs md:text-sm font-semibold text-[var(--text-secondary)] leading-relaxed">
               {confirmDialog.message}
             </p>
-            <div className="flex justify-end gap-3 pt-2">
+            <div className="flex justify-end gap-2 md:gap-3 pt-2">
               <button
                 onClick={() =>
                   setConfirmDialog({ show: false, billId: null, message: "" })
                 }
-                className="px-4 py-2 border border-[var(--border-color)] hover:bg-[var(--bg-tertiary)] rounded-xl text-xs font-bold text-[var(--text-primary)] transition-all"
+                className="px-3 md:px-4 py-2 border border-[var(--border-color)] hover:bg-[var(--bg-tertiary)] rounded-xl text-[10px] md:text-xs font-bold text-[var(--text-primary)] transition-all"
               >
                 {t.btnCancel}
               </button>
               <button
                 onClick={handleMarkAsPaid}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-600/20 transition-all"
+                className="px-3 md:px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] md:text-xs font-bold shadow-lg shadow-indigo-600/20 transition-all"
               >
                 {t.btnConfirm}
               </button>
@@ -252,37 +252,38 @@ export default function AdminBilling() {
         </div>
       )}
 
-      <div className="flex justify-between items-center bg-[var(--card-bg)] p-6 rounded-3xl border border-[var(--border-color)] shadow-sm animate-in fade-in">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 bg-[var(--card-bg)] p-4 md:p-6 rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm animate-in fade-in">
         <div>
-          <h2 className="text-2xl font-black text-[var(--text-primary)]">
+          <h2 className="text-xl md:text-2xl font-black text-[var(--text-primary)]">
             {t.headerTitle}
           </h2>
-          <p className="text-[var(--text-secondary)] font-medium mt-1">
+          <p className="text-xs md:text-sm text-[var(--text-secondary)] font-medium mt-1">
             {t.headerSubtitle}
           </p>
         </div>
       </div>
 
-      <div className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border-color)] shadow-sm overflow-hidden animate-in fade-in">
-        <div className="p-4 border-b border-[var(--border-color)] flex items-center justify-between gap-4 bg-[var(--bg-tertiary)]">
-          <div className="relative w-80">
+      <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm overflow-hidden animate-in fade-in">
+        <div className="p-3 md:p-4 border-b border-[var(--border-color)] flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4 bg-[var(--bg-tertiary)]">
+          <div className="relative w-full md:w-80">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
-              size={18}
+              size={16}
+              md={18}
             />
             <input
               type="text"
               placeholder={t.searchPlaceholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-[var(--text-primary)]"
+              className="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl text-xs md:text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-[var(--text-primary)]"
             />
           </div>
-          <div>
+          <div className="w-full md:w-auto">
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="bg-[var(--card-bg)] border border-[var(--border-color)] text-sm font-bold text-[var(--text-primary)] rounded-xl px-4 py-2 outline-none"
+              className="w-full md:w-auto bg-[var(--card-bg)] border border-[var(--border-color)] text-xs md:text-sm font-bold text-[var(--text-primary)] rounded-xl px-3 md:px-4 py-2 outline-none"
             >
               <option value="All">{t.filterAll}</option>
               <option value="unpaid">{t.filterUnpaid}</option>
@@ -292,15 +293,17 @@ export default function AdminBilling() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse min-w-[700px]">
             <thead>
-              <tr className="bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-xs uppercase tracking-wider font-bold">
-                <th className="p-4 pl-6">{t.colBillIdDate}</th>
-                <th className="p-4">{t.colPatient}</th>
-                <th className="p-4">{t.colServices}</th>
-                <th className="p-4">{t.colTotalAmount}</th>
-                <th className="p-4">{t.colStatus}</th>
-                <th className="p-4 text-right pr-6">{t.colAction}</th>
+              <tr className="bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-[10px] md:text-xs uppercase tracking-wider font-bold">
+                <th className="p-3 md:p-4 pl-4 md:pl-6">{t.colBillIdDate}</th>
+                <th className="p-3 md:p-4">{t.colPatient}</th>
+                <th className="p-3 md:p-4">{t.colServices}</th>
+                <th className="p-3 md:p-4">{t.colTotalAmount}</th>
+                <th className="p-3 md:p-4">{t.colStatus}</th>
+                <th className="p-3 md:p-4 text-right pr-4 md:pr-6">
+                  {t.colAction}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border-color)]">
@@ -309,30 +312,30 @@ export default function AdminBilling() {
                   key={b._id}
                   className="hover:bg-[var(--bg-tertiary)] transition-colors"
                 >
-                  <td className="p-4 pl-6 font-medium">
+                  <td className="p-3 md:p-4 pl-4 md:pl-6 font-medium">
                     <div className="flex flex-col">
-                      <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 text-sm">
+                      <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 text-xs md:text-sm">
                         {b._id?.slice(-8).toUpperCase()}
                       </span>
-                      <span className="text-xs text-[var(--text-secondary)] mt-0.5">
+                      <span className="text-[10px] md:text-xs text-[var(--text-secondary)] mt-0.5">
                         {formatDate(lang, b.createdAt)}
                       </span>
                     </div>
                   </td>
-                  <td className="p-4 font-bold text-[var(--text-primary)]">
+                  <td className="p-3 md:p-4 font-bold text-[var(--text-primary)] text-xs md:text-sm">
                     <div className="flex flex-col">
                       <span>{b.patient?.fullName || "Bệnh nhân ẩn"}</span>
-                      <span className="text-xs text-[var(--text-secondary)] font-mono">
+                      <span className="text-[10px] md:text-xs text-[var(--text-secondary)] font-mono">
                         {b.patient?.patientId || "N/A"}
                       </span>
                     </div>
                   </td>
-                  <td className="p-4 max-w-xs">
+                  <td className="p-3 md:p-4 max-w-xs">
                     <div className="flex flex-wrap gap-1">
                       {b.items.map((item, idx) => (
                         <span
                           key={idx}
-                          className="px-2 py-0.5 bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-xs font-bold rounded-lg border border-[var(--border-color)]"
+                          className="px-2 py-0.5 bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-[10px] md:text-xs font-bold rounded-lg border border-[var(--border-color)]"
                           title={item.description}
                         >
                           {item.description} ({fmt(item.amount)})
@@ -340,30 +343,30 @@ export default function AdminBilling() {
                       ))}
                     </div>
                   </td>
-                  <td className="p-4 font-black text-[var(--text-primary)]">
+                  <td className="p-3 md:p-4 font-black text-[var(--text-primary)] text-xs md:text-sm">
                     {fmt(b.totalAmount)}
                   </td>
-                  <td className="p-4">
+                  <td className="p-3 md:p-4">
                     {b.status === "paid" ? (
-                      <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                        <CheckCircle2 size={14} /> {t.statusPaid}
+                      <span className="flex items-center gap-1.5 text-[10px] md:text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                        <CheckCircle2 size={12} md={14} /> {t.statusPaid}
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1.5 text-xs font-bold text-orange-500 dark:text-orange-400">
-                        <Clock size={14} /> {t.statusUnpaid}
+                      <span className="flex items-center gap-1.5 text-[10px] md:text-xs font-bold text-orange-500 dark:text-orange-400">
+                        <Clock size={12} md={14} /> {t.statusUnpaid}
                       </span>
                     )}
                   </td>
-                  <td className="p-4 pr-6 text-right">
+                  <td className="p-3 md:p-4 pr-4 md:pr-6 text-right">
                     {b.status === "unpaid" ? (
                       <button
                         onClick={() => triggerConfirmPay(b._id)}
-                        className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg shadow-md transition-colors"
+                        className="px-2 md:px-3 py-1 md:py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] md:text-xs rounded-lg shadow-md transition-colors"
                       >
                         {t.btnConfirmPay}
                       </button>
                     ) : (
-                      <span className="text-xs font-bold text-[var(--text-tertiary)]">
+                      <span className="text-[10px] md:text-xs font-bold text-[var(--text-tertiary)]">
                         {t.paidTimePrefix}{" "}
                         {b.paidAt
                           ? new Date(b.paidAt).toLocaleTimeString(locale)

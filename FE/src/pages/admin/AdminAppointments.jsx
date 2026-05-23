@@ -424,37 +424,38 @@ export default function AdminAppointments() {
         </div>
       )}
 
-      <div className="flex justify-between items-center bg-[var(--card-bg)] p-6 rounded-3xl border border-[var(--border-color)] shadow-sm animate-in fade-in">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 bg-[var(--card-bg)] p-4 md:p-6 rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm animate-in fade-in">
         <div>
-          <h2 className="text-2xl font-black text-[var(--text-primary)]">
+          <h2 className="text-xl md:text-2xl font-black text-[var(--text-primary)]">
             {t.headerTitle}
           </h2>
-          <p className="text-[var(--text-secondary)] font-medium mt-1">
+          <p className="text-xs md:text-sm text-[var(--text-secondary)] font-medium mt-1">
             {t.headerSubtitle}
           </p>
         </div>
       </div>
 
-      <div className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border-color)] shadow-sm overflow-hidden animate-in fade-in">
-        <div className="p-4 border-b border-[var(--border-color)] flex flex-col md:flex-row items-center justify-between gap-4 bg-[var(--bg-tertiary)]">
+      <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm overflow-hidden animate-in fade-in">
+        <div className="p-3 md:p-4 border-b border-[var(--border-color)] flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4 bg-[var(--bg-tertiary)]">
           <div className="relative w-full md:w-80">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
-              size={18}
+              size={16}
+              md={18}
             />
             <input
               type="text"
               placeholder={t.searchPlaceholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-[var(--text-primary)]"
+              className="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-[var(--text-primary)]"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full md:w-auto">
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="bg-[var(--card-bg)] border border-[var(--border-color)] text-sm font-bold text-[var(--text-primary)] rounded-xl px-4 py-2 outline-none"
+              className="w-full md:w-auto bg-[var(--card-bg)] border border-[var(--border-color)] text-xs md:text-sm font-bold text-[var(--text-primary)] rounded-xl px-3 md:px-4 py-2 outline-none"
             >
               <option value="All">{t.filterAllStatus}</option>
               <option value="confirmed">CONFIRMED</option>
@@ -466,15 +467,17 @@ export default function AdminAppointments() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse min-w-[600px]">
             <thead>
-              <tr className="bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-xs uppercase tracking-wider font-bold">
-                <th className="p-4 pl-6">{t.colTicketDate}</th>
-                <th className="p-4">{t.colPatient}</th>
-                <th className="p-4">{t.colDoctor}</th>
-                <th className="p-4">{t.colQueue}</th>
-                <th className="p-4">{t.colStatus}</th>
-                <th className="p-4 text-right pr-6">{t.colAction}</th>
+              <tr className="bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-[10px] md:text-xs uppercase tracking-wider font-bold">
+                <th className="p-3 md:p-4 pl-4 md:pl-6">{t.colTicketDate}</th>
+                <th className="p-3 md:p-4">{t.colPatient}</th>
+                <th className="p-3 md:p-4">{t.colDoctor}</th>
+                <th className="p-3 md:p-4">{t.colQueue}</th>
+                <th className="p-3 md:p-4">{t.colStatus}</th>
+                <th className="p-3 md:p-4 text-right pr-4 md:pr-6">
+                  {t.colAction}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border-color)]">
@@ -483,49 +486,49 @@ export default function AdminAppointments() {
                   key={app._id}
                   className="hover:bg-[var(--bg-tertiary)] transition-colors"
                 >
-                  <td className="p-4 pl-6">
+                  <td className="p-3 md:p-4 pl-4 md:pl-6">
                     <div className="flex flex-col font-medium">
-                      <span className="font-mono font-bold text-[var(--text-primary)] text-sm">
+                      <span className="font-mono font-bold text-[var(--text-primary)] text-xs md:text-sm">
                         {app.ticketNumber || "N/A"}
                       </span>
-                      <span className="text-xs text-[var(--text-secondary)] flex items-center gap-1 mt-0.5">
-                        <Calendar size={12} /> {app.date} | <Clock size={12} />{" "}
-                        {app.time}
+                      <span className="text-[10px] md:text-xs text-[var(--text-secondary)] flex items-center gap-1 mt-0.5">
+                        <Calendar size={10} md={12} /> {app.date} |{" "}
+                        <Clock size={10} md={12} /> {app.time}
                       </span>
                     </div>
                   </td>
-                  <td className="p-4">
+                  <td className="p-3 md:p-4">
                     <div className="flex flex-col font-medium">
-                      <span className="font-bold text-[var(--text-primary)] text-sm">
+                      <span className="font-bold text-[var(--text-primary)] text-xs md:text-sm">
                         {app.patient?.fullName || "Bệnh nhân ẩn"}
                       </span>
-                      <span className="text-xs text-[var(--text-secondary)] font-mono">
+                      <span className="text-[10px] md:text-xs text-[var(--text-secondary)] font-mono">
                         {app.patient?.patientId || "N/A"}
                       </span>
                     </div>
                   </td>
-                  <td className="p-4">
+                  <td className="p-3 md:p-4">
                     <div className="flex flex-col font-medium">
-                      <span className="font-bold text-[var(--text-primary)] text-sm">
+                      <span className="font-bold text-[var(--text-primary)] text-xs md:text-sm">
                         {getDoctorDisplayName(app.doctor?.userId?.fullName)}
                       </span>
-                      <span className="text-xs text-indigo-600 dark:text-indigo-400 font-bold">
+                      <span className="text-[10px] md:text-xs text-indigo-600 dark:text-indigo-400 font-bold">
                         {getLocalizedDept(lang, app.doctor?.department)}
                       </span>
                     </div>
                   </td>
-                  <td className="p-4">
-                    <span className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center font-black text-[var(--text-primary)] text-xs border border-[var(--border-color)]">
+                  <td className="p-3 md:p-4">
+                    <span className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center font-black text-[var(--text-primary)] text-[10px] md:text-xs border border-[var(--border-color)]">
                       {app.queueNumber || "1"}
                     </span>
                   </td>
-                  <td className="p-4">{getStatusBadge(app.status)}</td>
-                  <td className="p-4 pr-6 text-right space-x-2">
+                  <td className="p-3 md:p-4">{getStatusBadge(app.status)}</td>
+                  <td className="p-3 md:p-4 pr-4 md:pr-6 text-right space-x-1 md:space-x-2">
                     {["pending", "confirmed"].includes(app.status) && (
                       <>
                         <button
                           onClick={() => handleOpenCoordModal(app)}
-                          className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors"
+                          className="px-2 md:px-3 py-1 md:py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] md:text-xs rounded-xl shadow-md transition-colors"
                         >
                           {t.btnReschedule}
                         </button>
@@ -537,7 +540,7 @@ export default function AdminAppointments() {
                               t.toastCancelConfirm,
                             )
                           }
-                          className="px-2.5 py-1.5 bg-rose-50 dark:bg-rose-900/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-400 font-bold text-xs rounded-lg border border-rose-200 dark:border-rose-900/30 transition-colors"
+                          className="px-2 md:px-2.5 py-1 md:py-1.5 bg-rose-50 dark:bg-rose-900/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-400 font-bold text-[10px] md:text-xs rounded-lg border border-rose-200 dark:border-rose-900/30 transition-colors"
                         >
                           {t.btnCancelAppt}
                         </button>
@@ -552,13 +555,13 @@ export default function AdminAppointments() {
                             t.toastApproveConfirm,
                           )
                         }
-                        className="px-2.5 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 text-indigo-700 dark:text-indigo-400 font-bold text-xs rounded-lg border border-indigo-200 dark:border-indigo-900/30 transition-colors"
+                        className="px-2 md:px-2.5 py-1 md:py-1.5 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 text-indigo-700 dark:text-indigo-400 font-bold text-[10px] md:text-xs rounded-lg border border-indigo-200 dark:border-indigo-900/30 transition-colors"
                       >
                         {t.btnConfirmAppt}
                       </button>
                     )}
                     {["completed", "cancelled"].includes(app.status) && (
-                      <span className="text-xs font-bold text-[var(--text-tertiary)]">
+                      <span className="text-[10px] md:text-xs font-bold text-[var(--text-tertiary)]">
                         {t.apptClosed}
                       </span>
                     )}
@@ -572,15 +575,19 @@ export default function AdminAppointments() {
 
       {/* Advanced Reschedule & Transfer Modal */}
       {isModalOpen && selectedAppt && (
-        <div className="fixed inset-0 w-screen h-screen bg-slate-900/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-          <div className="bg-[var(--card-bg)] w-full max-w-xl rounded-3xl shadow-2xl border border-[var(--border-color)] flex flex-col overflow-hidden max-h-[90vh]">
-            <div className="p-6 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-tertiary)]">
+        <div className="fixed inset-0 w-screen h-screen bg-slate-900/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-3 md:p-4">
+          <div className="bg-[var(--card-bg)] w-full max-w-lg md:max-w-xl rounded-2xl md:rounded-3xl shadow-2xl border border-[var(--border-color)] flex flex-col overflow-hidden max-h-[90vh] md:max-h-[85vh]">
+            <div className="p-4 md:p-6 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-tertiary)]">
               <div>
-                <h3 className="text-lg font-black text-[var(--text-primary)] flex items-center gap-2">
-                  <UserRoundCheck className="text-indigo-600 dark:text-indigo-400" />{" "}
+                <h3 className="text-base md:text-lg font-black text-[var(--text-primary)] flex items-center gap-2">
+                  <UserRoundCheck
+                    className="text-indigo-600 dark:text-indigo-400"
+                    size={18}
+                    md={20}
+                  />{" "}
                   {t.modalTitle}
                 </h3>
-                <p className="text-xs text-[var(--text-secondary)] font-medium mt-0.5">
+                <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-medium mt-0.5">
                   {t.modalTicketNo} {selectedAppt.ticketNumber}
                 </p>
               </div>
@@ -588,17 +595,17 @@ export default function AdminAppointments() {
                 onClick={() => setIsModalOpen(false)}
                 className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] p-1 hover:bg-[var(--border-color)] rounded-full transition-colors"
               >
-                <X size={20} />
+                <X size={18} md={20} />
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto flex-1 space-y-6">
+            <div className="p-4 md:p-6 overflow-y-auto flex-1 space-y-4 md:space-y-6">
               {/* Original Appt Summary */}
-              <div className="p-4 bg-[var(--bg-tertiary)] rounded-2xl border border-[var(--border-color)] text-sm">
-                <h4 className="font-bold text-[var(--text-primary)] mb-2">
+              <div className="p-3 md:p-4 bg-[var(--bg-tertiary)] rounded-2xl border border-[var(--border-color)] text-xs md:text-sm">
+                <h4 className="font-bold text-[var(--text-primary)] mb-2 text-xs md:text-sm">
                   {t.modalOrigHeader}
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-xs font-medium text-[var(--text-secondary)]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-[10px] md:text-xs font-medium text-[var(--text-secondary)]">
                   <p>
                     {t.modalOrigPatient}{" "}
                     <span className="font-bold text-[var(--text-primary)]">
@@ -630,13 +637,13 @@ export default function AdminAppointments() {
               </div>
 
               {/* Step 1: Reschedule Date & Time */}
-              <div className="space-y-3">
-                <h4 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-wider">
+              <div className="space-y-2 md:space-y-3">
+                <h4 className="text-xs md:text-sm font-black text-[var(--text-primary)] uppercase tracking-wider">
                   {t.modalStep1}
                 </h4>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3 md:gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-[var(--text-tertiary)] uppercase mb-1">
+                    <label className="block text-[10px] md:text-xs font-bold text-[var(--text-tertiary)] uppercase mb-1">
                       {t.modalDateLabel}
                     </label>
                     <input
@@ -646,11 +653,11 @@ export default function AdminAppointments() {
                         setNewDate(e.target.value);
                         handleDateOrTimeChange(e.target.value, newTime);
                       }}
-                      className="w-full px-4 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-sm font-semibold focus:ring-2 focus:ring-indigo-500/20 outline-none text-[var(--text-primary)]"
+                      className="w-full px-3 md:px-4 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-xs md:text-sm font-semibold focus:ring-2 focus:ring-indigo-500/20 outline-none text-[var(--text-primary)]"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-[var(--text-tertiary)] uppercase mb-1">
+                    <label className="block text-[10px] md:text-xs font-bold text-[var(--text-tertiary)] uppercase mb-1">
                       {t.modalTimeLabel}
                     </label>
                     <select
@@ -659,7 +666,7 @@ export default function AdminAppointments() {
                         setNewTime(e.target.value);
                         handleDateOrTimeChange(newDate, e.target.value);
                       }}
-                      className="w-full px-4 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-sm font-semibold focus:ring-2 focus:ring-indigo-500/20 outline-none text-[var(--text-primary)]"
+                      className="w-full px-3 md:px-4 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-xs md:text-sm font-semibold focus:ring-2 focus:ring-indigo-500/20 outline-none text-[var(--text-primary)]"
                     >
                       <option value="08:00">08:00</option>
                       <option value="09:00">09:00</option>
