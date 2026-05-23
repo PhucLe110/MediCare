@@ -1,81 +1,103 @@
-import { API_URL, authFetch } from '../../config';
-import React, { useState, useEffect } from 'react';
-import { Download, Search, CheckCircle2, Clock, ShieldAlert, AlertCircle } from 'lucide-react';
-import { useTranslation } from '../../hooks/useTranslation';
-import { formatMoney, formatDate, getLocale } from '../../utils/i18nHelpers';
+import { API_URL, authFetch } from "../../config";
+import React, { useState, useEffect } from "react";
+import {
+  Download,
+  Search,
+  CheckCircle2,
+  Clock,
+  ShieldAlert,
+  AlertCircle,
+} from "lucide-react";
+import { useTranslation } from "../../hooks/useTranslation";
+import { formatMoney, formatDate, getLocale } from "../../utils/i18nHelpers";
 
 const trans = {
   vi: {
-    loading: 'Đang tải danh sách hóa đơn...',
-    connError: 'Lỗi kết nối đến máy chủ.',
-    confirmTitle: 'Xác Nhận Thu Phí',
-    confirmMessage: 'Bạn có chắc chắn muốn xác nhận ĐÃ THANH TOÁN cho hóa đơn này? Hệ thống sẽ ghi nhận giao dịch thành công.',
-    btnCancel: 'Hủy bỏ',
-    btnConfirm: 'Xác nhận',
-    toastSuccess: 'Xác nhận thanh toán hóa đơn thành công!',
-    toastUpdateError: 'Không thể cập nhật hóa đơn.',
-    headerTitle: 'Quản lý Viện phí & Hóa đơn',
-    headerSubtitle: 'Theo dõi các khoản thu y tế, khám bệnh, đơn thuốc và thanh toán hóa đơn.',
-    searchPlaceholder: 'Tìm kiếm bệnh nhân hoặc mã HĐ...',
-    filterAll: 'Tất cả hóa đơn',
-    filterUnpaid: 'Chờ thanh toán',
-    filterPaid: 'Đã thanh toán',
-    colBillIdDate: 'Mã HĐ / Ngày tạo',
-    colPatient: 'Bệnh nhân',
-    colServices: 'Chi tiết các dịch vụ',
-    colTotalAmount: 'Tổng tiền',
-    colStatus: 'Trạng thái',
-    colAction: 'Hành động',
-    statusPaid: 'Đã thanh toán',
-    statusUnpaid: 'Chờ thanh toán',
-    btnConfirmPay: 'Xác nhận thu phí',
-    paidTimePrefix: 'Đã thanh toán lúc',
+    loading: "Đang tải danh sách hóa đơn...",
+    connError: "Lỗi kết nối đến máy chủ.",
+    confirmTitle: "Xác Nhận Thu Phí",
+    confirmMessage:
+      "Bạn có chắc chắn muốn xác nhận ĐÃ THANH TOÁN cho hóa đơn này? Hệ thống sẽ ghi nhận giao dịch thành công.",
+    btnCancel: "Hủy bỏ",
+    btnConfirm: "Xác nhận",
+    toastSuccess: "Xác nhận thanh toán hóa đơn thành công!",
+    toastUpdateError: "Không thể cập nhật hóa đơn.",
+    headerTitle: "Quản lý Viện phí & Hóa đơn",
+    headerSubtitle:
+      "Theo dõi các khoản thu y tế, khám bệnh, đơn thuốc và thanh toán hóa đơn.",
+    searchPlaceholder: "Tìm kiếm bệnh nhân hoặc mã HĐ...",
+    filterAll: "Tất cả hóa đơn",
+    filterUnpaid: "Chờ thanh toán",
+    filterPaid: "Đã thanh toán",
+    colBillIdDate: "Mã HĐ / Ngày tạo",
+    colPatient: "Bệnh nhân",
+    colServices: "Chi tiết các dịch vụ",
+    colTotalAmount: "Tổng tiền",
+    colStatus: "Trạng thái",
+    colAction: "Hành động",
+    statusPaid: "Đã thanh toán",
+    statusUnpaid: "Chờ thanh toán",
+    btnConfirmPay: "Xác nhận thu phí",
+    paidTimePrefix: "Đã thanh toán lúc",
   },
   en: {
-    loading: 'Loading billing records...',
-    connError: 'Server connection error.',
-    confirmTitle: 'Confirm Payment Settle',
-    confirmMessage: 'Are you sure you want to verify that this bill has been PAID? The clinical database will record this transaction immediately.',
-    btnCancel: 'Cancel',
-    btnConfirm: 'Confirm',
-    toastSuccess: 'Billing payment settled successfully!',
-    toastUpdateError: 'Failed to update billing statement.',
-    headerTitle: 'Hospital Fee & Billing Management',
-    headerSubtitle: 'Track patient diagnostics fees, consultations charges, prescriptions costs, and manage electronic transactions.',
-    searchPlaceholder: 'Search by patient name or bill reference...',
-    filterAll: 'All Bills',
-    filterUnpaid: 'Awaiting Payment',
-    filterPaid: 'Paid',
-    colBillIdDate: 'Bill Ref / Generated Date',
-    colPatient: 'Patient',
-    colServices: 'Itemized Services Summary',
-    colTotalAmount: 'Amount Due',
-    colStatus: 'Status',
-    colAction: 'Action',
-    statusPaid: 'Settled',
-    statusUnpaid: 'Unpaid',
-    btnConfirmPay: 'Settle Payment',
-    paidTimePrefix: 'Settled at',
-  }
+    loading: "Loading billing records...",
+    connError: "Server connection error.",
+    confirmTitle: "Confirm Payment Settle",
+    confirmMessage:
+      "Are you sure you want to verify that this bill has been PAID? The clinical database will record this transaction immediately.",
+    btnCancel: "Cancel",
+    btnConfirm: "Confirm",
+    toastSuccess: "Billing payment settled successfully!",
+    toastUpdateError: "Failed to update billing statement.",
+    headerTitle: "Hospital Fee & Billing Management",
+    headerSubtitle:
+      "Track patient diagnostics fees, consultations charges, prescriptions costs, and manage electronic transactions.",
+    searchPlaceholder: "Search by patient name or bill reference...",
+    filterAll: "All Bills",
+    filterUnpaid: "Awaiting Payment",
+    filterPaid: "Paid",
+    colBillIdDate: "Bill Ref / Generated Date",
+    colPatient: "Patient",
+    colServices: "Itemized Services Summary",
+    colTotalAmount: "Amount Due",
+    colStatus: "Status",
+    colAction: "Action",
+    statusPaid: "Settled",
+    statusUnpaid: "Unpaid",
+    btnConfirmPay: "Settle Payment",
+    paidTimePrefix: "Settled at",
+  },
 };
 
 export default function AdminBilling() {
   const { lang, t } = useTranslation(trans);
   const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('All');
+  const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("All");
 
   // Custom Toast State
-  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
-  const showToast = (message, type = 'success') => {
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
+  const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
+    setTimeout(
+      () => setToast({ show: false, message: "", type: "success" }),
+      3000,
+    );
   };
 
   // Custom Confirm State
-  const [confirmDialog, setConfirmDialog] = useState({ show: false, billId: null, message: '' });
+  const [confirmDialog, setConfirmDialog] = useState({
+    show: false,
+    billId: null,
+    message: "",
+  });
 
   const fetchBills = async () => {
     try {
@@ -99,17 +121,17 @@ export default function AdminBilling() {
 
   // Lock scrolling on scrollable main container when modal is open
   useEffect(() => {
-    const mainContainer = document.querySelector('main');
+    const mainContainer = document.querySelector("main");
     if (confirmDialog.show) {
-      document.body.style.overflow = 'hidden';
-      if (mainContainer) mainContainer.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
+      if (mainContainer) mainContainer.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
-      if (mainContainer) mainContainer.style.overflow = 'auto';
+      document.body.style.overflow = "";
+      if (mainContainer) mainContainer.style.overflow = "auto";
     }
     return () => {
-      document.body.style.overflow = '';
-      if (mainContainer) mainContainer.style.overflow = 'auto';
+      document.body.style.overflow = "";
+      if (mainContainer) mainContainer.style.overflow = "auto";
     };
   }, [confirmDialog.show]);
 
@@ -117,54 +139,72 @@ export default function AdminBilling() {
     setConfirmDialog({
       show: true,
       billId,
-      message: t.confirmMessage
+      message: t.confirmMessage,
     });
   };
 
   const handleMarkAsPaid = async () => {
     const billId = confirmDialog.billId;
-    setConfirmDialog({ show: false, billId: null, message: '' });
+    setConfirmDialog({ show: false, billId: null, message: "" });
 
     try {
       const res = await authFetch(`${API_URL}/api/bills/${billId}/pay`, {
-        method: 'PATCH',
+        method: "PATCH",
       });
       const json = await res.json();
       if (json.success) {
-        showToast(t.toastSuccess, 'success');
+        showToast(t.toastSuccess, "success");
         fetchBills();
       } else {
-        showToast(json.message, 'error');
+        showToast(json.message, "error");
       }
     } catch (err) {
-      showToast(t.toastUpdateError, 'error');
+      showToast(t.toastUpdateError, "error");
     }
   };
 
   const fmt = (n) => formatMoney(lang, n);
   const locale = getLocale(lang);
 
-  const filteredBills = bills.filter(b => {
-    const patientName = b.patient?.fullName?.toLowerCase() || '';
-    const billId = b._id?.toLowerCase() || '';
-    const matchSearch = patientName.includes(searchTerm.toLowerCase()) || billId.includes(searchTerm.toLowerCase());
-    const matchStatus = filterStatus === 'All' || b.status === filterStatus;
+  const filteredBills = bills.filter((b) => {
+    const patientName = b.patient?.fullName?.toLowerCase() || "";
+    const billId = b._id?.toLowerCase() || "";
+    const matchSearch =
+      patientName.includes(searchTerm.toLowerCase()) ||
+      billId.includes(searchTerm.toLowerCase());
+    const matchStatus = filterStatus === "All" || b.status === filterStatus;
     return matchSearch && matchStatus;
   });
 
-  if (loading) return <div className="text-center py-10 font-bold text-slate-600">{t.loading}</div>;
-  if (error) return <div className="bg-red-50 text-red-500 p-4 rounded-2xl">{error}</div>;
+  if (loading)
+    return (
+      <div className="text-center py-10 font-bold text-[var(--text-secondary)]">
+        {t.loading}
+      </div>
+    );
+  if (error)
+    return (
+      <div className="bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400 p-4 rounded-2xl">
+        {error}
+      </div>
+    );
 
   return (
     <div className="space-y-6 relative">
       {/* Toast Notification */}
       {toast.show && (
-        <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border transition-all duration-300 transform translate-y-0 animate-in fade-in slide-in-from-top-4 ${
-          toast.type === 'success' 
-            ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
-            : 'bg-rose-50 text-rose-800 border-rose-200'
-        }`}>
-          {toast.type === 'success' ? <CheckCircle2 className="text-emerald-500" /> : <AlertCircle className="text-rose-500" />}
+        <div
+          className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border transition-all duration-300 transform translate-y-0 animate-in fade-in slide-in-from-top-4 ${
+            toast.type === "success"
+              ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-100 border-emerald-200 dark:border-emerald-900/30"
+              : "bg-rose-50 dark:bg-rose-900/30 text-rose-800 dark:text-rose-100 border-rose-200 dark:border-rose-900/30"
+          }`}
+        >
+          {toast.type === "success" ? (
+            <CheckCircle2 className="text-emerald-500 dark:text-emerald-400" />
+          ) : (
+            <AlertCircle className="text-rose-500 dark:text-rose-400" />
+          )}
           <span className="font-bold text-sm">{toast.message}</span>
         </div>
       )}
@@ -172,20 +212,26 @@ export default function AdminBilling() {
       {/* Confirmation Modal */}
       {confirmDialog.show && (
         <div className="fixed inset-0 w-screen h-screen bg-slate-900/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-slate-100 space-y-4">
-            <div className="flex items-center gap-3 text-indigo-600">
+          <div className="bg-[var(--card-bg)] w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-[var(--border-color)] space-y-4">
+            <div className="flex items-center gap-3 text-indigo-600 dark:text-indigo-400">
               <ShieldAlert size={28} />
-              <h3 className="font-black text-lg text-slate-800">{t.confirmTitle}</h3>
+              <h3 className="font-black text-lg text-[var(--text-primary)]">
+                {t.confirmTitle}
+              </h3>
             </div>
-            <p className="text-sm font-semibold text-slate-500 leading-relaxed">{confirmDialog.message}</p>
+            <p className="text-sm font-semibold text-[var(--text-secondary)] leading-relaxed">
+              {confirmDialog.message}
+            </p>
             <div className="flex justify-end gap-3 pt-2">
-              <button 
-                onClick={() => setConfirmDialog({ show: false, billId: null, message: '' })} 
-                className="px-4 py-2 border border-slate-200 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 transition-all"
+              <button
+                onClick={() =>
+                  setConfirmDialog({ show: false, billId: null, message: "" })
+                }
+                className="px-4 py-2 border border-[var(--border-color)] hover:bg-[var(--bg-tertiary)] rounded-xl text-xs font-bold text-[var(--text-primary)] transition-all"
               >
                 {t.btnCancel}
               </button>
-              <button 
+              <button
                 onClick={handleMarkAsPaid}
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-600/20 transition-all"
               >
@@ -196,30 +242,37 @@ export default function AdminBilling() {
         </div>
       )}
 
-      <div className="flex justify-between items-center bg-white p-6 rounded-3xl border border-slate-200 shadow-sm animate-in fade-in">
+      <div className="flex justify-between items-center bg-[var(--card-bg)] p-6 rounded-3xl border border-[var(--border-color)] shadow-sm animate-in fade-in">
         <div>
-          <h2 className="text-2xl font-black text-slate-800">{t.headerTitle}</h2>
-          <p className="text-slate-500 font-medium mt-1">{t.headerSubtitle}</p>
+          <h2 className="text-2xl font-black text-[var(--text-primary)]">
+            {t.headerTitle}
+          </h2>
+          <p className="text-[var(--text-secondary)] font-medium mt-1">
+            {t.headerSubtitle}
+          </p>
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in">
-        <div className="p-4 border-b border-slate-100 flex items-center justify-between gap-4 bg-slate-50/50">
+      <div className="bg-[var(--card-bg)] rounded-3xl border border-[var(--border-color)] shadow-sm overflow-hidden animate-in fade-in">
+        <div className="p-4 border-b border-[var(--border-color)] flex items-center justify-between gap-4 bg-[var(--bg-tertiary)]">
           <div className="relative w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input 
-              type="text" 
-              placeholder={t.searchPlaceholder} 
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
+              size={18}
+            />
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" 
+              className="w-full pl-10 pr-4 py-2 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-[var(--text-primary)]"
             />
           </div>
           <div>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="bg-white border border-slate-200 text-sm font-bold text-slate-700 rounded-xl px-4 py-2 outline-none"
+              className="bg-[var(--card-bg)] border border-[var(--border-color)] text-sm font-bold text-[var(--text-primary)] rounded-xl px-4 py-2 outline-none"
             >
               <option value="All">{t.filterAll}</option>
               <option value="unpaid">{t.filterUnpaid}</option>
@@ -231,7 +284,7 @@ export default function AdminBilling() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-bold">
+              <tr className="bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-xs uppercase tracking-wider font-bold">
                 <th className="p-4 pl-6">{t.colBillIdDate}</th>
                 <th className="p-4">{t.colPatient}</th>
                 <th className="p-4">{t.colServices}</th>
@@ -240,48 +293,72 @@ export default function AdminBilling() {
                 <th className="p-4 text-right pr-6">{t.colAction}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredBills.map(b => (
-                <tr key={b._id} className="hover:bg-slate-50/50 transition-colors">
+            <tbody className="divide-y divide-[var(--border-color)]">
+              {filteredBills.map((b) => (
+                <tr
+                  key={b._id}
+                  className="hover:bg-[var(--bg-tertiary)] transition-colors"
+                >
                   <td className="p-4 pl-6 font-medium">
                     <div className="flex flex-col">
-                      <span className="font-mono font-bold text-indigo-600 text-sm">{b._id?.slice(-8).toUpperCase()}</span>
-                      <span className="text-xs text-slate-500 mt-0.5">{formatDate(lang, b.createdAt)}</span>
+                      <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 text-sm">
+                        {b._id?.slice(-8).toUpperCase()}
+                      </span>
+                      <span className="text-xs text-[var(--text-secondary)] mt-0.5">
+                        {formatDate(lang, b.createdAt)}
+                      </span>
                     </div>
                   </td>
-                  <td className="p-4 font-bold text-slate-800">
+                  <td className="p-4 font-bold text-[var(--text-primary)]">
                     <div className="flex flex-col">
-                      <span>{b.patient?.fullName || 'Bệnh nhân ẩn'}</span>
-                      <span className="text-xs text-slate-500 font-mono">{b.patient?.patientId || 'N/A'}</span>
+                      <span>{b.patient?.fullName || "Bệnh nhân ẩn"}</span>
+                      <span className="text-xs text-[var(--text-secondary)] font-mono">
+                        {b.patient?.patientId || "N/A"}
+                      </span>
                     </div>
                   </td>
                   <td className="p-4 max-w-xs">
                     <div className="flex flex-wrap gap-1">
                       {b.items.map((item, idx) => (
-                        <span key={idx} className="px-2 py-0.5 bg-slate-100 text-slate-700 text-xs font-bold rounded-lg border border-slate-200" title={item.description}>
+                        <span
+                          key={idx}
+                          className="px-2 py-0.5 bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-xs font-bold rounded-lg border border-[var(--border-color)]"
+                          title={item.description}
+                        >
                           {item.description} ({fmt(item.amount)})
                         </span>
                       ))}
                     </div>
                   </td>
-                  <td className="p-4 font-black text-slate-700">{fmt(b.totalAmount)}</td>
+                  <td className="p-4 font-black text-[var(--text-primary)]">
+                    {fmt(b.totalAmount)}
+                  </td>
                   <td className="p-4">
-                    {b.status === 'paid' ? (
-                      <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600"><CheckCircle2 size={14}/> {t.statusPaid}</span>
+                    {b.status === "paid" ? (
+                      <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                        <CheckCircle2 size={14} /> {t.statusPaid}
+                      </span>
                     ) : (
-                      <span className="flex items-center gap-1.5 text-xs font-bold text-orange-500"><Clock size={14}/> {t.statusUnpaid}</span>
+                      <span className="flex items-center gap-1.5 text-xs font-bold text-orange-500 dark:text-orange-400">
+                        <Clock size={14} /> {t.statusUnpaid}
+                      </span>
                     )}
                   </td>
                   <td className="p-4 pr-6 text-right">
-                    {b.status === 'unpaid' ? (
-                      <button 
+                    {b.status === "unpaid" ? (
+                      <button
                         onClick={() => triggerConfirmPay(b._id)}
                         className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg shadow-md transition-colors"
                       >
                         {t.btnConfirmPay}
                       </button>
                     ) : (
-                      <span className="text-xs font-bold text-slate-400">{t.paidTimePrefix} {b.paidAt ? new Date(b.paidAt).toLocaleTimeString(locale) : ''}</span>
+                      <span className="text-xs font-bold text-[var(--text-tertiary)]">
+                        {t.paidTimePrefix}{" "}
+                        {b.paidAt
+                          ? new Date(b.paidAt).toLocaleTimeString(locale)
+                          : ""}
+                      </span>
                     )}
                   </td>
                 </tr>

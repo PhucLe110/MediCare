@@ -121,8 +121,8 @@ const MainLayout = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-gray-800 font-sans transition-colors duration-200">
-      <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans transition-colors duration-200">
+      <header className="sticky top-0 z-50 bg-[var(--bg-primary)] shadow-sm border-b border-[var(--border-color)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Navigation */}
@@ -134,7 +134,7 @@ const MainLayout = () => {
                   className={`text-sm font-bold transition-colors hover:text-primary ${
                     location.pathname === item.path
                       ? "text-primary border-b-2 border-primary py-1"
-                      : "text-gray-600"
+                      : "text-[var(--text-secondary)]"
                   }`}
                 >
                   {item.name}
@@ -154,38 +154,38 @@ const MainLayout = () => {
             {/* Actions & Toggles */}
             <div className="flex items-center space-x-6">
               {/* Modern Navbar Controls */}
-              <div className="flex items-center gap-2.5 bg-gray-50 border border-gray-200/80 p-1 rounded-full shadow-inner">
+              <div className="flex items-center gap-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] p-1 rounded-full shadow-inner">
                 {/* Theme Switcher */}
-                <div className="flex bg-gray-200/40 p-0.5 rounded-full">
+                <div className="flex bg-[var(--bg-tertiary)] p-0.5 rounded-full">
                   <button
                     onClick={() => setTheme("light")}
-                    className={`w-7 h-7 rounded-full transition-all flex items-center justify-center ${theme === "light" ? "bg-white text-primary shadow-sm scale-105" : "text-gray-500 hover:text-gray-800"}`}
+                    className={`w-7 h-7 rounded-full transition-all flex items-center justify-center ${theme === "light" ? "bg-white text-primary shadow-sm scale-105" : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"}`}
                     title={t.lightMode}
                   >
                     <Sun size={14} />
                   </button>
                   <button
                     onClick={() => setTheme("dark")}
-                    className={`w-7 h-7 rounded-full transition-all flex items-center justify-center ${theme === "dark" ? "bg-white text-primary shadow-sm scale-105" : "text-gray-500 hover:text-gray-800"}`}
+                    className={`w-7 h-7 rounded-full transition-all flex items-center justify-center ${theme === "dark" ? "bg-white text-primary shadow-sm scale-105" : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"}`}
                     title={t.darkMode}
                   >
                     <Moon size={14} />
                   </button>
                 </div>
 
-                <span className="w-px h-3.5 bg-gray-300"></span>
+                <span className="w-px h-3.5 bg-[var(--border-color)]"></span>
 
                 {/* Language Switcher */}
-                <div className="flex bg-gray-200/40 p-0.5 rounded-full mr-1">
+                <div className="flex bg-[var(--bg-tertiary)] p-0.5 rounded-full mr-1">
                   <button
                     onClick={() => setLang("vi")}
-                    className={`w-7 h-7 flex items-center justify-center rounded-full text-[10px] font-black tracking-wider transition-all ${lang === "vi" ? "bg-white text-primary shadow-sm scale-105" : "text-gray-500 hover:text-gray-800"}`}
+                    className={`w-7 h-7 flex items-center justify-center rounded-full text-[10px] font-black tracking-wider transition-all ${lang === "vi" ? "bg-white text-primary shadow-sm scale-105" : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"}`}
                   >
                     VI
                   </button>
                   <button
                     onClick={() => setLang("en")}
-                    className={`w-7 h-7 flex items-center justify-center rounded-full text-[10px] font-black tracking-wider transition-all ${lang === "en" ? "bg-white text-primary shadow-sm scale-105" : "text-gray-500 hover:text-gray-800"}`}
+                    className={`w-7 h-7 flex items-center justify-center rounded-full text-[10px] font-black tracking-wider transition-all ${lang === "en" ? "bg-white text-primary shadow-sm scale-105" : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"}`}
                   >
                     EN
                   </button>
@@ -196,7 +196,7 @@ const MainLayout = () => {
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => setAuthModal({ isOpen: true, mode: "login" })}
-                  className="px-5 py-2.5 bg-white text-primary border border-primary text-sm font-bold rounded-full hover:bg-blue-50 transition-all"
+                  className="px-5 py-2.5 bg-[var(--bg-primary)] text-primary border border-primary text-sm font-bold rounded-full hover:bg-[var(--bg-secondary)] transition-all"
                 >
                   {t.login}
                 </button>

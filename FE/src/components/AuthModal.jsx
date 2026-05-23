@@ -118,11 +118,11 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden relative animate-in fade-in zoom-in duration-200">
+      <div className="bg-[var(--card-bg)] rounded-3xl shadow-2xl w-full max-w-md overflow-hidden relative animate-in fade-in zoom-in duration-200">
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors z-10"
+          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--border-color)] transition-colors z-10"
         >
           <X size={18} />
         </button>
@@ -134,16 +134,16 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
               alt="MediCare"
               className="h-12 w-auto object-contain mb-4 no-invert"
             />
-            <h2 className="text-2xl font-black text-gray-900">
+            <h2 className="text-2xl font-black text-[var(--text-primary)]">
               {mode === "login" ? t.loginTitle : t.registerTitle}
             </h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--text-secondary)] mt-1">
               {mode === "login" ? t.loginSub : t.registerSub}
             </p>
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm mb-4 font-medium text-center border border-red-100">
+            <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-xl text-sm mb-4 font-medium text-center border border-red-100 dark:border-red-900/30">
               {error}
             </div>
           )}
@@ -152,37 +152,37 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
             {mode === "register" && (
               <>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">
+                  <label className="block text-sm font-bold text-[var(--text-primary)] mb-1">
                     {t.fullName}
                   </label>
                   <input
                     type="text"
                     required
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-gray-50 focus:bg-white outline-none"
+                    className="w-full px-4 py-2.5 border border-[var(--border-color)] rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-[var(--input-bg)] focus:bg-[var(--bg-primary)] outline-none text-[var(--text-primary)]"
                     placeholder={t.fullNamePh}
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">
+                  <label className="block text-sm font-bold text-[var(--text-primary)] mb-1">
                     {t.phone}
                   </label>
                   <input
                     type="tel"
                     required
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-gray-50 focus:bg-white outline-none"
+                    className="w-full px-4 py-2.5 border border-[var(--border-color)] rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-[var(--input-bg)] focus:bg-[var(--bg-primary)] outline-none text-[var(--text-primary)]"
                     placeholder="0912345678"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">
+                  <label className="block text-sm font-bold text-[var(--text-primary)] mb-1">
                     {t.gender}
                   </label>
                   <div className="flex gap-4">
-                    <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border rounded-xl cursor-pointer transition-all font-bold text-sm bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700 has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-500 has-[:checked]:text-indigo-600">
+                    <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border rounded-xl cursor-pointer transition-all font-bold text-sm bg-[var(--input-bg)] hover:bg-[var(--bg-tertiary)] border-[var(--border-color)] text-[var(--text-secondary)] has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-500 has-[:checked]:text-indigo-600">
                       <input
                         type="radio"
                         name="modalGender"
@@ -193,7 +193,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
                       />
                       {t.male}
                     </label>
-                    <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border rounded-xl cursor-pointer transition-all font-bold text-sm bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700 has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-500 has-[:checked]:text-indigo-600">
+                    <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border rounded-xl cursor-pointer transition-all font-bold text-sm bg-[var(--input-bg)] hover:bg-[var(--bg-tertiary)] border-[var(--border-color)] text-[var(--text-secondary)] has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-500 has-[:checked]:text-indigo-600">
                       <input
                         type="radio"
                         name="modalGender"
@@ -210,13 +210,13 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
             )}
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">
+              <label className="block text-sm font-bold text-[var(--text-primary)] mb-1">
                 {t.email}
               </label>
               <input
                 type="email"
                 required
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-gray-50 focus:bg-white outline-none"
+                className="w-full px-4 py-2.5 border border-[var(--border-color)] rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-[var(--input-bg)] focus:bg-[var(--bg-primary)] outline-none text-[var(--text-primary)]"
                 placeholder="email@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -224,13 +224,13 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">
+              <label className="block text-sm font-bold text-[var(--text-primary)] mb-1">
                 {t.password}
               </label>
               <input
                 type="password"
                 required
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-gray-50 focus:bg-white outline-none"
+                className="w-full px-4 py-2.5 border border-[var(--border-color)] rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-[var(--input-bg)] focus:bg-[var(--bg-primary)] outline-none text-[var(--text-primary)]"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -243,11 +243,11 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
                   <input
                     type="checkbox"
                     id="remember"
-                    className="rounded text-primary focus:ring-primary border-gray-300 w-4 h-4"
+                    className="rounded text-primary focus:ring-primary border-[var(--border-color)] w-4 h-4"
                   />
                   <label
                     htmlFor="remember"
-                    className="text-sm font-medium text-gray-600"
+                    className="text-sm font-medium text-[var(--text-secondary)]"
                   >
                     {t.remember}
                   </label>
@@ -269,8 +269,8 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-gray-100 text-center">
-            <p className="text-sm text-gray-600 font-medium">
+          <div className="mt-6 pt-6 border-t border-[var(--border-color)] text-center">
+            <p className="text-sm text-[var(--text-secondary)] font-medium">
               {mode === "login" ? t.noAccount : t.hasAccount}{" "}
               <button
                 type="button"

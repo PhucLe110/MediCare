@@ -1,27 +1,57 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #1E3A8A; /* Xanh dương đậm */
-  --color-primary-light: #3B82F6; /* Xanh dương sáng */
-  --color-primary-pale: #EFF6FF; /* Xanh nhạt */
-  --color-accent: #E11D48; /* Đỏ hồng từ logo */
+  --color-primary: #1e3a8a;
+  --color-primary-light: #3b82f6;
+  --color-primary-pale: #eff6ff;
+  --color-accent: #e11d48;
 }
 
 @layer base {
-  body {
-    @apply bg-white text-gray-800 antialiased font-sans;
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-tertiary: #f3f4f6;
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-tertiary: #9ca3af;
+    --border-color: #e5e7eb;
+    --card-bg: #ffffff;
+    --input-bg: #f9fafb;
   }
-}
 
-/* Smart Hue-Inverted Global Dark Mode */
-html.dark {
-  filter: invert(0.9) hue-rotate(180deg);
-  background-color: #0f172a;
-}
-html.dark img,
-html.dark video,
-html.dark canvas,
-html.dark iframe,
-html.dark .no-invert {
-  filter: invert(1) hue-rotate(180deg);
+  .dark {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-tertiary: #9ca3af;
+    --border-color: #374151;
+    --card-bg: #1e293b;
+    --input-bg: #1e293b;
+  }
+
+  body {
+    @apply bg-[var(--bg-primary)] text-[var(--text-primary)] antialiased font-sans transition-colors duration-200;
+  }
+
+  /* Custom scrollbar for dark mode */
+  .dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+  }
 }
