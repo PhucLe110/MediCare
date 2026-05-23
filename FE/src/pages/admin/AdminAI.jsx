@@ -1,4 +1,3 @@
-import React from "react";
 import { Bot, Terminal, RefreshCw } from "lucide-react";
 import { useTranslation } from "../../hooks/useTranslation";
 

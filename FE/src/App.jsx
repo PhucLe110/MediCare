@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -13,14 +13,11 @@ import DashboardLayout from "./layouts/DashboardLayout";
 // Pages
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
 import Booking from "./pages/Booking";
 import AITriage from "./pages/AITriage";
 import Records from "./pages/Records";
 import ComingSoon from "./pages/ComingSoon";
 import LabResults from "./pages/LabResults";
-import LabUpload from "./pages/LabUpload";
 import LabStaffDashboard from "./pages/LabStaffDashboard";
 import Prescriptions from "./pages/Prescriptions";
 import Billing from "./pages/Billing";
@@ -66,10 +63,6 @@ function App() {
     <Router>
       <ScrollToTop />
       <Routes>
-        {/* Public Routes without Layout */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-
         {/* Public Routes with Layout */}
         <Route path="/" element={<MainLayout />}>
           <Route index element={<LandingPage />} />

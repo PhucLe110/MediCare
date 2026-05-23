@@ -1,5 +1,5 @@
 import { API_URL, authFetch } from "../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Users,
@@ -132,7 +132,7 @@ export default function AdminDashboard() {
         } else {
           setError(json.message);
         }
-      } catch (err) {
+      } catch {
         setError(t.connError);
       } finally {
         setLoading(false);

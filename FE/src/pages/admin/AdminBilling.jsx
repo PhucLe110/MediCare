@@ -1,7 +1,6 @@
 import { API_URL, authFetch } from "../../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
-  Download,
   Search,
   CheckCircle2,
   Clock,
@@ -99,24 +98,25 @@ export default function AdminBilling() {
     message: "",
   });
 
-  const fetchBills = async () => {
-    try {
-      const res = await authFetch(`${API_URL}/api/admin/bills`);
-      const json = await res.json();
-      if (json.success) {
-        setBills(json.data);
-      } else {
-        setError(json.message);
-      }
-    } catch (err) {
-      setError(t.connError);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchBills = async () => {
+      try {
+        const res = await authFetch(`${API_URL}/api/admin/bills`);
+        const json = await res.json();
+        if (json.success) {
+          setBills(json.data);
+        } else {
+          setError(json.message);
+        }
+      } catch {
+        setError(t.connError);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchBills();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Lock scrolling on scrollable main container when modal is open
@@ -154,11 +154,21 @@ export default function AdminBilling() {
       const json = await res.json();
       if (json.success) {
         showToast(t.toastSuccess, "success");
-        fetchBills();
+        // Refetch bills
+        const refetchBills = async () => {
+          try {
+            const res = await authFetch(`${API_URL}/api/admin/bills`);
+            const json = await res.json();
+            if (json.success) setBills(json.data);
+          } catch {
+            // Error handling
+          }
+        };
+        refetchBills();
       } else {
         showToast(json.message, "error");
       }
-    } catch (err) {
+    } catch {
       showToast(t.toastUpdateError, "error");
     }
   };

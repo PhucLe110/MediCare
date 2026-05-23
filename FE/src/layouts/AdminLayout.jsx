@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -9,13 +9,10 @@ import {
   Pill,
   CreditCard,
   Bot,
-  Settings,
   LogOut,
   ChevronLeft,
   Sun,
   Moon,
-  Globe,
-  CalendarClock,
 } from "lucide-react";
 import { ensureValidSession, logoutAuth } from "../utils/auth";
 

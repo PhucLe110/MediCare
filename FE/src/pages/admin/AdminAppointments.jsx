@@ -1,11 +1,9 @@
 import { API_URL, authFetch } from "../../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Calendar,
   Clock,
   AlertCircle,
-  CheckCircle,
-  XCircle,
   Search,
   UserRoundCheck,
   RefreshCw,
@@ -162,24 +160,25 @@ export default function AdminAppointments() {
 
   const jsonHeaders = () => ({ "Content-Type": "application/json" });
 
-  const fetchAppointments = async () => {
-    try {
-      const res = await authFetch(`${API_URL}/api/admin/appointments`);
-      const json = await res.json();
-      if (json.success) {
-        setAppointments(json.data);
-      } else {
-        setError(json.message);
-      }
-    } catch (err) {
-      setError(t.connError);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const res = await authFetch(`${API_URL}/api/admin/appointments`);
+        const json = await res.json();
+        if (json.success) {
+          setAppointments(json.data);
+        } else {
+          setError(json.message);
+        }
+      } catch {
+        setError(t.connError);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchAppointments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Lock scrolling on scrollable main container when modals are open
@@ -220,7 +219,7 @@ export default function AdminAppointments() {
       } else {
         showToast(json.message, "error");
       }
-    } catch (err) {
+    } catch {
       showToast(t.toastFetchDoctorError, "error");
     } finally {
       setLoadingModal(false);
@@ -255,11 +254,21 @@ export default function AdminAppointments() {
       if (json.success) {
         showToast(t.toastReschedSuccess, "success");
         setIsModalOpen(false);
-        fetchAppointments();
+        // Refetch appointments
+        const refetchAppointments = async () => {
+          try {
+            const res = await authFetch(`${API_URL}/api/admin/appointments`);
+            const json = await res.json();
+            if (json.success) setAppointments(json.data);
+          } catch {
+            // Error handling
+          }
+        };
+        refetchAppointments();
       } else {
         showToast(json.message, "error");
       }
-    } catch (err) {
+    } catch {
       showToast(t.toastSaveError, "error");
     }
   };
@@ -289,11 +298,21 @@ export default function AdminAppointments() {
       const json = await res.json();
       if (json.success) {
         showToast(t.toastSuccess, "success");
-        fetchAppointments();
+        // Refetch appointments
+        const refetchAppointments = async () => {
+          try {
+            const res = await authFetch(`${API_URL}/api/admin/appointments`);
+            const json = await res.json();
+            if (json.success) setAppointments(json.data);
+          } catch {
+            // Error handling
+          }
+        };
+        refetchAppointments();
       } else {
         showToast(json.message, "error");
       }
-    } catch (err) {
+    } catch {
       showToast(t.toastUpdateError, "error");
     }
   };

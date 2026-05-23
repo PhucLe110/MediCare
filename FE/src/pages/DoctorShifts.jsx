@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { API_URL, authFetch } from "../config";
 import {
   Calendar,
@@ -106,36 +106,6 @@ const DoctorShifts = () => {
 
   const jsonHeaders = () => ({ "Content-Type": "application/json" });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const [resReq, resProf] = await Promise.all([
-        authFetch(`${API_URL}/api/doctors/shift-requests`),
-        authFetch(`${API_URL}/api/doctors/profile`),
-      ]);
-      const dataReq = await resReq.json();
-      const dataProf = await resProf.json();
-
-      let reqs = [];
-      if (dataReq.success) {
-        reqs = dataReq.data;
-        setRequests(reqs);
-      }
-      if (dataProf.success) {
-        setProfile(dataProf.data.profile);
-        generateSchedule(dataProf.data.profile, reqs);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const generateSchedule = (doctor, reqs) => {
     const pattern = doctor.shiftPattern || "Cả tuần";
     const baseTimes = ["08:00", "09:00", "10:00", "14:00", "15:00", "16:00"];
@@ -147,49 +117,61 @@ const DoctorShifts = () => {
     for (let i = 0; i < 30; i++) {
       const d = new Date(today);
       d.setDate(d.getDate() + i);
-      const dayOfWeek = d.getDay();
+      const dayName = d.toLocaleDateString("vi-VN", { weekday: "long" });
+      const dateStr = d.toISOString().split("T")[0];
 
-      if (dayOfWeek === 0) continue; // Skip Sunday
-
-      let isWorkingDay = false;
-      if (pattern === "Cả tuần") isWorkingDay = true;
-      else if (pattern === "T2-T3-T4" && [1, 2, 3].includes(dayOfWeek))
-        isWorkingDay = true;
-      else if (pattern === "T5-T6-T7" && [4, 5, 6].includes(dayOfWeek))
-        isWorkingDay = true;
-      else if (pattern === "T2-T4-T6" && [1, 3, 5].includes(dayOfWeek))
-        isWorkingDay = true;
-      else if (pattern === "T3-T5-T7" && [2, 4, 6].includes(dayOfWeek))
-        isWorkingDay = true;
-
-      let times = isWorkingDay ? [...baseTimes] : [];
-
-      const dateString = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-
-      // Direct string comparison — avoids timezone issues
-      const approvedReqs = reqs.filter(
-        (r) =>
-          r.status === "approved" && String(r.date).slice(0, 10) === dateString,
-      );
-
-      for (const r of approvedReqs) {
-        for (const t of r.times || []) {
-          if (r.type === "add" && !times.includes(t)) {
-            times.push(t);
-          } else if (r.type === "cancel") {
-            times = times.filter((x) => x !== t);
+      if (pattern === "Cả tuần" || pattern === dayName) {
+        baseTimes.forEach((time) => {
+          const isRequested = reqs.some(
+            (r) =>
+              r.date === dateStr && r.time === time && r.status === "approved",
+          );
+          const isCancelled = reqs.some(
+            (r) =>
+              r.date === dateStr &&
+              r.time === time &&
+              r.status === "approved" &&
+              r.type === "cancel",
+          );
+          if (!isCancelled) {
+            days.push({ date: dateStr, time, isRequested });
           }
-        }
-      }
-
-      times.sort();
-      // Only show days that actually have shifts
-      if (times.length > 0) {
-        days.push({ date: d, times });
+        });
       }
     }
+
     setSchedule(days);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [resReq, resProf] = await Promise.all([
+          authFetch(`${API_URL}/api/doctors/shift-requests`),
+          authFetch(`${API_URL}/api/doctors/profile`),
+        ]);
+        const dataReq = await resReq.json();
+        const dataProf = await resProf.json();
+
+        let reqs = [];
+        if (dataReq.success) {
+          reqs = dataReq.data;
+          setRequests(reqs);
+        }
+        if (dataProf.success) {
+          setProfile(dataProf.data.profile);
+          generateSchedule(dataProf.data.profile, reqs);
+        }
+      } catch {
+        // Error handling
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const toggleTime = (t) => {
     setSelectedTimes((prev) =>
@@ -214,6 +196,32 @@ const DoctorShifts = () => {
 
       if (data.success) {
         showToast(t.submitSuccess(selectedTimes.length), "success");
+        // Refetch data
+        const fetchData = async () => {
+          setLoading(true);
+          try {
+            const [resReq, resProf] = await Promise.all([
+              authFetch(`${API_URL}/api/doctors/shift-requests`),
+              authFetch(`${API_URL}/api/doctors/profile`),
+            ]);
+            const dataReq = await resReq.json();
+            const dataProf = await resProf.json();
+
+            let reqs = [];
+            if (dataReq.success) {
+              reqs = dataReq.data;
+              setRequests(reqs);
+            }
+            if (dataProf.success) {
+              setProfile(dataProf.data.profile);
+              generateSchedule(dataProf.data.profile, reqs);
+            }
+          } catch {
+            // Error handling
+          } finally {
+            setLoading(false);
+          }
+        };
         fetchData();
         setDate("");
         setSelectedTimes([]);

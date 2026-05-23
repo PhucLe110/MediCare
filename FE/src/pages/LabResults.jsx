@@ -1,5 +1,5 @@
 import { API_URL, authFetch } from "../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   FlaskConical,
   FileText,

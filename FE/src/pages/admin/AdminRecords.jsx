@@ -1,6 +1,6 @@
 import { API_URL, authFetch } from "../../config";
-import React, { useState, useEffect } from "react";
-import { Database, FileText, Activity, Search, RefreshCw } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Database, FileText, Activity, Search } from "lucide-react";
 import { useTranslation } from "../../hooks/useTranslation";
 import { formatDoctorName, formatDate } from "../../utils/i18nHelpers";
 
@@ -73,24 +73,25 @@ export default function AdminRecords() {
   const [activeTab, setActiveTab] = useState("prescriptions");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const fetchRecords = async () => {
-    try {
-      const res = await authFetch(`${API_URL}/api/admin/records`);
-      const json = await res.json();
-      if (json.success) {
-        setRecords(json.data);
-      } else {
-        setError(json.message);
-      }
-    } catch (err) {
-      setError(t.connError);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchRecords = async () => {
+      try {
+        const res = await authFetch(`${API_URL}/api/admin/records`);
+        const json = await res.json();
+        if (json.success) {
+          setRecords(json.data);
+        } else {
+          setError(json.message);
+        }
+      } catch {
+        setError(t.connError);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchRecords();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleBackup = () => {

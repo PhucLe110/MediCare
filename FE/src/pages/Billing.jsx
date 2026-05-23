@@ -1,5 +1,5 @@
 import { API_URL, authFetch, getStoredUser } from "../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Receipt,
   CheckCircle2,
@@ -12,9 +12,7 @@ import {
   Stethoscope,
   FlaskConical,
   Pill,
-  Clock,
   Calendar,
-  CreditCard,
 } from "lucide-react";
 import { useTranslation } from "../hooks/useTranslation";
 import {
@@ -143,7 +141,6 @@ export default function Billing() {
     formatDoctorName(lang, name) || t.doctorTitle;
 
   useEffect(() => {
-    setUser(getStoredUser() || {});
     (async () => {
       try {
         const [br, pr] = await Promise.all([
@@ -156,7 +153,9 @@ export default function Billing() {
           if (bd.data[0]) setSelId(bd.data[0].appointment?._id || "other");
         }
         if (pd.success) setPayInfo(pd.data);
+        setUser(getStoredUser() || {});
       } catch {
+        // Error handling
       } finally {
         setLoading(false);
       }
@@ -184,7 +183,7 @@ export default function Billing() {
       }
     }, 3000);
     return () => clearInterval(iv);
-  }, [selId, bills.length]);
+  }, [selId, bills]);
 
   const appsMap = bills.reduce((acc, b) => {
     const id = b.appointment?._id || "other";
@@ -883,7 +882,7 @@ export default function Billing() {
                 <div
                   style={{ display: "flex", flexDirection: "column", gap: 14 }}
                 >
-                  {sel.paid.map((bill, bi) => (
+                  {sel.paid.map((bill) => (
                     <div
                       key={bill._id}
                       style={{

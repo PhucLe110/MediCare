@@ -1,20 +1,18 @@
-import React from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { Search, Bell, Bot, ChevronRight, Sun, Moon } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Sun, Moon } from "lucide-react";
 import AuthModal from "../components/AuthModal";
 
 const MainLayout = () => {
   const location = useLocation();
-  const [authModal, setAuthModal] = React.useState({
+  const [authModal, setAuthModal] = useState({
     isOpen: false,
     mode: "login",
   });
-  const [lang, setLang] = React.useState(localStorage.getItem("lang") || "vi");
-  const [theme, setTheme] = React.useState(
-    localStorage.getItem("theme") || "light",
-  );
+  const [lang, setLang] = useState(localStorage.getItem("lang") || "vi");
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
@@ -23,12 +21,12 @@ const MainLayout = () => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     localStorage.setItem("lang", lang);
     window.dispatchEvent(new Event("language-change"));
   }, [lang]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleLangChange = () => {
       const currentLang = localStorage.getItem("lang") || "vi";
       if (currentLang !== lang) {
@@ -112,7 +110,7 @@ const MainLayout = () => {
     { name: t.doctors, path: "/doctors" },
   ];
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleOpenAuth = (e) => {
       setAuthModal({ isOpen: true, mode: e.detail || "login" });
     };

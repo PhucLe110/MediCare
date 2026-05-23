@@ -1,11 +1,9 @@
 import { API_URL, authFetch, getStoredUser } from "../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Calendar,
   Clock,
-  ChevronRight,
   CheckCircle2,
-  X,
   CreditCard,
   Printer,
 } from "lucide-react";
@@ -150,8 +148,6 @@ export default function AppointmentsHistory() {
   const handleAction = (a) => {
     navigate(`/dashboard/appointment/${a._id}`);
   };
-
-  const handlePrint = () => window.print();
 
   return (
     <div className="max-w-4xl mx-auto py-8">

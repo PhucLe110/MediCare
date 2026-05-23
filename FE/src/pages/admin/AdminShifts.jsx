@@ -1,5 +1,5 @@
 import { API_URL, authFetch } from "../../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   CheckCircle,
@@ -144,40 +144,40 @@ export default function AdminShifts() {
   const jsonHeaders = () => ({ "Content-Type": "application/json" });
 
   useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const res = await authFetch(`${API_URL}/api/admin/shift-requests`);
+        const json = await res.json();
+        if (json.success) setRequests(json.data);
+      } catch {
+        // Error handling
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchRequests();
   }, []);
 
   useEffect(() => {
+    const fetchSchedule = async (doctorId) => {
+      setPreviewLoading(true);
+      try {
+        const { year, month } = previewMonth;
+        const res = await authFetch(
+          `${API_URL}/api/admin/doctors/${doctorId}/schedule?year=${year}&month=${month}`,
+        );
+        const json = await res.json();
+        if (json.success) setPreviewSchedule(json.data);
+      } catch {
+        // Error handling
+      } finally {
+        setPreviewLoading(false);
+      }
+    };
+
     if (previewDoctor) fetchSchedule(previewDoctor.doctorId);
   }, [previewMonth, previewDoctor]);
-
-  const fetchRequests = async () => {
-    try {
-      const res = await authFetch(`${API_URL}/api/admin/shift-requests`);
-      const json = await res.json();
-      if (json.success) setRequests(json.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchSchedule = async (doctorId) => {
-    setPreviewLoading(true);
-    try {
-      const { year, month } = previewMonth;
-      const res = await authFetch(
-        `${API_URL}/api/admin/doctors/${doctorId}/schedule?year=${year}&month=${month}`,
-      );
-      const json = await res.json();
-      if (json.success) setPreviewSchedule(json.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setPreviewLoading(false);
-    }
-  };
 
   const openPreview = (doctorId, doctorName) => {
     setPreviewDoctor({ doctorId, doctorName });
@@ -205,13 +205,40 @@ export default function AdminShifts() {
           status === "approved" ? t.toastApproved : t.toastRejected,
           status === "approved" ? "success" : "error",
         );
-        fetchRequests();
+        // Refetch requests
+        const refetchRequests = async () => {
+          try {
+            const res = await authFetch(`${API_URL}/api/admin/shift-requests`);
+            const json = await res.json();
+            if (json.success) setRequests(json.data);
+          } catch {
+            // Error handling
+          }
+        };
+        refetchRequests();
         // Refresh schedule if preview open
-        if (previewDoctor) fetchSchedule(previewDoctor.doctorId);
+        if (previewDoctor) {
+          const refetchSchedule = async (doctorId) => {
+            setPreviewLoading(true);
+            try {
+              const { year, month } = previewMonth;
+              const res = await authFetch(
+                `${API_URL}/api/admin/doctors/${doctorId}/schedule?year=${year}&month=${month}`,
+              );
+              const json = await res.json();
+              if (json.success) setPreviewSchedule(json.data);
+            } catch {
+              // Error handling
+            } finally {
+              setPreviewLoading(false);
+            }
+          };
+          refetchSchedule(previewDoctor.doctorId);
+        }
       } else {
         showToast(json.message || t.toastError, "error");
       }
-    } catch (err) {
+    } catch {
       showToast(t.toastError, "error");
     }
   };

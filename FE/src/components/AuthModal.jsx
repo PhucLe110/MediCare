@@ -1,6 +1,6 @@
 import { API_URL } from "../config";
 import { saveAuthSession } from "../utils/auth";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 import { useTranslation } from "../hooks/useTranslation";
@@ -55,7 +55,7 @@ const trans = {
 };
 
 const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
-  const { lang, t } = useTranslation(trans);
+  const { t } = useTranslation(trans);
   const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -64,11 +64,18 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
   const [gender, setGender] = useState("Nam");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const initialModeRef = useRef(initialMode);
 
   useEffect(() => {
-    setMode(initialMode);
-    setError("");
-  }, [isOpen, initialMode]);
+    initialModeRef.current = initialMode;
+  }, [initialMode]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setMode(initialModeRef.current);
+      setError("");
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";

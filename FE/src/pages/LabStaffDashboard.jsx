@@ -1,5 +1,5 @@
 import { API_URL, authFetch } from "../config";
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   FlaskConical,
   Clock,
@@ -20,7 +20,6 @@ import {
   formatDoctorName,
   formatDate,
   formatDateTime,
-  getLocale,
 } from "../utils/i18nHelpers";
 
 // const API_URL = API_URL;
@@ -181,7 +180,6 @@ const RequestCard = ({ req, onStart, onComplete }) => {
   };
 
   const getDoctorDisplayName = (name) => formatDoctorName(lang, name);
-  const locale = getLocale(lang);
 
   const isUrgent = req.tests?.some((t) => t.urgency === "urgent");
   const labPaid =
@@ -429,32 +427,32 @@ const LabStaffDashboard = () => {
     );
   };
 
-  const fetchRequests = async () => {
-    setLoading(true);
-    try {
-      const endpoint =
-        activeTab === "pending"
-          ? "/api/lab-requests/pending"
-          : "/api/lab-requests";
-      const res = await authFetch(`${API_URL}${endpoint}`);
-      const data = await res.json();
-      if (data.success) {
-        if (activeTab === "history") {
-          setRequests(data.data.filter((r) => r.status === "completed"));
-        } else {
-          setRequests(data.data);
-        }
-      }
-    } catch (err) {
-      showToast(t.loadError, "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchRequests = async () => {
+      setLoading(true);
+      try {
+        const endpoint =
+          activeTab === "history"
+            ? "/api/lab-requests/history"
+            : "/api/lab-requests";
+        const res = await authFetch(`${API_URL}${endpoint}`);
+        const data = await res.json();
+        if (data.success) {
+          if (activeTab === "history") {
+            setRequests(data.data.filter((r) => r.status === "completed"));
+          } else {
+            setRequests(data.data);
+          }
+        }
+      } catch {
+        showToast(t.loadError, "error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchRequests();
-  }, [activeTab]);
+  }, [activeTab, t]);
 
   const handleStart = async (id) => {
     try {
@@ -529,7 +527,33 @@ const LabStaffDashboard = () => {
         </div>
         <div className="flex gap-4 text-center items-center">
           <button
-            onClick={fetchRequests}
+            onClick={() => {
+              const fetchRequests = async () => {
+                setLoading(true);
+                try {
+                  const endpoint =
+                    activeTab === "history"
+                      ? "/api/lab-requests/history"
+                      : "/api/lab-requests";
+                  const res = await authFetch(`${API_URL}${endpoint}`);
+                  const data = await res.json();
+                  if (data.success) {
+                    if (activeTab === "history") {
+                      setRequests(
+                        data.data.filter((r) => r.status === "completed"),
+                      );
+                    } else {
+                      setRequests(data.data);
+                    }
+                  }
+                } catch {
+                  showToast(t.loadError, "error");
+                } finally {
+                  setLoading(false);
+                }
+              };
+              fetchRequests();
+            }}
             disabled={loading}
             className="p-3 bg-teal-50 dark:bg-teal-900/30 border border-teal-100 dark:border-teal-900/30 rounded-2xl hover:bg-teal-100 dark:hover:bg-teal-900/40 hover:border-teal-200 dark:hover:border-teal-900/40 transition-all flex flex-col items-center justify-center h-full min-h-[72px] shadow-sm"
             title={t.refreshTitle}

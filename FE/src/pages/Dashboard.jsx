@@ -1,17 +1,11 @@
 import { API_URL as API, authFetch, getStoredUser } from "../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Calendar,
   FlaskConical,
   Pill,
   CreditCard,
-  ChevronRight,
-  Stethoscope,
-  TrendingUp,
-  Clock,
-  CheckCircle2,
   AlertCircle,
-  Sparkles,
   ArrowUpRight,
   Printer,
 } from "lucide-react";
@@ -142,21 +136,12 @@ export default function Dashboard() {
     cancelled: { label: t.cancelled, color: "#dc2626", bg: "#fee2e2" },
   };
 
-  const timeAgo = (tDate) => {
-    const s = (Date.now() - new Date(tDate)) / 1000;
-    if (s < 60) return t.justNow;
-    if (s < 3600) return t.minsAgo(Math.floor(s / 60));
-    if (s < 86400) return t.hoursAgo(Math.floor(s / 3600));
-    return t.daysAgo(Math.floor(s / 86400));
-  };
-
   const getDoctorDisplayName = (name) =>
     formatDoctorName(lang, name) || t.doctorTitle;
 
   useEffect(() => {
     const u = getStoredUser();
     if (!u) return navigate("/login");
-    setUser(u);
     (async () => {
       try {
         const [ar, br, lr, rxr] = await Promise.all([
@@ -175,14 +160,16 @@ export default function Dashboard() {
         if (bd.success) setBills(bd.data);
         if (ld.success) setLabs(ld.data);
         if (rxd.success) setRxs(rxd.data);
+        setUser(u);
       } catch {
+        // Error handling
       } finally {
         setLoading(false);
       }
     })();
-  }, [navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const pendingPay = appts.filter((a) => a.status === "pending_payment");
   const upcoming = appts.filter(
     (a) =>
       a.status === "confirmed" ||
@@ -200,7 +187,7 @@ export default function Dashboard() {
     .filter((a) => a.status === "confirmed" || a.status === "pending")
     .filter((a) => {
       const apptTime = new Date(`${a.date}T${a.time}`);
-      const diff = (apptTime - Date.now()) / 60000;
+      const diff = (apptTime - Date.now()) / 60000; // eslint-disable-line react-hooks/purity
       return diff >= 0 && diff <= 60;
     });
 

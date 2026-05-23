@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, Heart, Calendar } from "lucide-react";
 import { useTranslation } from "../../hooks/useTranslation";

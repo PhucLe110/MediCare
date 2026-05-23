@@ -1,5 +1,4 @@
-import React from "react";
-import { Award, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { useTranslation } from "../../hooks/useTranslation";
 
 const trans = {

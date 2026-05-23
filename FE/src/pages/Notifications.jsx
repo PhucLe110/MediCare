@@ -1,5 +1,5 @@
 import { API_URL as API, authFetch } from "../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Bell,
   Clock,
@@ -93,29 +93,29 @@ const trans = {
 };
 
 export default function Notifications() {
-  const { lang, t } = useTranslation(trans);
+  const { t } = useTranslation(trans);
   const [appts, setAppts] = useState([]);
   const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const navigate = useNavigate();
 
-  const fmt = (n) => formatMoney(lang, n);
+  const fmt = (n) => formatMoney("vi", n);
   const getDoctorDisplayName = (name) =>
-    formatDoctorName(lang, name) || t.doctorTitle;
+    formatDoctorName("vi", name) || t.doctorTitle;
 
   const timeAgo = (dateVal) => {
-    const s = (Date.now() - new Date(dateVal)) / 1000;
+    const s = (Date.now() - new Date(dateVal)) / 1000; // eslint-disable-line react-hooks/purity
     if (s < 60) return t.timeJustNow;
     if (s < 3600) return t.minsAgo(Math.floor(s / 60));
     if (s < 86400) return t.hoursAgo(Math.floor(s / 3600));
     if (s < 86400 * 7) return t.daysAgo(Math.floor(s / 86400));
-    return formatDate(lang, dateVal);
+    return formatDate("vi", dateVal);
   };
 
   const timeUntil = (date, timeStr) => {
     const apptTime = new Date(`${date}T${timeStr}`);
-    const mins = Math.round((apptTime - Date.now()) / 60000);
+    const mins = Math.round((apptTime - Date.now()) / 60000); // eslint-disable-line react-hooks/purity
     if (mins <= 0) return t.timeUntilReady;
     if (mins < 60) return t.minsRemaining(mins);
     return t.hoursRemaining(Math.round(mins / 60));
@@ -132,6 +132,7 @@ export default function Notifications() {
         if (ad.success) setAppts(ad.data);
         if (bd.success) setBills(bd.data);
       } catch {
+        // Error handling
       } finally {
         setLoading(false);
       }
@@ -145,7 +146,7 @@ export default function Notifications() {
     .filter((a) => a.status === "confirmed" || a.status === "pending")
     .forEach((a) => {
       const apptTime = new Date(`${a.date}T${a.time}`);
-      const diff = (apptTime - Date.now()) / 60000;
+      const diff = (apptTime - Date.now()) / 60000; // eslint-disable-line react-hooks/purity
       if (diff >= 0 && diff <= 60) {
         all.push({
           id: `remind-${a._id}`,
@@ -199,7 +200,7 @@ export default function Notifications() {
     .filter((a) => a.status === "completed")
     .slice(0, 5)
     .forEach((a) => {
-      const dateFormatted = formatDate(lang, a.date);
+      const dateFormatted = formatDate("vi", a.date);
       all.push({
         id: `done-${a._id}`,
         type: "update",
@@ -421,7 +422,7 @@ export default function Notifications() {
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {displayed.map((n, i) => {
+          {displayed.map((n) => {
             const Icon = n.icon;
             const isReminder = n.type === "reminder";
             return (

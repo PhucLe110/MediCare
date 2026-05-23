@@ -1,4 +1,3 @@
-import React from "react";
 import { Construction } from "lucide-react";
 import { useTranslation } from "../hooks/useTranslation";
 

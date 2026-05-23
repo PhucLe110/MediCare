@@ -1,9 +1,8 @@
 import { API_URL, authFetch } from "../../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Ban,
-  CheckCircle,
   ShieldAlert,
   AlertCircle,
   CheckCircle2,
@@ -84,7 +83,7 @@ const trans = {
 };
 
 export default function AdminUsers() {
-  const { lang, t } = useTranslation(trans);
+  const { t } = useTranslation(trans);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -115,24 +114,25 @@ export default function AdminUsers() {
 
   const jsonHeaders = () => ({ "Content-Type": "application/json" });
 
-  const fetchUsers = async () => {
-    try {
-      const res = await authFetch(`${API_URL}/api/admin/users`);
-      const json = await res.json();
-      if (json.success) {
-        setUsers(json.data);
-      } else {
-        setError(json.message);
-      }
-    } catch (err) {
-      setError(t.connError);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await authFetch(`${API_URL}/api/admin/users`);
+        const json = await res.json();
+        if (json.success) {
+          setUsers(json.data);
+        } else {
+          setError(json.message);
+        }
+      } catch {
+        setError(t.connError);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Lock scrolling on scrollable main container when modal is open
@@ -189,7 +189,7 @@ export default function AdminUsers() {
       } else {
         showToast(json.message, "error");
       }
-    } catch (err) {
+    } catch {
       showToast(t.toastErrorStatus, "error");
     }
   };
@@ -210,7 +210,7 @@ export default function AdminUsers() {
       } else {
         showToast(json.message, "error");
       }
-    } catch (err) {
+    } catch {
       showToast(t.toastErrorRole, "error");
     }
   };

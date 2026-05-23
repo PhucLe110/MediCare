@@ -1,5 +1,5 @@
 import { API_URL } from "../../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Filter,
   Search,

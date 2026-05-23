@@ -1,5 +1,5 @@
 import { API_URL, authFetch, getStoredUser } from "../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   FolderHeart,
   Calendar,
@@ -196,9 +196,6 @@ const Records = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [appointments, setAppointments] = useState([]);
-  const [prescriptions, setPrescriptions] = useState([]);
-  const [labResults, setLabResults] = useState([]);
-  const [apptLoading, setApptLoading] = useState(false);
   const [toast, setToast] = useState({
     show: false,
     type: "success",
@@ -229,30 +226,25 @@ const Records = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [profileRes, apptRes, rxRes, labRes] = await Promise.all([
+        const [profileRes, apptRes] = await Promise.all([
           authFetch(`${API_URL}/api/users/health-profile`),
           authFetch(`${API_URL}/api/appointments`),
-          authFetch(`${API_URL}/api/prescriptions/my`),
-          authFetch(`${API_URL}/api/lab-results/my`),
         ]);
         const profileData = await profileRes.json();
         const apptData = await apptRes.json();
-        const rxData = await rxRes.json();
-        const labData = await labRes.json();
 
         if (profileData.success && profileData.data) {
           setPersonalInfo((prev) => ({ ...prev, ...profileData.data }));
         }
         if (apptData.success) setAppointments(apptData.data);
-        if (rxData.success) setPrescriptions(rxData.data);
-        if (labData.success) setLabResults(labData.data);
-      } catch (err) {
+      } catch {
         showToast(t.toastLoadError, "error");
       } finally {
         setLoading(false);
       }
     };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Scroll to highlighted appointment if provided in location state
@@ -289,7 +281,7 @@ const Records = () => {
       } else {
         showToast(data.message || t.toastSaveError, "error");
       }
-    } catch (err) {
+    } catch {
       showToast(t.toastConnError, "error");
     } finally {
       setSaving(false);
@@ -868,7 +860,7 @@ const Records = () => {
               {t.treatmentHistorySub}
             </p>
 
-            {apptLoading ? (
+            {loading ? (
               <div className="space-y-4 animate-pulse">
                 {[1, 2, 3].map((i) => (
                   <div

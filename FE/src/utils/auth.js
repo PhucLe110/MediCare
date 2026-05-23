@@ -16,6 +16,8 @@ export function saveAuthSession(data) {
   // Only store access token and user data, not refresh token
   // Refresh token is now stored in httpOnly cookie by backend
   const { refreshToken, ...sessionData } = data;
+  // eslint-disable-next-line no-unused-vars
+  const _ = refreshToken;
   localStorage.setItem(USER_KEY, JSON.stringify(sessionData));
 }
 

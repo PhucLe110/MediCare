@@ -1,5 +1,5 @@
 import { API_URL, authFetch } from "../../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Plus,
@@ -174,24 +174,25 @@ export default function AdminDoctors() {
 
   const jsonHeaders = () => ({ "Content-Type": "application/json" });
 
-  const fetchDoctors = async () => {
-    try {
-      const res = await authFetch(`${API_URL}/api/admin/doctors`);
-      const json = await res.json();
-      if (json.success) {
-        setDoctors(json.data);
-      } else {
-        setError(json.message);
-      }
-    } catch (err) {
-      setError(t.connError);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const res = await authFetch(`${API_URL}/api/admin/doctors`);
+        const json = await res.json();
+        if (json.success) {
+          setDoctors(json.data);
+        } else {
+          setError(json.message);
+        }
+      } catch {
+        setError(t.connError);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchDoctors();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Lock scrolling on scrollable main container when modals are open
@@ -258,7 +259,7 @@ export default function AdminDoctors() {
       } else {
         showToast(json.message, "error");
       }
-    } catch (err) {
+    } catch {
       showToast(t.toastErrorDelete, "error");
     }
   };
@@ -300,11 +301,21 @@ export default function AdminDoctors() {
           "success",
         );
         setIsModalOpen(false);
-        fetchDoctors();
+        // Refetch doctors
+        const refetchDoctors = async () => {
+          try {
+            const res = await authFetch(`${API_URL}/api/admin/doctors`);
+            const json = await res.json();
+            if (json.success) setDoctors(json.data);
+          } catch {
+            // Error handling
+          }
+        };
+        refetchDoctors();
       } else {
         showToast(json.message, "error");
       }
-    } catch (err) {
+    } catch {
       showToast(t.toastErrorSave, "error");
     }
   };

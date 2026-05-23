@@ -1,5 +1,5 @@
 import { API_URL } from "../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Calendar,
@@ -11,15 +11,8 @@ import {
   FileText,
   ChevronRight,
   Stethoscope,
-  HeartPulse,
-  Brain,
-  Bone,
-  Eye,
-  Star,
   CheckCircle2,
   Award,
-  Users,
-  Clock,
 } from "lucide-react";
 import { useTranslation } from "../hooks/useTranslation";
 import { resolveDeptLabel } from "../utils/i18nHelpers";

@@ -1,5 +1,5 @@
 import { API_URL, authFetch } from "../../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Pill,
   AlertCircle,
@@ -156,24 +156,25 @@ export default function AdminInventory() {
 
   const jsonHeaders = () => ({ "Content-Type": "application/json" });
 
-  const fetchMedicines = async () => {
-    try {
-      const res = await authFetch(`${API_URL}/api/admin/medicines`);
-      const json = await res.json();
-      if (json.success) {
-        setMedicines(json.data);
-      } else {
-        setError(json.message);
-      }
-    } catch (err) {
-      setError(t.connError);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchMedicines = async () => {
+      try {
+        const res = await authFetch(`${API_URL}/api/admin/medicines`);
+        const json = await res.json();
+        if (json.success) {
+          setMedicines(json.data);
+        } else {
+          setError(json.message);
+        }
+      } catch {
+        setError(t.connError);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchMedicines();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Lock scrolling on scrollable main container when modals are open
@@ -238,7 +239,7 @@ export default function AdminInventory() {
       } else {
         showToast(json.message, "error");
       }
-    } catch (err) {
+    } catch {
       showToast(t.toastErrorDelete, "error");
     }
   };
@@ -276,11 +277,21 @@ export default function AdminInventory() {
           "success",
         );
         setIsModalOpen(false);
-        fetchMedicines();
+        // Refetch medicines
+        const refetchMedicines = async () => {
+          try {
+            const res = await authFetch(`${API_URL}/api/admin/medicines`);
+            const json = await res.json();
+            if (json.success) setMedicines(json.data);
+          } catch {
+            // Error handling
+          }
+        };
+        refetchMedicines();
       } else {
         showToast(json.message, "error");
       }
-    } catch (err) {
+    } catch {
       showToast(t.toastErrorSave, "error");
     }
   };

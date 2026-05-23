@@ -1,5 +1,5 @@
 import { API_URL, authFetch } from "../config";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Bot, Activity, ArrowRight, Loader2, RefreshCcw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";

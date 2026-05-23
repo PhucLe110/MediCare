@@ -1,16 +1,11 @@
 import { API_URL, authFetch } from "../config";
 import { isAppointmentTimeReached } from "../utils/dateTime";
-import {
-  getLocale,
-  getDefaultLabTests,
-  formatDate,
-} from "../utils/i18nHelpers";
+import { getLocale, getDefaultLabTests } from "../utils/i18nHelpers";
 import { doctorDashboardTrans } from "../i18n/doctorDashboardI18n";
 import { useTranslation } from "../hooks/useTranslation";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Users,
-  Award,
   Calendar,
   Clipboard,
   Search,
@@ -101,6 +96,11 @@ const DoctorDashboard = () => {
 
   const jsonHeaders = () => ({ "Content-Type": "application/json" });
 
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
+
   useEffect(() => {
     const fetchFollowUpAvailability = async () => {
       if (!profileData?.profile?._id || !followUpDate) {
@@ -119,8 +119,8 @@ const DoctorDashboard = () => {
             setFollowUpTime("");
           }
         }
-      } catch (err) {
-        console.error(err);
+      } catch {
+        // Error handling
       } finally {
         setLoadingFollowUpTimes(false);
       }
@@ -128,45 +128,40 @@ const DoctorDashboard = () => {
     fetchFollowUpAvailability();
   }, [followUpDate, profileData?.profile?._id, followUpTime]);
 
-  const showToast = (message, type = "success") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 4000);
-  };
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      // 1. Fetch Profile
-      const profRes = await authFetch(`${API_URL}/api/doctors/profile`);
-      const profData = await profRes.json();
-      if (profData.success) {
-        setProfileData(profData.data);
-      }
-
-      // 2. Fetch Appointments
-      const apptRes = await authFetch(`${API_URL}/api/doctors/appointments`);
-      const apptData = await apptRes.json();
-      if (apptData.success) {
-        setAppointments(apptData.data);
-      }
-
-      // 3. Fetch Medicines
-      const medRes = await authFetch(`${API_URL}/api/doctors/medicines`);
-      const medData = await medRes.json();
-      if (medData.success) {
-        setMedicinesList(medData.data);
-      }
-    } catch (error) {
-      console.error(error);
-      showToast(t.toastSyncError, "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // 1. Fetch Profile
+        const profRes = await authFetch(`${API_URL}/api/doctors/profile`);
+        const profData = await profRes.json();
+        if (profData.success) {
+          setProfileData(profData.data);
+        }
+
+        // 2. Fetch Appointments
+        const apptRes = await authFetch(`${API_URL}/api/doctors/appointments`);
+        const apptData = await apptRes.json();
+        if (apptData.success) {
+          setAppointments(apptData.data);
+        }
+
+        // 3. Fetch Medicines
+        const medRes = await authFetch(`${API_URL}/api/doctors/medicines`);
+        const medData = await medRes.json();
+        if (medData.success) {
+          setMedicinesList(medData.data);
+        }
+      } catch {
+        showToast(t.toastSyncError, "error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchData();
-  }, [lang]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Load Patient clinical history
   const loadPatientHistory = async (patientId) => {
@@ -333,6 +328,7 @@ const DoctorDashboard = () => {
     followUpTime,
     followUpNotes,
     selectedAppt,
+    saveDraftToServer,
   ]);
 
   // Prescribing Medicines Handlers
@@ -493,7 +489,30 @@ const DoctorDashboard = () => {
       if (data.success) {
         showToast(t.toastComplete);
         setSelectedAppt(null);
-        fetchData();
+        // Refetch data
+        const refetchData = async () => {
+          setLoading(true);
+          try {
+            const profRes = await authFetch(`${API_URL}/api/doctors/profile`);
+            const profData = await profRes.json();
+            if (profData.success) setProfileData(profData.data);
+
+            const apptRes = await authFetch(
+              `${API_URL}/api/doctors/appointments`,
+            );
+            const apptData = await apptRes.json();
+            if (apptData.success) setAppointments(apptData.data);
+
+            const medRes = await authFetch(`${API_URL}/api/doctors/medicines`);
+            const medData = await medRes.json();
+            if (medData.success) setMedicinesList(medData.data);
+          } catch {
+            // Error handling
+          } finally {
+            setLoading(false);
+          }
+        };
+        refetchData();
       } else {
         showToast(data.message, "error");
       }
@@ -515,7 +534,30 @@ const DoctorDashboard = () => {
       if (data.success) {
         showToast(t.toastStartExam);
         setSelectedAppt({ ...selectedAppt, status: "examining" });
-        fetchData();
+        // Refetch data
+        const refetchData = async () => {
+          setLoading(true);
+          try {
+            const profRes = await authFetch(`${API_URL}/api/doctors/profile`);
+            const profData = await profRes.json();
+            if (profData.success) setProfileData(profData.data);
+
+            const apptRes = await authFetch(
+              `${API_URL}/api/doctors/appointments`,
+            );
+            const apptData = await apptRes.json();
+            if (apptData.success) setAppointments(apptData.data);
+
+            const medRes = await authFetch(`${API_URL}/api/doctors/medicines`);
+            const medData = await medRes.json();
+            if (medData.success) setMedicinesList(medData.data);
+          } catch {
+            // Error handling
+          } finally {
+            setLoading(false);
+          }
+        };
+        refetchData();
       } else {
         showToast(data.message, "error");
       }
@@ -570,17 +612,16 @@ const DoctorDashboard = () => {
 
     // Date filter
     const apptDate = a.date ? String(a.date).substring(0, 10) : "";
-    let dateMatches = true;
     if (activeTab === "confirmed") {
-      dateMatches =
+      const dateMatches =
         waitingFilter === "today"
           ? apptDate === vnToday
           : apptDate === filterDate;
+      return statusMatches && nameMatches && dateMatches;
     } else {
-      dateMatches = apptDate === filterDate;
+      const dateMatches = apptDate === filterDate;
+      return statusMatches && nameMatches && dateMatches;
     }
-
-    return statusMatches && nameMatches && dateMatches;
   });
 
   return (
@@ -615,7 +656,35 @@ const DoctorDashboard = () => {
           </p>
         </div>
         <button
-          onClick={fetchData}
+          onClick={() => {
+            const fetchData = async () => {
+              setLoading(true);
+              try {
+                const profRes = await authFetch(
+                  `${API_URL}/api/doctors/profile`,
+                );
+                const profData = await profRes.json();
+                if (profData.success) setProfileData(profData.data);
+
+                const apptRes = await authFetch(
+                  `${API_URL}/api/doctors/appointments`,
+                );
+                const apptData = await apptRes.json();
+                if (apptData.success) setAppointments(apptData.data);
+
+                const medRes = await authFetch(
+                  `${API_URL}/api/doctors/medicines`,
+                );
+                const medData = await medRes.json();
+                if (medData.success) setMedicinesList(medData.data);
+              } catch {
+                // Error handling
+              } finally {
+                setLoading(false);
+              }
+            };
+            fetchData();
+          }}
           className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-primary font-extrabold text-sm border border-blue-100 dark:border-blue-900/30 hover:bg-primary hover:text-white transition-all shadow-sm"
         >
           <RefreshCw size={16} className={loading ? "animate-spin" : ""} />

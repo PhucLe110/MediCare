@@ -1,5 +1,5 @@
 import { API_URL, authFetch, getStoredUser } from "../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Calendar,
   Clock,
@@ -226,31 +226,31 @@ const Booking = () => {
   const fmtFee = (n) => formatMoney(lang, n);
 
   useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const res = await authFetch(`${API_URL}/api/appointments/doctors`);
+        const data = await res.json();
+        if (data.success) setDoctors(data.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchPaymentInfo = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/payment-info`);
+        const data = await res.json();
+        if (data.success) setPaymentInfo(data.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
     fetchDoctors();
     fetchPaymentInfo();
   }, []);
-
-  const fetchDoctors = async () => {
-    try {
-      const res = await authFetch(`${API_URL}/api/appointments/doctors`);
-      const data = await res.json();
-      if (data.success) setDoctors(data.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchPaymentInfo = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/payment-info`);
-      const data = await res.json();
-      if (data.success) setPaymentInfo(data.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const handleBooking = async (e) => {
     e.preventDefault();
@@ -318,7 +318,7 @@ const Booking = () => {
       }, 3000);
     }
     return () => clearInterval(interval);
-  }, [billResult?._id, isPaid]);
+  }, [billResult, isPaid]);
 
   const generateQrUrl = (bill) => {
     if (!paymentInfo || !bill) return "";

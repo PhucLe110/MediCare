@@ -1,5 +1,5 @@
 import { API_URL, authFetch, getStoredUser } from "../config";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -19,7 +19,6 @@ import {
   formatDoctorName,
   getLocalizedDept,
   formatDate,
-  getLocale,
 } from "../utils/i18nHelpers";
 
 // const API_URL = API_URL;
@@ -147,7 +146,6 @@ export default function AppointmentDetail() {
     fetchDetails();
   }, [id]);
 
-  const locale = getLocale(lang);
   const getDoctorDisplayName = (name) => formatDoctorName(lang, name);
 
   if (loading) {

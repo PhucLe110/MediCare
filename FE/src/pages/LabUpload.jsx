@@ -1,5 +1,5 @@
 import { API_URL, authFetch } from "../config";
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import {
   Upload,
   FlaskConical,
@@ -76,7 +76,7 @@ const trans = {
 };
 
 const LabUpload = () => {
-  const { lang, t } = useTranslation(trans);
+  const { t } = useTranslation(trans);
   const [form, setForm] = useState({
     patientId: "",
     testName: "",
@@ -152,7 +152,7 @@ const LabUpload = () => {
       } else {
         showToast(data.message, "error");
       }
-    } catch (err) {
+    } catch {
       showToast(t.toastConnError, "error");
     } finally {
       setLoading(false);

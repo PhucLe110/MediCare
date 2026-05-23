@@ -1,6 +1,6 @@
 import { API_URL } from "../config";
 import { authFetch, ensureValidSession, logoutAuth } from "../utils/auth";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -15,7 +15,6 @@ import {
   LogOut,
   Sun,
   Moon,
-  Globe,
 } from "lucide-react";
 
 const DashboardLayout = () => {
