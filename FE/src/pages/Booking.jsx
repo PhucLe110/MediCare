@@ -611,7 +611,7 @@ const Booking = () => {
                           <h3 className="font-black text-[var(--text-primary)] text-lg tracking-tight flex items-center gap-2">
                             {getDoctorDisplayName(doctor.userId.fullName)}
                             <span
-                              className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wide ${doctor.userId.gender === "Nam" ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" : "bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400"}`}
+                              className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wide ${doctor.userId.gender === "Nam" ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" : "bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400"}`}
                             >
                               {getLocalizedGender(doctor.userId.gender)}
                             </span>
@@ -734,7 +734,7 @@ const Booking = () => {
                     <h4 className="font-black text-[var(--text-primary)] tracking-tight flex items-center gap-1.5">
                       {getDoctorDisplayName(selectedDoctor.userId.fullName)}
                       <span
-                        className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase ${selectedDoctor.userId.gender === "Nam" ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" : "bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400"}`}
+                        className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase ${selectedDoctor.userId.gender === "Nam" ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" : "bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400"}`}
                       >
                         {getLocalizedGender(selectedDoctor.userId.gender)}
                       </span>

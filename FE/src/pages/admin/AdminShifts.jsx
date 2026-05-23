@@ -651,7 +651,7 @@ export default function AdminShifts() {
                                     className={`mt-1 pt-1.5 border-t ${pr.type === "add" ? "border-emerald-200 dark:border-emerald-900/30" : "border-rose-200 dark:border-rose-900/30"}`}
                                   >
                                     <p
-                                      className={`text-[9px] font-black uppercase mb-1 ${pr.type === "add" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}
+                                      className={`text-[10px] font-black uppercase mb-1 ${pr.type === "add" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}
                                     >
                                       ⏳ {t.waitingPrefix}{" "}
                                       {pr.type === "add"
@@ -674,7 +674,7 @@ export default function AdminShifts() {
                                         onClick={() =>
                                           updateStatus(pr._id, "approved")
                                         }
-                                        className="flex-1 text-[9px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 rounded-md py-1 transition-colors"
+                                        className="flex-1 text-[10px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 rounded-md py-1 transition-colors"
                                       >
                                         {t.approveBtn}
                                       </button>
@@ -682,7 +682,7 @@ export default function AdminShifts() {
                                         onClick={() =>
                                           updateStatus(pr._id, "rejected")
                                         }
-                                        className="flex-1 text-[9px] font-black text-rose-700 dark:text-rose-400 bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200 dark:hover:bg-rose-900/50 rounded-md py-1 transition-colors"
+                                        className="flex-1 text-[10px] font-black text-rose-700 dark:text-rose-400 bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200 dark:hover:bg-rose-900/50 rounded-md py-1 transition-colors"
                                       >
                                         {t.rejectBtn}
                                       </button>
@@ -711,7 +711,7 @@ export default function AdminShifts() {
                                     {dateObj.getDate()}/{dateObj.getMonth() + 1}
                                   </span>
                                 </div>
-                                <p className="text-[9px] text-yellow-600 dark:text-yellow-400 font-bold mb-1">
+                                <p className="text-[10px] text-yellow-600 dark:text-yellow-400 font-bold mb-1">
                                   {t.noShiftDay}
                                 </p>
                                 {pendingForDay.map((pr) => (
@@ -719,7 +719,7 @@ export default function AdminShifts() {
                                     key={pr._id}
                                     className="mt-1 pt-1 border-t border-emerald-200 dark:border-emerald-900/30"
                                   >
-                                    <p className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase mb-1">
+                                    <p className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase mb-1">
                                       {t.waitingAddShift}
                                     </p>
                                     <div className="flex flex-wrap gap-1 mb-1.5">
@@ -737,7 +737,7 @@ export default function AdminShifts() {
                                         onClick={() =>
                                           updateStatus(pr._id, "approved")
                                         }
-                                        className="flex-1 text-[9px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 rounded-md py-1 transition-colors"
+                                        className="flex-1 text-[10px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 rounded-md py-1 transition-colors"
                                       >
                                         {t.approveBtn}
                                       </button>
@@ -745,7 +745,7 @@ export default function AdminShifts() {
                                         onClick={() =>
                                           updateStatus(pr._id, "rejected")
                                         }
-                                        className="flex-1 text-[9px] font-black text-rose-700 dark:text-rose-400 bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200 dark:hover:bg-rose-900/50 rounded-md py-1 transition-colors"
+                                        className="flex-1 text-[10px] font-black text-rose-700 dark:text-rose-400 bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200 dark:hover:bg-rose-900/50 rounded-md py-1 transition-colors"
                                       >
                                         {t.rejectBtn}
                                       </button>

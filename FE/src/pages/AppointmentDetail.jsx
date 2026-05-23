@@ -455,7 +455,7 @@ export default function AppointmentDetail() {
                     />
                   ))}
                 </svg>
-                <p className="text-[9px] text-[var(--text-tertiary)] font-mono tracking-widest mt-2">
+                <p className="text-[10px] text-[var(--text-tertiary)] font-mono tracking-widest mt-2">
                   {appt._id}
                 </p>
               </div>

@@ -1746,7 +1746,7 @@ const DoctorDashboard = () => {
                                             className="pl-2 border-l-2 border-[var(--border-color)]"
                                           >
                                             <div className="flex items-center gap-2">
-                                              <span className="text-[9px] font-bold bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded uppercase text-[var(--text-secondary)]">
+                                              <span className="text-[10px] font-bold bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded uppercase text-[var(--text-secondary)]">
                                                 {test.testType}
                                               </span>
                                               <h5 className="font-extrabold text-sm text-[var(--text-primary)]">
