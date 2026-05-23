@@ -50,7 +50,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/lab-results", labResultRoutes);
 app.use("/api/lab-requests", labRequestRoutes);
 app.use("/api/webhooks", webhookRoutes);
-app.use("/api/webhook", webhookRoutes);
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api", billingRoutes);

@@ -193,9 +193,11 @@ const Records = () => {
     location.state?.activeTab || "personal",
   );
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingPersonal, setIsEditingPersonal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [appointments, setAppointments] = useState([]);
+  const [currentUser, setCurrentUser] = useState(getStoredUser());
   const [toast, setToast] = useState({
     show: false,
     type: "success",
@@ -209,6 +211,10 @@ const Records = () => {
     allergies: "",
     medicalHistory: "",
     isFilled: false,
+  });
+  const [userProfile, setUserProfile] = useState({
+    phone: "",
+    gender: "Nam",
   });
 
   const getDoctorDisplayName = (name) =>
@@ -246,6 +252,44 @@ const Records = () => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Auto-open personal info edit mode for first-time Google users
+  useEffect(() => {
+    if (currentUser && currentUser.profileCompleted === false) {
+      setIsEditingPersonal(true);
+      setUserProfile({
+        phone: currentUser.phone || "",
+        gender: currentUser.gender || "Nam",
+      });
+    }
+  }, [currentUser]);
+
+  const handleSavePersonalInfo = async () => {
+    setSaving(true);
+    try {
+      const user = getStoredUser();
+      const res = await authFetch(`${API_URL}/api/users/profile`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userProfile),
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Update stored user and state
+        const updatedUser = { ...user, ...userProfile, profileCompleted: true };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        setCurrentUser(updatedUser);
+        setIsEditingPersonal(false);
+        showToast("Đã lưu thông tin cá nhân thành công", "success");
+      } else {
+        showToast(data.message || "Lưu thất bại", "error");
+      }
+    } catch {
+      showToast("Lỗi kết nối", "error");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   // Scroll to highlighted appointment if provided in location state
   useEffect(() => {
@@ -630,6 +674,132 @@ const Records = () => {
 
           <div className="bg-[var(--card-bg)] rounded-3xl p-8 border border-[var(--border-color)] shadow-xl shadow-gray-200/20 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 dark:bg-blue-900/20 rounded-full blur-3xl -z-10 opacity-50"></div>
+
+            {/* Basic User Info Section */}
+            <div className="mb-8 pb-6 border-b border-[var(--border-color)]">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">
+                  <UserCircle className="text-primary" /> Thông tin cá nhân
+                </h3>
+                {!isEditingPersonal ? (
+                  <button
+                    onClick={() => {
+                      setUserProfile({
+                        phone: currentUser?.phone || "",
+                        gender: currentUser?.gender || "Nam",
+                      });
+                      setIsEditingPersonal(true);
+                    }}
+                    className="px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-primary font-bold rounded-lg hover:bg-primary hover:text-white transition-all flex items-center gap-2 text-sm"
+                  >
+                    <Edit3 size={14} /> Chỉnh sửa
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleSavePersonalInfo}
+                    disabled={saving}
+                    className="px-4 py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-all flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {saving ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <Save size={14} />
+                    )}
+                    {saving ? "Đang lưu..." : "Lưu"}
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-[var(--bg-tertiary)]/80 rounded-xl border border-[var(--border-color)]">
+                  <div className="text-xs font-bold text-[var(--text-secondary)] mb-1">
+                    Họ và tên
+                  </div>
+                  <div className="text-sm font-bold text-[var(--text-primary)]">
+                    {currentUser?.fullName || t.notUpdated}
+                  </div>
+                </div>
+                <div className="p-4 bg-[var(--bg-tertiary)]/80 rounded-xl border border-[var(--border-color)]">
+                  <div className="text-xs font-bold text-[var(--text-secondary)] mb-1">
+                    Số điện thoại
+                  </div>
+                  {isEditingPersonal ? (
+                    <input
+                      type="text"
+                      value={userProfile.phone}
+                      onChange={(e) =>
+                        setUserProfile({
+                          ...userProfile,
+                          phone: e.target.value,
+                        })
+                      }
+                      className="w-full p-2 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg focus:ring-2 focus:ring-primary/20 outline-none transition-all text-[var(--text-primary)] text-sm"
+                      placeholder="Nhập số điện thoại"
+                    />
+                  ) : (
+                    <div className="text-sm font-bold text-[var(--text-primary)]">
+                      {currentUser?.phone || t.notUpdated}
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 bg-[var(--bg-tertiary)]/80 rounded-xl border border-[var(--border-color)]">
+                  <div className="text-xs font-bold text-[var(--text-secondary)] mb-1">
+                    Email
+                  </div>
+                  <div className="text-sm font-bold text-[var(--text-primary)]">
+                    {currentUser?.email || t.notUpdated}
+                  </div>
+                </div>
+                <div className="p-4 bg-[var(--bg-tertiary)]/80 rounded-xl border border-[var(--border-color)]">
+                  <div className="text-xs font-bold text-[var(--text-secondary)] mb-1">
+                    Giới tính
+                  </div>
+                  {isEditingPersonal ? (
+                    <div className="flex gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="gender"
+                          value="Nam"
+                          checked={userProfile.gender === "Nam"}
+                          onChange={(e) =>
+                            setUserProfile({
+                              ...userProfile,
+                              gender: e.target.value,
+                            })
+                          }
+                          className="w-4 h-4 text-primary focus:ring-primary"
+                        />
+                        <span className="text-sm text-[var(--text-primary)]">
+                          Nam
+                        </span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="gender"
+                          value="Nữ"
+                          checked={userProfile.gender === "Nữ"}
+                          onChange={(e) =>
+                            setUserProfile({
+                              ...userProfile,
+                              gender: e.target.value,
+                            })
+                          }
+                          className="w-4 h-4 text-primary focus:ring-primary"
+                        />
+                        <span className="text-sm text-[var(--text-primary)]">
+                          Nữ
+                        </span>
+                      </label>
+                    </div>
+                  ) : (
+                    <div className="text-sm font-bold text-[var(--text-primary)]">
+                      {currentUser?.gender || t.notUpdated}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
 
             <div className="flex justify-between items-center mb-8 pb-6 border-b border-[var(--border-color)]">
               <h2 className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-3">

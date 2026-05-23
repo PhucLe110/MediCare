@@ -7,6 +7,7 @@ const {
   verifyRefreshToken,
   REFRESH_EXPIRES,
 } = require("../utils/tokenHelper");
+const { sendVerificationCode } = require("../utils/emailService");
 
 const formatAuthUser = (user, accessToken, refreshToken = null) => {
   const result = {
@@ -58,7 +59,7 @@ const issueTokenPair = async (user, deviceInfo = {}) => {
 
 const register = async (
   { fullName, email, password, phone, gender },
-  deviceInfo = {}
+  deviceInfo = {},
 ) => {
   const userExists = await User.findOne({ email });
   if (userExists) throw new HttpError(400, "Email đã được sử dụng");
@@ -88,7 +89,7 @@ const login = async ({ email, password }, deviceInfo = {}) => {
   if (user.status === "blocked") {
     throw new HttpError(
       403,
-      "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin!"
+      "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin!",
     );
   }
 
@@ -123,14 +124,14 @@ const refresh = async ({ refreshToken }, deviceInfo = {}) => {
     // Breach detection: Revoke all tokens for this user and increment version to force logout
     await RefreshToken.updateMany(
       { userId: storedToken.userId },
-      { isRevoked: true, revokedAt: new Date() }
+      { isRevoked: true, revokedAt: new Date() },
     );
     await User.findByIdAndUpdate(storedToken.userId, {
       $inc: { refreshTokenVersion: 1 },
     });
     throw new HttpError(
       401,
-      "Refresh token đã bị thu hồi. Phát hiện dấu hiệu xâm nhập, tất cả các phiên đăng nhập khác đã bị vô hiệu hóa."
+      "Refresh token đã bị thu hồi. Phát hiện dấu hiệu xâm nhập, tất cả các phiên đăng nhập khác đã bị vô hiệu hóa.",
     );
   }
 
@@ -142,7 +143,7 @@ const refresh = async ({ refreshToken }, deviceInfo = {}) => {
   if ((user.refreshTokenVersion ?? 0) !== (decoded.v ?? 0)) {
     throw new HttpError(
       401,
-      "Phiên đăng nhập đã bị thu hồi, vui lòng đăng nhập lại"
+      "Phiên đăng nhập đã bị thu hồi, vui lòng đăng nhập lại",
     );
   }
 
@@ -158,7 +159,7 @@ const refresh = async ({ refreshToken }, deviceInfo = {}) => {
   // Link new token to old token for audit trail
   await RefreshToken.findOneAndUpdate(
     { token: tokens.refreshToken },
-    { replacedBy: storedToken._id }
+    { replacedBy: storedToken._id },
   );
 
   return {
@@ -176,7 +177,7 @@ const logout = async (refreshToken = null) => {
       // Revoke specific refresh token if provided
       await RefreshToken.findOneAndUpdate(
         { token: refreshToken, userId },
-        { isRevoked: true, revokedAt: new Date() }
+        { isRevoked: true, revokedAt: new Date() },
       );
 
       // Increment refresh token version to invalidate all other tokens
@@ -203,4 +204,84 @@ const logout = async (refreshToken = null) => {
 
 const getMe = async (userId) => User.findById(userId);
 
-module.exports = { register, login, refresh, logout, getMe };
+// In-memory storage for verification codes (in production, use Redis or database)
+const verificationCodes = new Map();
+
+const forgotPassword = async (email) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new HttpError(400, "Email không tồn tại trong hệ thống");
+  }
+
+  // Generate a 6-digit code
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+  // Store code with expiration (5 minutes)
+  verificationCodes.set(email, {
+    code,
+    expiresAt: Date.now() + 5 * 60 * 1000,
+  });
+
+  // Send email with the code
+  try {
+    await sendVerificationCode(email, code);
+  } catch (emailError) {
+    console.error("Failed to send email:", emailError);
+    throw new HttpError(
+      400,
+      "Không thể gửi email xác nhận. Vui lòng kiểm tra lại email.",
+    );
+  }
+
+  return { message: "Mã xác nhận đã được gửi đến email của bạn" };
+};
+
+const verifyCode = async (email, code) => {
+  const stored = verificationCodes.get(email);
+
+  if (!stored) {
+    throw new HttpError(400, "Mã xác nhận không hợp lệ hoặc đã hết hạn");
+  }
+
+  if (Date.now() > stored.expiresAt) {
+    verificationCodes.delete(email);
+    throw new HttpError(400, "Mã xác nhận đã hết hạn");
+  }
+
+  if (stored.code !== code) {
+    throw new HttpError(400, "Mã xác nhận không đúng");
+  }
+
+  return { message: "Xác nhận thành công" };
+};
+
+const resetPassword = async (email, code, newPassword) => {
+  // Verify code first
+  await verifyCode(email, code);
+
+  const user = await User.findOne({ email }).select("+password");
+  if (!user) {
+    throw new HttpError(400, "Email không tồn tại");
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  // Clear the verification code after successful reset
+  verificationCodes.delete(email);
+
+  return { message: "Mật khẩu đã được đặt lại thành công" };
+};
+
+module.exports = {
+  register,
+  login,
+  refresh,
+  logout,
+  getMe,
+  forgotPassword,
+  verifyCode,
+  resetPassword,
+  issueTokenPair,
+  formatAuthUser,
+};

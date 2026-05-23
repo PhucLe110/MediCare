@@ -1,24 +1,27 @@
-const User = require('../../models/User');
-const Doctor = require('../../models/Doctor');
-const Appointment = require('../../models/Appointment');
-const bcrypt = require('bcryptjs');
-const HttpError = require('../../utils/httpError');
-const { CONSULTATION_FEE } = require('../../constants/billing');
-const { SLOT_TIMES_SHIFT } = require('../../constants/appointment');
+const User = require("../../models/User");
+const Doctor = require("../../models/Doctor");
+const Appointment = require("../../models/Appointment");
+const bcrypt = require("bcryptjs");
+const HttpError = require("../../utils/httpError");
+const { CONSULTATION_FEE } = require("../../constants/billing");
+const { SLOT_TIMES_SHIFT } = require("../../constants/appointment");
 
 const getDoctors = async () => {
-  const doctors = await Doctor.find().populate('userId', 'fullName email phone status gender');
-  const appointments = await Appointment.find({ status: { $ne: 'cancelled' } });
+  const doctors = await Doctor.find().populate(
+    "userId",
+    "fullName email phone status gender",
+  );
+  const appointments = await Appointment.find({ status: { $ne: "cancelled" } });
 
   const doctorApptCounts = {};
-  appointments.forEach(app => {
+  appointments.forEach((app) => {
     if (app.doctor) {
       const docId = app.doctor.toString();
       doctorApptCounts[docId] = (doctorApptCounts[docId] || 0) + 1;
     }
   });
 
-  return doctors.map(doc => {
+  return doctors.map((doc) => {
     const docObj = doc.toObject();
     docObj.monthlyAppointmentsCount = doctorApptCounts[doc._id.toString()] || 0;
     return docObj;
@@ -26,10 +29,19 @@ const getDoctors = async () => {
 };
 
 const createDoctor = async (body) => {
-  const { fullName, email, password, phone, department, specialty, experience, consultationFee } = body;
+  const {
+    fullName,
+    email,
+    password,
+    phone,
+    department,
+    specialty,
+    experience,
+    consultationFee,
+  } = body;
 
   const userExists = await User.findOne({ email });
-  if (userExists) throw new HttpError(400, 'Email đã được sử dụng');
+  if (userExists) throw new HttpError(400, "Email đã được sử dụng");
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
@@ -39,7 +51,7 @@ const createDoctor = async (body) => {
     email,
     password: hashedPassword,
     phone,
-    role: 'doctor'
+    role: "doctor",
   });
 
   const doctor = await Doctor.create({
@@ -48,21 +60,26 @@ const createDoctor = async (body) => {
     specialty,
     experience,
     consultationFee: consultationFee || CONSULTATION_FEE,
-    availableSlots: [{
-      date: new Date().toISOString().split('T')[0],
-      times: [...SLOT_TIMES_SHIFT]
-    }]
   });
 
-  await doctor.populate('userId', 'fullName email phone status');
+  await doctor.populate("userId", "fullName email phone status");
   return doctor;
 };
 
 const updateDoctor = async (id, body) => {
-  const { fullName, email, phone, department, specialty, experience, consultationFee, status } = body;
+  const {
+    fullName,
+    email,
+    phone,
+    department,
+    specialty,
+    experience,
+    consultationFee,
+    status,
+  } = body;
 
   const doctor = await Doctor.findById(id);
-  if (!doctor) throw new HttpError(404, 'Không tìm thấy bác sĩ');
+  if (!doctor) throw new HttpError(404, "Không tìm thấy bác sĩ");
 
   doctor.department = department || doctor.department;
   doctor.specialty = specialty || doctor.specialty;
@@ -80,17 +97,17 @@ const updateDoctor = async (id, body) => {
     await User.findByIdAndUpdate(doctor.userId, userUpdates);
   }
 
-  await doctor.populate('userId', 'fullName email phone status');
+  await doctor.populate("userId", "fullName email phone status");
   return doctor;
 };
 
 const deleteDoctor = async (id) => {
   const doctor = await Doctor.findById(id);
-  if (!doctor) throw new HttpError(404, 'Không tìm thấy bác sĩ');
+  if (!doctor) throw new HttpError(404, "Không tìm thấy bác sĩ");
 
   await Doctor.findByIdAndDelete(id);
-  await User.findByIdAndUpdate(doctor.userId, { role: 'patient' });
-  return { message: 'Đã xóa bác sĩ thành công' };
+  await User.findByIdAndUpdate(doctor.userId, { role: "patient" });
+  return { message: "Đã xóa bác sĩ thành công" };
 };
 
 module.exports = { getDoctors, createDoctor, updateDoctor, deleteDoctor };

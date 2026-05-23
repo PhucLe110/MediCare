@@ -142,6 +142,12 @@ export default function Dashboard() {
   useEffect(() => {
     const u = getStoredUser();
     if (!u) return navigate("/login");
+
+    // Check if user needs to complete profile (first-time Google users)
+    if (u.profileCompleted === false) {
+      return navigate("/dashboard/records");
+    }
+
     (async () => {
       try {
         const [ar, br, lr, rxr] = await Promise.all([

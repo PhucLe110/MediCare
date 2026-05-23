@@ -123,6 +123,15 @@ const MainLayout = () => {
       <header className="sticky top-0 z-50 bg-[var(--bg-primary)] shadow-sm border-b border-[var(--border-color)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
+            {/* Logo - Left */}
+            <Link to="/" className="flex items-center cursor-pointer">
+              <img
+                src="/LOGO.png"
+                alt="MediCare Logo"
+                className="h-16 w-auto object-contain drop-shadow-md no-invert"
+              />
+            </Link>
+
             {/* Navigation */}
             <nav className="hidden md:flex space-x-8">
               {navItems.map((item, index) => (
@@ -139,15 +148,6 @@ const MainLayout = () => {
                 </Link>
               ))}
             </nav>
-
-            {/* Logo - Centered */}
-            <Link to="/" className="flex items-center cursor-pointer">
-              <img
-                src="/LOGO.png"
-                alt="MediCare Logo"
-                className="h-16 w-auto object-contain drop-shadow-md no-invert"
-              />
-            </Link>
 
             {/* Actions & Toggles */}
             <div className="flex items-center space-x-6">
