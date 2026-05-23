@@ -16,7 +16,11 @@ const app = express();
 // Configure CORS to support cookies
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://medi-care-two-brown.vercel.app",
+      process.env.FRONTEND_URL,
+    ].filter(Boolean),
     credentials: true,
   }),
 );
