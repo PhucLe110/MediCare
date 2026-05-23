@@ -166,12 +166,6 @@ export default function AdminUsers() {
 
   const handleUpdateStatus = async () => {
     const { userId: id, currentStatus } = confirmDialog;
-    setConfirmDialog({
-      show: false,
-      userId: null,
-      currentStatus: "",
-      message: "",
-    });
     const nextStatus = currentStatus === "active" ? "blocked" : "active";
 
     try {
@@ -186,10 +180,18 @@ export default function AdminUsers() {
           users.map((u) => (u._id === id ? { ...u, status: nextStatus } : u)),
         );
         showToast(t.toastSuccessStatus, "success");
+        // Close dialog after success
+        setConfirmDialog({
+          show: false,
+          userId: null,
+          currentStatus: "",
+          message: "",
+        });
       } else {
         showToast(json.message, "error");
       }
-    } catch {
+    } catch (err) {
+      console.error("Failed to update user status:", err);
       showToast(t.toastErrorStatus, "error");
     }
   };
@@ -210,7 +212,8 @@ export default function AdminUsers() {
       } else {
         showToast(json.message, "error");
       }
-    } catch {
+    } catch (err) {
+      console.error("Failed to update user role:", err);
       showToast(t.toastErrorRole, "error");
     }
   };

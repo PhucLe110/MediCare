@@ -143,14 +143,40 @@ export default function AdminShifts() {
 
   const jsonHeaders = () => ({ "Content-Type": "application/json" });
 
+  const parseDate = (dateStr) => {
+    if (!dateStr) return null;
+    // Ensure date is in YYYY-MM-DD format before parsing
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return null;
+    return date;
+  };
+
+  const fetchSchedule = async (doctorId) => {
+    setPreviewLoading(true);
+    try {
+      const { year, month } = previewMonth;
+      const res = await authFetch(
+        `${API_URL}/api/admin/doctors/${doctorId}/schedule?year=${year}&month=${month}`,
+      );
+      const json = await res.json();
+      if (json.success) setPreviewSchedule(json.data);
+    } catch (err) {
+      console.error("Failed to fetch schedule:", err);
+      showToast(t.toastError, "error");
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
   useEffect(() => {
     const fetchRequests = async () => {
       try {
         const res = await authFetch(`${API_URL}/api/admin/shift-requests`);
         const json = await res.json();
         if (json.success) setRequests(json.data);
-      } catch {
-        // Error handling
+      } catch (err) {
+        console.error("Failed to fetch shift requests:", err);
+        showToast(t.toastError, "error");
       } finally {
         setLoading(false);
       }
@@ -160,22 +186,6 @@ export default function AdminShifts() {
   }, []);
 
   useEffect(() => {
-    const fetchSchedule = async (doctorId) => {
-      setPreviewLoading(true);
-      try {
-        const { year, month } = previewMonth;
-        const res = await authFetch(
-          `${API_URL}/api/admin/doctors/${doctorId}/schedule?year=${year}&month=${month}`,
-        );
-        const json = await res.json();
-        if (json.success) setPreviewSchedule(json.data);
-      } catch {
-        // Error handling
-      } finally {
-        setPreviewLoading(false);
-      }
-    };
-
     if (previewDoctor) fetchSchedule(previewDoctor.doctorId);
   }, [previewMonth, previewDoctor]);
 
@@ -211,34 +221,20 @@ export default function AdminShifts() {
             const res = await authFetch(`${API_URL}/api/admin/shift-requests`);
             const json = await res.json();
             if (json.success) setRequests(json.data);
-          } catch {
-            // Error handling
+          } catch (err) {
+            console.error("Failed to refetch shift requests:", err);
           }
         };
         refetchRequests();
         // Refresh schedule if preview open
         if (previewDoctor) {
-          const refetchSchedule = async (doctorId) => {
-            setPreviewLoading(true);
-            try {
-              const { year, month } = previewMonth;
-              const res = await authFetch(
-                `${API_URL}/api/admin/doctors/${doctorId}/schedule?year=${year}&month=${month}`,
-              );
-              const json = await res.json();
-              if (json.success) setPreviewSchedule(json.data);
-            } catch {
-              // Error handling
-            } finally {
-              setPreviewLoading(false);
-            }
-          };
-          refetchSchedule(previewDoctor.doctorId);
+          fetchSchedule(previewDoctor.doctorId);
         }
       } else {
         showToast(json.message || t.toastError, "error");
       }
-    } catch {
+    } catch (err) {
+      console.error("Failed to update status:", err);
       showToast(t.toastError, "error");
     }
   };
@@ -610,7 +606,8 @@ export default function AdminShifts() {
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                           {/* Days with approved schedule */}
                           {(previewSchedule?.schedule || []).map((s) => {
-                            const dateObj = new Date(s.date + "T00:00:00");
+                            const dateObj = parseDate(s.date);
+                            if (!dateObj) return null;
                             const isToday =
                               new Date().toDateString() ===
                               dateObj.toDateString();
@@ -695,7 +692,8 @@ export default function AdminShifts() {
 
                           {/* Days that only have pending (not yet in schedule) */}
                           {pendingOnlyDates.sort().map((dateStr) => {
-                            const dateObj = new Date(dateStr + "T00:00:00");
+                            const dateObj = parseDate(dateStr);
+                            if (!dateObj) return null;
                             const dow = dateObj.getDay();
                             const pendingForDay = pendingByDate[dateStr] || [];
                             return (
