@@ -133,7 +133,6 @@ const AdminLayout = () => {
     { name: t.records, icon: FileStack, path: "/admin/records" },
     { name: t.inventory, icon: Pill, path: "/admin/inventory" },
     { name: t.billing, icon: CreditCard, path: "/admin/billing" },
-    { name: t.ai, icon: Bot, path: "/admin/ai" },
   ];
 
   if (!user) return null;
@@ -259,7 +258,7 @@ const AdminLayout = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col relative min-w-0">
         {/* Mobile Top Bar */}
-        <div className="mobile-top-bar md:hidden">
+        <div className="mobile-top-bar desktop-hide md:hidden">
           <button
             className="hamburger-button"
             onClick={() => setSidebarOpen(true)}

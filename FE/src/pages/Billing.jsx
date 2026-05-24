@@ -226,10 +226,7 @@ export default function Billing() {
     );
 
   return (
-    <div
-      className="flex flex-col md:flex-row"
-      style={{ height: "calc(100vh - 64px)" }}
-    >
+    <div className="flex flex-col md:flex-row h-[calc(100vh-64px)]">
       {/* ══ SIDEBAR — soft white ══ */}
       <aside className="w-full md:w-80 md:min-w-72 bg-[var(--bg-secondary)] border-r border-[var(--border-color)] flex flex-col md:block hidden">
         {/* Logo + title */}

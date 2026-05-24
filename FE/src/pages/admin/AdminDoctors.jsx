@@ -436,7 +436,7 @@ export default function AdminDoctors() {
             onClick={handleOpenAddModal}
             className="px-4 md:px-5 py-2 md:py-2.5 bg-indigo-600 text-white font-bold rounded-xl flex items-center gap-2 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition-all text-xs md:text-sm"
           >
-            <Plus size={16} md={18} /> {t.btnAddDoctor}
+            <Plus size={18} /> {t.btnAddDoctor}
           </button>
         )}
       </div>
@@ -449,8 +449,7 @@ export default function AdminDoctors() {
             <div className="relative w-full md:w-auto">
               <Search
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
-                size={16}
-                md={18}
+                size={18}
               />
               <input
                 type="text"
@@ -484,7 +483,7 @@ export default function AdminDoctors() {
                     <td className="p-3 md:p-4 pl-4 md:pl-6 font-medium">
                       <div className="flex items-center gap-2 md:gap-3">
                         <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold shrink-0">
-                          <Stethoscope size={14} md={18} />
+                          <Stethoscope size={18} />
                         </div>
                         <div>
                           <p className="font-bold text-[var(--text-primary)] text-xs md:text-sm">
@@ -517,13 +516,13 @@ export default function AdminDoctors() {
                         onClick={() => handleOpenEditModal(d)}
                         className="p-1.5 md:p-2 text-[var(--text-tertiary)] hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors"
                       >
-                        <Edit3 size={14} md={18} />
+                        <Edit3 size={18} />
                       </button>
                       <button
                         onClick={() => confirmDeleteDoctor(d._id)}
                         className="p-1.5 md:p-2 text-[var(--text-tertiary)] hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                       >
-                        <Trash2 size={14} md={18} />
+                        <Trash2 size={18} />
                       </button>
                     </td>
                   </tr>
@@ -546,7 +545,7 @@ export default function AdminDoctors() {
                 onClick={() => setIsModalOpen(false)}
                 className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] p-1 hover:bg-[var(--border-color)] rounded-full transition-colors"
               >
-                <X size={18} md={20} />
+                <X size={20} />
               </button>
             </div>
 

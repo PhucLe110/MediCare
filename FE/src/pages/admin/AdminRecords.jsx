@@ -152,7 +152,7 @@ export default function AdminRecords() {
           onClick={handleBackup}
           className="px-4 md:px-5 py-2 md:py-2.5 bg-indigo-600 text-white font-bold rounded-xl flex items-center gap-2 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition-all shrink-0 text-xs md:text-sm"
         >
-          <Database size={16} md={18} /> {t.btnBackup}
+          <Database size={18} /> {t.btnBackup}
         </button>
       </div>
 
@@ -170,7 +170,7 @@ export default function AdminRecords() {
                 : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             }`}
           >
-            <FileText size={14} md={16} /> {t.tabPrescriptions} (
+            <FileText size={16} /> {t.tabPrescriptions} (
             {records.prescriptions.length})
           </button>
           <button
@@ -184,7 +184,7 @@ export default function AdminRecords() {
                 : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             }`}
           >
-            <Activity size={14} md={16} /> {t.tabLabResults} (
+            <Activity size={16} /> {t.tabLabResults} (
             {records.labResults.length})
           </button>
         </div>
@@ -194,8 +194,7 @@ export default function AdminRecords() {
           <div className="relative w-full md:w-80">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
-              size={16}
-              md={18}
+              size={18}
             />
             <input
               type="text"

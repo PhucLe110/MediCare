@@ -440,8 +440,7 @@ export default function AdminAppointments() {
           <div className="relative w-full md:w-80">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
-              size={16}
-              md={18}
+              size={18}
             />
             <input
               type="text"
@@ -492,8 +491,8 @@ export default function AdminAppointments() {
                         {app.ticketNumber || "N/A"}
                       </span>
                       <span className="text-[10px] md:text-xs text-[var(--text-secondary)] flex items-center gap-1 mt-0.5">
-                        <Calendar size={10} md={12} /> {app.date} |{" "}
-                        <Clock size={10} md={12} /> {app.time}
+                        <Calendar size={12} /> {app.date} | <Clock size={12} />{" "}
+                        {app.time}
                       </span>
                     </div>
                   </td>
@@ -582,8 +581,7 @@ export default function AdminAppointments() {
                 <h3 className="text-base md:text-lg font-black text-[var(--text-primary)] flex items-center gap-2">
                   <UserRoundCheck
                     className="text-indigo-600 dark:text-indigo-400"
-                    size={18}
-                    md={20}
+                    size={20}
                   />{" "}
                   {t.modalTitle}
                 </h3>
@@ -595,7 +593,7 @@ export default function AdminAppointments() {
                 onClick={() => setIsModalOpen(false)}
                 className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] p-1 hover:bg-[var(--border-color)] rounded-full transition-colors"
               >
-                <X size={18} md={20} />
+                <X size={20} />
               </button>
             </div>
 

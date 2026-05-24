@@ -103,6 +103,7 @@ export default function AppointmentDetail() {
   const [rx, setRx] = useState(null);
   const [labs, setLabs] = useState([]);
   const [showTicket, setShowTicket] = useState(false);
+  const [paymentModal, setPaymentModal] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -168,6 +169,41 @@ export default function AppointmentDetail() {
         >
           {t.backSimple}
         </button>
+      </div>
+    );
+  }
+
+  // Check payment status - only allow viewing if paid or completed
+  if (appt.paymentStatus !== "paid" && appt.status !== "completed") {
+    return (
+      <div className="max-w-4xl mx-auto py-4 md:py-6 px-3 md:px-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-primary transition-colors mb-4 md:mb-6 font-bold text-xs md:text-sm"
+        >
+          <ArrowLeft size={14} /> {t.backBtn}
+        </button>
+
+        <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl p-6 md:p-8 lg:p-16 text-center border border-[var(--border-color)] shadow-xl">
+          <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-amber-100 dark:bg-amber-900/30 mx-auto mb-4 md:mb-5">
+            <CreditCard
+              size={32}
+              className="md:size-40 text-amber-600 dark:text-amber-400"
+            />
+          </div>
+          <h2 className="text-xl md:text-2xl font-black text-[var(--text-primary)] mb-4">
+            Cần thanh toán phí khám
+          </h2>
+          <p className="text-sm md:text-base text-[var(--text-secondary)] mb-8 leading-relaxed">
+            Vui lòng thanh toán phí khám trước khi xem chi tiết phiếu khám.
+          </p>
+          <button
+            onClick={() => navigate("/dashboard/billing")}
+            className="px-6 md:px-8 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-all shadow-md"
+          >
+            Thanh toán ngay
+          </button>
+        </div>
       </div>
     );
   }

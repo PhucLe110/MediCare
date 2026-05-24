@@ -88,6 +88,7 @@ export default function AppointmentsHistory() {
   const [appts, setAppts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ticketModal, setTicketModal] = useState(null);
+  const [paymentModal, setPaymentModal] = useState(null);
   const navigate = useNavigate();
 
   const STATUS = {
@@ -220,7 +221,11 @@ export default function AppointmentsHistory() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setTicketModal(a);
+                              if (a.paymentStatus === "paid") {
+                                setTicketModal(a);
+                              } else {
+                                setPaymentModal(a);
+                              }
                             }}
                             className="px-2 md:px-2.5 py-0.5 rounded-full text-[10px] md:text-xs font-black bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-900/30 hover:bg-orange-600 hover:text-white transition-all flex items-center gap-1 md:gap-1.5 active:scale-95 duration-150"
                             style={{ cursor: "pointer" }}
@@ -296,7 +301,13 @@ export default function AppointmentsHistory() {
                     </button>
                   ) : (
                     <button
-                      onClick={() => handleAction(a)}
+                      onClick={() => {
+                        if (a.paymentStatus === "paid") {
+                          handleAction(a);
+                        } else {
+                          setPaymentModal(a);
+                        }
+                      }}
                       className="px-4 md:px-5 py-2 rounded-xl font-bold text-xs md:text-sm transition-all border bg-blue-50 dark:bg-blue-900/30 text-primary border-blue-100 dark:border-blue-900/30 hover:bg-primary hover:text-white shadow-sm shrink-0"
                     >
                       {isCompleted ? t.viewRecords : t.viewTicket}
@@ -318,285 +329,131 @@ export default function AppointmentsHistory() {
         </div>
       )}
 
+      {/* Payment Required Modal */}
+      {paymentModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl w-full max-w-md p-6 md:p-8 shadow-2xl border border-[var(--border-color)]">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/30 mb-4">
+              <CreditCard
+                size={32}
+                className="text-amber-600 dark:text-amber-400"
+              />
+            </div>
+            <h3 className="text-lg md:text-xl font-black text-[var(--text-primary)] mb-2 text-center">
+              Cần thanh toán phí khám
+            </h3>
+            <p className="text-sm md:text-base text-[var(--text-secondary)] mb-5 text-center leading-relaxed">
+              Vui lòng thanh toán phí khám trước khi xem phiếu STT hoặc phiếu
+              khám.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPaymentModal(null)}
+                className="flex-1 px-4 py-3 bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-sm font-bold rounded-xl border border-[var(--border-color)] cursor-pointer"
+              >
+                Đóng
+              </button>
+              <button
+                onClick={() => {
+                  setPaymentModal(null);
+                  navigate("/dashboard/billing");
+                }}
+                className="flex-1 px-4 py-3 bg-orange-600 text-white text-sm font-bold rounded-xl border-none cursor-pointer hover:bg-orange-700 transition-colors"
+              >
+                Thanh toán ngay
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Ticket Modal */}
       {ticketModal && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.6)",
-            backdropFilter: "blur(4px)",
-            zIndex: 9999,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 16,
-          }}
-        >
-          <div
-            style={{
-              background: "var(--card-bg)",
-              borderRadius: 32,
-              width: "100%",
-              maxWidth: 400,
-              overflow: "hidden",
-              boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
-              border: "1px solid var(--border-color)",
-              fontFamily: "Inter, system-ui, sans-serif",
-            }}
-          >
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-[var(--card-bg)] rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-[var(--border-color)]">
             {/* Ticket Header with Colorful Project Logo */}
-            <div
-              style={{
-                padding: "16px 16px 12px",
-                borderBottom: "1px dashed var(--border-color)",
-                textAlign: "center",
-                position: "relative",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  marginBottom: 8,
-                }}
-              >
+            <div className="p-4 md:p-6 border-b border-dashed border-[var(--border-color)] text-center relative">
+              <div className="flex justify-center mb-2">
                 <img
                   src="/LOGO.png"
                   alt="MediCare"
-                  style={{ height: 28, width: "auto", objectFit: "contain" }}
+                  className="h-7 md:h-8 w-auto object-contain"
                 />
               </div>
-              <h3
-                style={{
-                  fontSize: 16,
-                  fontWeight: 900,
-                  letterSpacing: "-0.02em",
-                  margin: "6px 0 0",
-                  color: "var(--text-primary)",
-                }}
-              >
+              <h3 className="text-base md:text-lg font-black tracking-tight text-[var(--text-primary)] mt-1.5">
                 {t.ticketTitle}
               </h3>
-              <p
-                style={{
-                  fontSize: 10,
-                  color: "var(--text-secondary)",
-                  marginTop: 4,
-                  fontWeight: 600,
-                  margin: "4px 0 0",
-                }}
-              >
+              <p className="text-[10px] md:text-xs text-[var(--text-secondary)] mt-1 font-semibold">
                 {t.ticketSubtitle}
               </p>
 
               {/* Left/Right ticket notches */}
-              <div
-                style={{
-                  position: "absolute",
-                  left: -8,
-                  bottom: -8,
-                  width: 16,
-                  height: 16,
-                  borderRadius: "50%",
-                  background: "rgba(0,0,0,0.6)",
-                  zIndex: 10,
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  right: -8,
-                  bottom: -8,
-                  width: 16,
-                  height: 16,
-                  borderRadius: "50%",
-                  background: "rgba(0,0,0,0.6)",
-                  zIndex: 10,
-                }}
-              />
+              <div className="absolute -left-2 -bottom-2 w-4 h-4 rounded-full bg-black/60 z-10" />
+              <div className="absolute -right-2 -bottom-2 w-4 h-4 rounded-full bg-black/60 z-10" />
             </div>
 
             {/* Ticket Body */}
-            <div style={{ padding: 16 }}>
+            <div className="p-4 md:p-6">
               {/* Big Queue Number */}
-              <div
-                style={{
-                  background: "#f0f7ff dark:bg-blue-900/20",
-                  border: "1px solid #e0f2fe dark:border-blue-900/30",
-                  borderRadius: 16,
-                  padding: "12px 0",
-                  textAlign: "center",
-                  marginBottom: 16,
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 800,
-                    color: "#3b82f6",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    margin: "0 0 4px",
-                  }}
-                >
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-3 md:p-4 text-center mb-4">
+                <p className="text-[9px] md:text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1">
                   {t.yourQueue}
                 </p>
-                <div
-                  style={{
-                    display: "inline-flex",
-                    width: 72,
-                    height: 72,
-                    borderRadius: "50%",
-                    background:
-                      "linear-gradient(135deg, #102a63 0%, #2563eb 100%)",
-                    color: "#fff",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: 900,
-                    fontSize: 28,
-                    boxShadow: "0 10px 15px -3px rgba(59, 130, 246, 0.3)",
-                    margin: "6px 0",
-                  }}
-                >
+                <div className="inline-flex w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-[#102a63] to-blue-600 text-white items-center justify-center font-black text-2xl md:text-3xl shadow-lg shadow-blue-500/30 my-1.5">
                   #{ticketModal.queueNumber || "01"}
                 </div>
-                <p
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 700,
-                    margin: "4px 0 0",
-                    color: "var(--text-secondary)",
-                  }}
-                >
+                <p className="text-[9px] md:text-[10px] font-bold text-[var(--text-secondary)] mt-1">
                   {t.watchMonitor}
                 </p>
               </div>
 
               {/* Ticket Details */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 8,
-                  fontSize: 12,
-                  color: "var(--text-primary)",
-                  fontWeight: 600,
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    borderBottom: "1px solid var(--border-color)",
-                    paddingBottom: 6,
-                  }}
-                >
-                  <span
-                    style={{ color: "var(--text-tertiary)", fontWeight: 700 }}
-                  >
+              <div className="flex flex-col gap-2 text-xs md:text-sm font-semibold text-[var(--text-primary)]">
+                <div className="flex justify-between border-b border-[var(--border-color)] pb-1.5">
+                  <span className="font-bold text-[var(--text-tertiary)]">
                     {t.ticketId}
                   </span>
-                  <span
-                    style={{
-                      fontFamily: "monospace",
-                      fontWeight: 900,
-                      color: "var(--text-primary)",
-                      fontSize: 12,
-                    }}
-                  >
+                  <span className="font-mono font-black text-[var(--text-primary)]">
                     {ticketModal.ticketNumber}
                   </span>
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    borderBottom: "1px solid var(--border-color)",
-                    paddingBottom: 6,
-                  }}
-                >
-                  <span
-                    style={{ color: "var(--text-tertiary)", fontWeight: 700 }}
-                  >
+                <div className="flex justify-between border-b border-[var(--border-color)] pb-1.5">
+                  <span className="font-bold text-[var(--text-tertiary)]">
                     {t.patient}
                   </span>
-                  <span
-                    style={{ fontWeight: 800, color: "var(--text-primary)" }}
-                  >
+                  <span className="font-extrabold text-[var(--text-primary)]">
                     {getStoredUser()?.fullName}
                   </span>
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    borderBottom: "1px solid var(--border-color)",
-                    paddingBottom: 6,
-                  }}
-                >
-                  <span
-                    style={{ color: "var(--text-tertiary)", fontWeight: 700 }}
-                  >
+                <div className="flex justify-between border-b border-[var(--border-color)] pb-1.5">
+                  <span className="font-bold text-[var(--text-tertiary)]">
                     {t.physician}
                   </span>
-                  <span
-                    style={{ fontWeight: 800, color: "var(--text-primary)" }}
-                  >
+                  <span className="font-extrabold text-[var(--text-primary)]">
                     {getDoctorDisplayName(ticketModal.doctor?.userId?.fullName)}
                   </span>
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    borderBottom: "1px solid var(--border-color)",
-                    paddingBottom: 6,
-                  }}
-                >
-                  <span
-                    style={{ color: "var(--text-tertiary)", fontWeight: 700 }}
-                  >
+                <div className="flex justify-between border-b border-[var(--border-color)] pb-1.5">
+                  <span className="font-bold text-[var(--text-tertiary)]">
                     {t.department}
                   </span>
-                  <span
-                    style={{ fontWeight: 800, color: "var(--text-primary)" }}
-                  >
+                  <span className="font-extrabold text-[var(--text-primary)]">
                     {getLocalizedDept(ticketModal.doctor?.department)}
                   </span>
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    borderBottom: "1px solid var(--border-color)",
-                    paddingBottom: 6,
-                  }}
-                >
-                  <span
-                    style={{ color: "var(--text-tertiary)", fontWeight: 700 }}
-                  >
+                <div className="flex justify-between border-b border-[var(--border-color)] pb-1.5">
+                  <span className="font-bold text-[var(--text-tertiary)]">
                     {t.schedule}
                   </span>
-                  <span
-                    style={{ fontWeight: 800, color: "var(--text-primary)" }}
-                  >
+                  <span className="font-extrabold text-[var(--text-primary)]">
                     {ticketModal.time} • {formatDate(lang, ticketModal.date)}
                   </span>
                 </div>
               </div>
 
               {/* Dummy Barcode using high-tech SVGs */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  paddingTop: 16,
-                }}
-              >
-                <svg style={{ width: 200, height: 40 }} overflow="visible">
+              <div className="flex flex-col items-center justify-center pt-4">
+                <svg className="w-48 md:w-56 h-10 md:h-12" overflow="visible">
                   {[...Array(32)].map((_, i) => (
                     <rect
                       key={i}
@@ -608,64 +465,24 @@ export default function AppointmentsHistory() {
                     />
                   ))}
                 </svg>
-                <p
-                  style={{
-                    fontSize: 8,
-                    color: "var(--text-tertiary)",
-                    fontFamily: "monospace",
-                    margin: "6px 0 0",
-                    letterSpacing: "0.15em",
-                  }}
-                >
+                <p className="text-[8px] md:text-[10px] text-[var(--text-tertiary)] font-mono tracking-widest mt-1.5">
                   {ticketModal._id}
                 </p>
               </div>
             </div>
 
             {/* Ticket Footer Buttons */}
-            <div
-              style={{
-                background: "var(--bg-tertiary)",
-                padding: "12px 16px",
-                display: "flex",
-                gap: 8,
-                borderTop: "1px solid var(--border-color)",
-              }}
-            >
+            <div className="bg-[var(--bg-tertiary)] p-3 md:p-4 flex gap-2 border-t border-[var(--border-color)]">
               <button
                 onClick={() => window.print()}
-                style={{
-                  flex: 1,
-                  padding: "8px 0",
-                  background: "#102a63",
-                  color: "#fff",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  borderRadius: 12,
-                  border: "none",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 4,
-                  boxShadow: "0 4px 6px -1px rgba(16, 42, 99, 0.2)",
-                }}
+                className="flex-1 py-2 md:py-2.5 bg-[#102a63] text-white text-[11px] md:text-xs font-bold rounded-xl border-none cursor-pointer flex items-center justify-center gap-1 md:gap-1.5 shadow-md shadow-[#102a63]/20"
               >
                 <Printer size={12} />
                 {t.printTicket}
               </button>
               <button
                 onClick={() => setTicketModal(null)}
-                style={{
-                  padding: "8px 12px",
-                  background: "var(--border-color)",
-                  color: "var(--text-secondary)",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  borderRadius: 12,
-                  border: "none",
-                  cursor: "pointer",
-                }}
+                className="px-3 py-2 md:py-2.5 bg-[var(--border-color)] text-[var(--text-secondary)] text-[11px] md:text-xs font-bold rounded-xl border-none cursor-pointer"
               >
                 {t.close}
               </button>

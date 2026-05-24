@@ -117,7 +117,7 @@ exports.resetPassword = asyncHandler(async (req, res) => {
 });
 
 exports.firebaseAuth = asyncHandler(async (req, res) => {
-  const { idToken, email, displayName, photoURL, mode } = req.body;
+  const { idToken, email, displayName, photoURL } = req.body;
 
   if (!idToken) {
     return res
@@ -137,15 +137,8 @@ exports.firebaseAuth = asyncHandler(async (req, res) => {
   // Check if user exists
   let user = await User.findOne({ email });
 
-  if (mode === "register") {
-    // Register mode: user should not exist
-    if (user) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Email đã được đăng ký" });
-    }
-    // Create new user
-    // Note: Using idToken temporarily as googleId - should be Firebase UID after proper verification
+  if (!user) {
+    // User doesn't exist - create new account
     user = await User.create({
       fullName: displayName || "User",
       email,
@@ -157,13 +150,7 @@ exports.firebaseAuth = asyncHandler(async (req, res) => {
       avatar: photoURL || "",
     });
   } else {
-    // Login mode: user should exist
-    if (!user) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Tài khoản không tồn tại" });
-    }
-    // Update googleId if not set
+    // User exists - update googleId if not set
     if (!user.googleId) {
       user.googleId = idToken;
       await user.save();

@@ -360,40 +360,69 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* AI & System Health */}
+      {/* Hospital Management Image */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        <div className="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-2xl md:rounded-3xl p-4 md:p-8 shadow-lg text-white relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10 transform translate-x-10 -translate-y-10">
-            <Bot size={150} md={200} />
-          </div>
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 md:gap-3 mb-2">
-              <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-indigo-500/30 flex items-center justify-center backdrop-blur-md">
-                <Bot size={16} md={20} className="text-indigo-200" />
-              </div>
-              <h3 className="text-base md:text-xl font-black tracking-tight">
-                {t.aiStatusTitle}
-              </h3>
-            </div>
-            <p className="text-indigo-200 font-medium mb-4 md:mb-8 max-w-sm text-xs md:text-sm">
-              {t.aiStatusSub}
+        <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl overflow-hidden shadow-sm border border-[var(--border-color)]">
+          <img
+            src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&h=600&fit=crop"
+            alt="Hospital Management"
+            className="w-full h-64 md:h-80 object-cover"
+          />
+          <div className="p-2 md:p-3 text-center pb-1 md:pb-1">
+            <h3 className="text-sm md:text-base font-black text-[var(--text-primary)] mb-1">
+              Quản lý Bệnh viện Thông minh
+            </h3>
+            <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-medium mb-2">
+              Hệ thống quản lý toàn diện giúp tối ưu hóa quy trình vận hành và
+              nâng cao chất lượng dịch vụ y tế.
             </p>
-
-            <div className="grid grid-cols-2 gap-3 md:gap-4">
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 md:p-4 border border-white/10">
-                <p className="text-indigo-200 text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">
-                  {t.aiAccuracy}
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              <div className="bg-[var(--bg-tertiary)] rounded-lg p-2">
+                <p className="text-[9px] md:text-[10px] font-bold text-primary mb-0.5">
+                  📊 Quản lý dữ liệu
                 </p>
-                <p className="text-2xl md:text-3xl font-black text-white">
-                  96.8%
+                <p className="text-[8px] md:text-[9px] text-[var(--text-tertiary)]">
+                  Theo dõi bệnh nhân & bác sĩ
                 </p>
               </div>
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 md:p-4 border border-white/10">
-                <p className="text-indigo-200 text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">
-                  {t.aiAnalyzedCases}
+              <div className="bg-[var(--bg-tertiary)] rounded-lg p-2">
+                <p className="text-[9px] md:text-[10px] font-bold text-primary mb-0.5">
+                  📅 Lịch khám
                 </p>
-                <p className="text-2xl md:text-3xl font-black text-white">
-                  12,450
+                <p className="text-[8px] md:text-[9px] text-[var(--text-tertiary)]">
+                  Đặt lịch & quản lý ca
+                </p>
+              </div>
+              <div className="bg-[var(--bg-tertiary)] rounded-lg p-2">
+                <p className="text-[9px] md:text-[10px] font-bold text-primary mb-0.5">
+                  💰 Hóa đơn
+                </p>
+                <p className="text-[8px] md:text-[9px] text-[var(--text-tertiary)]">
+                  Quản lý thanh toán
+                </p>
+              </div>
+              <div className="bg-[var(--bg-tertiary)] rounded-lg p-2">
+                <p className="text-[9px] md:text-[10px] font-bold text-primary mb-0.5">
+                  📋 Hồ sơ
+                </p>
+                <p className="text-[8px] md:text-[9px] text-[var(--text-tertiary)]">
+                  Lưu trữ bệnh án
+                </p>
+              </div>
+              <div className="bg-[var(--bg-tertiary)] rounded-lg p-2">
+                <p className="text-[9px] md:text-[10px] font-bold text-primary mb-0.5">
+                  💊 Kho thuốc
+                </p>
+                <p className="text-[8px] md:text-[9px] text-[var(--text-tertiary)]">
+                  Quản lý tồn kho
+                </p>
+              </div>
+              <div className="bg-[var(--bg-tertiary)] rounded-lg p-2">
+                <p className="text-[9px] md:text-[10px] font-bold text-primary mb-0.5">
+                  👥 Nhân sự
+                </p>
+                <p className="text-[8px] md:text-[9px] text-[var(--text-tertiary)]">
+                  Quản lý bác sĩ
                 </p>
               </div>
             </div>
@@ -441,7 +470,7 @@ export default function AdminDashboard() {
                       {t.docPerfConsultationsCount(doc.count)}
                     </p>
                     <p className="text-[10px] md:text-xs font-bold text-indigo-500 dark:text-indigo-400 flex items-center justify-end gap-1">
-                      <ArrowUpRight size={10} md={12} />{" "}
+                      <ArrowUpRight size={12} />{" "}
                       <span className="hidden md:inline">
                         {t.docPerfSpecialtyLabel}
                       </span>
@@ -473,7 +502,7 @@ function StatCard({ title, value, icon: Icon, trend, isPositive, color }) {
       <div
         className={`w-10 h-10 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-3 md:mb-4 ${colorMap[color]}`}
       >
-        <Icon size={20} md={26} />
+        <Icon size={26} />
       </div>
       <div>
         <h3 className="text-[var(--text-secondary)] font-bold text-xs md:text-sm mb-1">
@@ -487,9 +516,9 @@ function StatCard({ title, value, icon: Icon, trend, isPositive, color }) {
             className={`flex items-center gap-1 text-[10px] md:text-sm font-bold pb-1 ${isPositive ? "text-emerald-500 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}
           >
             {isPositive ? (
-              <ArrowUpRight size={12} md={16} />
+              <ArrowUpRight size={16} />
             ) : (
-              <ArrowDownRight size={12} md={16} />
+              <ArrowDownRight size={16} />
             )}
             {trend}
           </span>

@@ -597,8 +597,7 @@ const Booking = () => {
                       </select>
                       <ChevronDown
                         className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] pointer-events-none"
-                        size={16}
-                        md={20}
+                        size={20}
                       />
                     </div>
                   </div>

@@ -216,7 +216,7 @@ const LandingPage = () => {
     <>
       {/* Hero Section */}
       <section
-        className="relative pt-16 pb-20 md:pt-20 md:pb-32 overflow-hidden"
+        className="relative pt-16 pb-20 md:pt-20 md:pb-32 lg:pt-20 lg:pb-32 overflow-hidden"
         style={{
           backgroundImage:
             "url(https://i.pinimg.com/1200x/b4/9f/ce/b49fce1ac413733758fb3bd8419e3fb5.jpg)",
@@ -225,31 +225,31 @@ const LandingPage = () => {
         }}
       >
         {/* Overlays to ensure text readability */}
-        <div className="absolute inset-0 bg-[var(--bg-primary)]/80 md:bg-[var(--bg-primary)]/60 z-0"></div>
+        <div className="absolute inset-0 bg-[var(--bg-primary)]/80 md:bg-[var(--bg-primary)]/60 lg:bg-[var(--bg-primary)]/60 z-0"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-primary)] via-[var(--bg-primary)]/80 to-transparent z-0"></div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-12 items-center">
             {/* Left Content */}
             <div className="max-w-xl order-2 lg:order-1">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-[var(--text-primary)] leading-tight mb-4">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl lg:text-6xl font-extrabold text-[var(--text-primary)] leading-tight mb-4">
                 {t.heroTitle1} <br />
                 <span className="text-primary">{t.heroTitle2}</span>
               </h1>
-              <p className="text-base md:text-lg text-[var(--text-secondary)] mb-6 md:mb-8 leading-relaxed">
+              <p className="text-base md:text-lg lg:text-lg text-[var(--text-secondary)] mb-6 md:mb-8 lg:mb-8 leading-relaxed">
                 {t.heroDesc}
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-8 md:mb-12">
+              <div className="flex flex-col md:flex-row lg:flex-row gap-3 md:gap-4 lg:gap-4 mb-8 md:mb-12 lg:mb-12">
                 <button
                   onClick={() =>
                     document.dispatchEvent(
                       new CustomEvent("open-auth", { detail: "login" }),
                     )
                   }
-                  className="flex items-center justify-center gap-2 px-5 py-3 md:px-6 md:py-3.5 bg-primary text-white font-medium rounded-lg hover:bg-primary-light transition-all shadow-md text-sm md:text-base"
+                  className="flex items-center justify-center gap-2 px-5 py-3 md:px-6 md:py-3.5 lg:px-6 lg:py-3.5 bg-primary text-white font-medium rounded-lg hover:bg-primary-light transition-all shadow-md text-sm md:text-base lg:text-base"
                 >
-                  <Calendar size={18} md={20} />
+                  <Calendar size={18} />
                   {t.btnBook}
                 </button>
                 <button
@@ -258,20 +258,20 @@ const LandingPage = () => {
                       new CustomEvent("open-auth", { detail: "login" }),
                     )
                   }
-                  className="flex items-center justify-center gap-2 px-5 py-3 md:px-6 md:py-3.5 bg-[var(--card-bg)] text-primary border border-primary font-medium rounded-lg hover:bg-primary-pale transition-all shadow-sm text-sm md:text-base"
+                  className="flex items-center justify-center gap-2 px-5 py-3 md:px-6 md:py-3.5 lg:px-6 lg:py-3.5 bg-[var(--card-bg)] text-primary border border-primary font-medium rounded-lg hover:bg-primary-pale transition-all shadow-sm text-sm md:text-base lg:text-base"
                 >
-                  <Bot size={18} md={20} />
+                  <Bot size={18} />
                   {t.btnAI}
                 </button>
               </div>
 
               {/* Bottom features */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-6 md:mt-8">
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-4 mt-6 md:mt-8 lg:mt-8">
                 <div className="flex flex-col gap-2">
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-primary">
                     <Activity size={20} />
                   </div>
-                  <span className="text-[10px] md:text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
+                  <span className="text-[10px] md:text-xs lg:text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
                     {t.featAI}
                   </span>
                 </div>
@@ -279,7 +279,7 @@ const LandingPage = () => {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-primary">
                     <Calendar size={20} />
                   </div>
-                  <span className="text-[10px] md:text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
+                  <span className="text-[10px] md:text-xs lg:text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
                     {t.featBooking}
                   </span>
                 </div>
@@ -287,7 +287,7 @@ const LandingPage = () => {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-primary">
                     <ShieldCheck size={20} />
                   </div>
-                  <span className="text-[10px] md:text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
+                  <span className="text-[10px] md:text-xs lg:text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
                     {t.featShield}
                   </span>
                 </div>
@@ -295,7 +295,7 @@ const LandingPage = () => {
                   <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-primary">
                     <FileText size={20} />
                   </div>
-                  <span className="text-[10px] md:text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
+                  <span className="text-[10px] md:text-xs lg:text-xs font-medium text-[var(--text-primary)] whitespace-pre-line">
                     {t.featRecord}
                   </span>
                 </div>
@@ -304,7 +304,7 @@ const LandingPage = () => {
 
             {/* Right Content - Stacked Action Cards */}
             <div className="relative flex justify-center lg:justify-end order-1 lg:order-2 mb-8 lg:mb-0">
-              <div className="w-full max-w-md space-y-3 md:space-y-4">
+              <div className="w-full max-w-md space-y-3 md:space-y-4 lg:space-y-4">
                 {[
                   {
                     icon: Calendar,
@@ -338,36 +338,35 @@ const LandingPage = () => {
                         new CustomEvent("open-auth", { detail: "login" }),
                       )
                     }
-                    className={`flex items-center p-4 md:p-5 rounded-2xl cursor-pointer transition-all duration-300 transform hover:-translate-y-1 shadow-lg ${
+                    className={`flex items-center p-4 md:p-5 lg:p-5 rounded-2xl cursor-pointer transition-all duration-300 transform hover:-translate-y-1 shadow-lg ${
                       item.primary
                         ? "bg-primary text-white border border-primary-light shadow-primary/20"
                         : "bg-[var(--card-bg)]/90 backdrop-blur-sm border border-[var(--border-color)] hover:bg-[var(--card-bg)] text-[var(--text-primary)]"
                     }`}
                   >
                     <div
-                      className={`w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center shrink-0 ${
+                      className={`w-12 h-12 md:w-14 md:h-14 lg:w-14 lg:h-14 rounded-xl flex items-center justify-center shrink-0 ${
                         item.primary
                           ? "bg-white/20"
                           : "bg-blue-50 dark:bg-blue-900/30 text-primary"
                       }`}
                     >
-                      <item.icon size={24} md={28} />
+                      <item.icon size={24} />
                     </div>
-                    <div className="ml-3 md:ml-5 flex-1">
+                    <div className="ml-3 md:ml-5 lg:ml-5 flex-1">
                       <h3
-                        className={`font-black text-base md:text-lg ${item.primary ? "text-white" : "text-[var(--text-primary)]"}`}
+                        className={`font-black text-base md:text-lg lg:text-lg ${item.primary ? "text-white" : "text-[var(--text-primary)]"}`}
                       >
                         {item.title}
                       </h3>
                       <p
-                        className={`text-xs md:text-sm mt-0.5 ${item.primary ? "text-blue-100" : "text-[var(--text-secondary)]"}`}
+                        className={`text-xs md:text-sm lg:text-sm mt-0.5 ${item.primary ? "text-blue-100" : "text-[var(--text-secondary)]"}`}
                       >
                         {item.desc}
                       </p>
                     </div>
                     <ChevronRight
                       size={18}
-                      md={20}
                       className={
                         item.primary
                           ? "text-white/70"
@@ -385,10 +384,10 @@ const LandingPage = () => {
       {/* About Section */}
       <section
         id="about"
-        className="py-16 md:py-24 bg-[var(--bg-secondary)] relative overflow-hidden"
+        className="py-16 md:py-24 lg:py-24 bg-[var(--bg-secondary)] relative overflow-hidden"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 lg:gap-16 items-center">
             <div className="relative order-2 lg:order-1">
               <div className="absolute -inset-4 bg-primary/10 rounded-[3rem] transform -rotate-3 z-0"></div>
               <img
@@ -398,17 +397,17 @@ const LandingPage = () => {
               />
 
               <div
-                className="absolute -bottom-4 -right-4 md:-bottom-8 md:-right-8 bg-[var(--card-bg)] p-4 md:p-6 rounded-3xl shadow-xl z-20 flex items-center gap-3 md:gap-4 animate-bounce"
+                className="absolute -bottom-4 -right-4 md:-bottom-8 md:-right-8 bg-[var(--card-bg)] p-4 md:p-6 lg:p-6 rounded-3xl shadow-xl z-20 flex items-center gap-3 md:gap-4 lg:gap-4 animate-bounce"
                 style={{ animationDuration: "3s" }}
               >
-                <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary flex items-center justify-center">
-                  <Award size={24} md={32} />
+                <div className="w-12 h-12 md:w-16 md:h-16 lg:w-16 lg:h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary flex items-center justify-center">
+                  <Award size={24} />
                 </div>
                 <div>
-                  <h4 className="text-2xl md:text-3xl font-black text-[var(--text-primary)]">
+                  <h4 className="text-2xl md:text-3xl lg:text-3xl font-black text-[var(--text-primary)]">
                     15+
                   </h4>
-                  <p className="text-[10px] md:text-sm font-bold text-[var(--text-secondary)] uppercase">
+                  <p className="text-[10px] md:text-sm lg:text-sm font-bold text-[var(--text-secondary)] uppercase">
                     {t.aboutExp}
                   </p>
                 </div>
@@ -416,18 +415,18 @@ const LandingPage = () => {
             </div>
 
             <div className="order-1 lg:order-2">
-              <h2 className="text-xs md:text-sm font-bold text-primary uppercase tracking-widest mb-2">
+              <h2 className="text-xs md:text-sm lg:text-sm font-bold text-primary uppercase tracking-widest mb-2">
                 {t.aboutSubtitle}
               </h2>
-              <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)] mb-4 md:mb-6 leading-tight">
+              <h3 className="text-2xl md:text-3xl lg:text-3xl lg:text-4xl font-black text-[var(--text-primary)] mb-4 md:mb-6 lg:mb-6 leading-tight">
                 {t.aboutTitle1} <br />
                 {t.aboutTitle2}
               </h3>
-              <p className="text-[var(--text-secondary)] mb-4 md:mb-6 leading-relaxed text-sm md:text-base lg:text-lg">
+              <p className="text-[var(--text-secondary)] mb-4 md:mb-6 lg:mb-6 leading-relaxed text-sm md:text-base lg:text-base lg:text-lg">
                 {t.aboutDesc}
               </p>
 
-              <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
+              <div className="space-y-3 md:space-y-4 lg:space-y-4 mb-6 md:mb-8 lg:mb-8">
                 {[
                   t.aboutPoint1,
                   t.aboutPoint2,
@@ -438,27 +437,27 @@ const LandingPage = () => {
                     <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
                       <CheckCircle2 size={14} />
                     </div>
-                    <span className="text-sm md:text-base text-[var(--text-primary)] font-medium">
+                    <span className="text-sm md:text-base lg:text-base text-[var(--text-primary)] font-medium">
                       {item}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div className="grid grid-cols-2 gap-4 md:gap-6 pt-4 md:pt-6 border-t border-[var(--border-color)]">
+              <div className="grid grid-cols-2 gap-4 md:gap-6 lg:gap-6 pt-4 md:pt-6 lg:pt-6 border-t border-[var(--border-color)]">
                 <div>
-                  <h4 className="text-3xl md:text-4xl font-black text-primary mb-1">
+                  <h4 className="text-3xl md:text-4xl lg:text-4xl font-black text-primary mb-1">
                     2M+
                   </h4>
-                  <p className="text-[10px] md:text-sm font-bold text-[var(--text-secondary)] uppercase">
+                  <p className="text-[10px] md:text-sm lg:text-sm font-bold text-[var(--text-secondary)] uppercase">
                     {t.aboutTrust}
                   </p>
                 </div>
                 <div>
-                  <h4 className="text-3xl md:text-4xl font-black text-primary mb-1">
+                  <h4 className="text-3xl md:text-4xl lg:text-4xl font-black text-primary mb-1">
                     98%
                   </h4>
-                  <p className="text-[10px] md:text-sm font-bold text-[var(--text-secondary)] uppercase">
+                  <p className="text-[10px] md:text-sm lg:text-sm font-bold text-[var(--text-secondary)] uppercase">
                     {t.aboutSatisfied}
                   </p>
                 </div>
@@ -471,19 +470,19 @@ const LandingPage = () => {
       {/* Services Section */}
       <section
         id="services"
-        className="py-16 md:py-24 bg-[var(--bg-primary)] relative"
+        className="py-16 md:py-24 lg:py-24 bg-[var(--bg-primary)] relative"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12 md:mb-16">
-            <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-[var(--text-primary)]">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-12 md:mb-16 lg:mb-16">
+            <h3 className="text-2xl md:text-3xl lg:text-3xl lg:text-4xl font-black text-[var(--text-primary)]">
               {t.servicesTitle}
             </h3>
-            <p className="mt-4 text-sm md:text-base text-[var(--text-secondary)]">
+            <p className="mt-4 text-sm md:text-base lg:text-base text-[var(--text-secondary)]">
               {t.servicesDesc}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-6">
             {[
               {
                 img: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=500&q=80",
@@ -719,7 +718,7 @@ const LandingPage = () => {
                     {p.step}
                   </div>
                   <div className="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-primary mb-4 md:mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-                    <p.icon size={24} md={32} />
+                    <p.icon size={32} />
                   </div>
                   <h4 className="text-lg md:text-xl font-bold text-[var(--text-primary)] mb-2 md:mb-3">
                     {p.title}

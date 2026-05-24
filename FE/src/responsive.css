@@ -10,6 +10,50 @@
   display: none !important;
 }
 
+/* Show elements on mobile (hidden on desktop) */
+.mobile-show {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .mobile-show {
+    display: flex !important;
+  }
+}
+
+/* Hide desktop elements on mobile */
+.desktop-hide {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .desktop-hide {
+    display: flex !important;
+  }
+}
+
+/* Show desktop elements (hidden on mobile) */
+.desktop-show {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .desktop-show {
+    display: flex !important;
+  }
+}
+
+/* Hide tablet elements on mobile */
+.tablet-hide {
+  display: flex;
+}
+
+@media (max-width: 767px) {
+  .tablet-hide {
+    display: none !important;
+  }
+}
+
 /* Mobile-specific adjustments */
 @media (max-width: 767px) {
   /* Header adjustments */
@@ -226,11 +270,89 @@
   .mobile-only {
     display: flex !important;
   }
+
+  /* Grid adjustments for mobile */
+  .grid-mobile-1 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .grid-mobile-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Padding adjustments for mobile */
+  .pt-mobile-8 {
+    padding-top: 2rem !important;
+  }
+
+  .pb-mobile-6 {
+    padding-bottom: 1.5rem !important;
+  }
+
+  .px-mobile-4 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Gap adjustments for mobile */
+  .gap-mobile-4 {
+    gap: 1rem !important;
+  }
+
+  .gap-mobile-6 {
+    gap: 1.5rem !important;
+  }
+
+  /* Text size adjustments for mobile */
+  .text-mobile-xs {
+    font-size: 0.75rem !important;
+  }
+
+  .text-mobile-sm {
+    font-size: 0.875rem !important;
+  }
+
+  /* Flex direction adjustments for mobile */
+  .flex-mobile-col {
+    flex-direction: column !important;
+  }
+
+  /* Hide tablet/desktop elements on mobile */
+  .tablet-desktop-hide {
+    display: none !important;
+  }
+
+  /* Show elements only on mobile */
+  .mobile-only-show {
+    display: flex !important;
+  }
 }
 
 /* ============================================
    TABLET BREAKPOINTS (768px - 1024px)
    ============================================ */
+
+/* Show elements on tablet (hidden on mobile/desktop) */
+.tablet-show {
+  display: none;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .tablet-show {
+    display: flex !important;
+  }
+}
+
+/* Hide mobile elements on tablet */
+.mobile-hide-tablet {
+  display: flex;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .mobile-hide-tablet {
+    display: none !important;
+  }
+}
 
 @media (min-width: 768px) and (max-width: 1024px) {
   /* Header adjustments for tablet */
@@ -304,6 +426,326 @@
 
   /* Hide mobile top bar on tablet */
   .mobile-top-bar {
+    display: none !important;
+  }
+
+  /* Grid adjustments for tablet */
+  .grid-tablet-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .grid-tablet-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .grid-tablet-4 {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  /* Padding adjustments for tablet */
+  .pt-tablet-12 {
+    padding-top: 3rem !important;
+  }
+
+  .py-tablet-12 {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+
+  .pt-tablet-20 {
+    padding-top: 5rem !important;
+  }
+
+  .pt-tablet-24 {
+    padding-top: 6rem !important;
+  }
+
+  .pb-tablet-8 {
+    padding-bottom: 2rem !important;
+  }
+
+  .pb-tablet-32 {
+    padding-bottom: 8rem !important;
+  }
+
+  .px-tablet-3 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .px-tablet-5 {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+  }
+
+  .px-tablet-6 {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+
+  .py-tablet-3\.5 {
+    padding-top: 0.875rem !important;
+    padding-bottom: 0.875rem !important;
+  }
+
+  .py-tablet-2 {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+
+  .py-tablet-3 {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  .py-tablet-1\.5 {
+    padding-top: 0.375rem !important;
+    padding-bottom: 0.375rem !important;
+  }
+
+  .py-tablet-2\.5 {
+    padding-top: 0.625rem !important;
+    padding-bottom: 0.625rem !important;
+  }
+
+  .p-tablet-5 {
+    padding: 1.25rem !important;
+  }
+
+  .p-tablet-6 {
+    padding: 1.5rem !important;
+  }
+
+  .pl-tablet-11 {
+    padding-left: 2.75rem !important;
+  }
+
+  .pr-tablet-4 {
+    padding-right: 1rem !important;
+  }
+
+  .p-tablet-\[36px_40px\] {
+    padding: 2.25rem 2.5rem !important;
+  }
+
+  .p-tablet-\[18px_24px\] {
+    padding: 1.125rem 1.5rem !important;
+  }
+
+  /* Gap adjustments for tablet */
+  .gap-tablet-3 {
+    gap: 0.75rem !important;
+  }
+
+  .gap-tablet-4 {
+    gap: 1rem !important;
+  }
+
+  .gap-tablet-6 {
+    gap: 1.5rem !important;
+  }
+
+  .gap-tablet-8 {
+    gap: 2rem !important;
+  }
+
+  .gap-tablet-12 {
+    gap: 3rem !important;
+  }
+
+  .gap-tablet-0 {
+    gap: 0 !important;
+  }
+
+  /* Margin adjustments for tablet */
+  .mt-tablet-3 {
+    margin-top: 0.75rem !important;
+  }
+
+  .mt-tablet-4 {
+    margin-top: 1rem !important;
+  }
+
+  .mt-tablet-8 {
+    margin-top: 2rem !important;
+  }
+
+  .ml-tablet-5 {
+    margin-left: 1.25rem !important;
+  }
+
+  .left-tablet-4 {
+    left: 1rem !important;
+  }
+
+  .mb-tablet-8 {
+    margin-bottom: 2rem !important;
+  }
+
+  .mb-tablet-12 {
+    margin-bottom: 3rem !important;
+  }
+
+  .mb-tablet-10 {
+    margin-bottom: 2.5rem !important;
+  }
+
+  .mb-tablet-28 {
+    margin-bottom: 7rem !important;
+  }
+
+  /* Text size adjustments for tablet */
+  .text-tablet-xs {
+    font-size: 0.75rem !important;
+  }
+
+  .text-tablet-\[9px\] {
+    font-size: 0.5625rem !important;
+  }
+
+  .text-tablet-\[10px\] {
+    font-size: 0.625rem !important;
+  }
+
+  .text-tablet-\[11px\] {
+    font-size: 0.6875rem !important;
+  }
+
+  .text-tablet-11 {
+    font-size: 0.6875rem !important;
+  }
+
+  .text-tablet-sm {
+    font-size: 0.875rem !important;
+  }
+
+  .text-tablet-base {
+    font-size: 1rem !important;
+  }
+
+  .text-tablet-lg {
+    font-size: 1.125rem !important;
+  }
+
+  .text-tablet-2xl {
+    font-size: 1.5rem !important;
+  }
+
+  .text-tablet-3xl {
+    font-size: 1.875rem !important;
+  }
+
+  .text-tablet-4xl {
+    font-size: 2.25rem !important;
+  }
+
+  /* Width/Height adjustments for tablet */
+  .w-tablet-10 {
+    width: 2.5rem !important;
+  }
+
+  .w-tablet-12 {
+    width: 3rem !important;
+  }
+
+  .w-tablet-14 {
+    width: 3.5rem !important;
+  }
+
+  .w-tablet-16 {
+    width: 4rem !important;
+  }
+
+  .w-tablet-32 {
+    width: 8rem !important;
+  }
+
+  .w-tablet-auto {
+    width: auto !important;
+  }
+
+  .h-tablet-10 {
+    height: 2.5rem !important;
+  }
+
+  .h-tablet-12 {
+    height: 3rem !important;
+  }
+
+  .h-tablet-14 {
+    height: 3.5rem !important;
+  }
+
+  .h-tablet-16 {
+    height: 4rem !important;
+  }
+
+  .h-tablet-32 {
+    height: 8rem !important;
+  }
+
+  .h-tablet-400 {
+    height: 25rem !important;
+  }
+
+  .h-tablet-850 {
+    max-height: 53.125rem !important;
+  }
+
+  /* Position adjustments for tablet */
+  .bottom-tablet-8 {
+    bottom: -2rem !important;
+  }
+
+  .right-tablet-8 {
+    right: -2rem !important;
+  }
+
+  /* Background adjustments for tablet */
+  .bg-tablet-60 {
+    background-color: rgba(var(--bg-primary), 0.6) !important;
+  }
+
+  /* Border radius adjustments for tablet */
+  .rounded-tablet-2xl {
+    border-radius: 1rem !important;
+  }
+
+  .rounded-tablet-3xl {
+    border-radius: 1.5rem !important;
+  }
+
+  .rounded-tablet-20 {
+    border-radius: 1.25rem !important;
+  }
+
+  /* Flex direction adjustments for tablet */
+  .flex-tablet-row {
+    flex-direction: row !important;
+  }
+
+  .items-tablet-center {
+    align-items: center !important;
+  }
+
+  .text-tablet-12 {
+    font-size: 0.75rem !important;
+  }
+
+  .text-tablet-14 {
+    font-size: 0.875rem !important;
+  }
+
+  .text-tablet-20 {
+    font-size: 1.25rem !important;
+  }
+
+  .text-tablet-32 {
+    font-size: 2rem !important;
+  }
+
+  /* Hide desktop-only elements on tablet */
+  .desktop-only-tablet {
     display: none !important;
   }
 }

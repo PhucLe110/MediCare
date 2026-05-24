@@ -119,6 +119,7 @@ export default function Dashboard() {
   const [rxs, setRxs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTicketAppt, setSelectedTicketAppt] = useState(null);
+  const [paymentModal, setPaymentModal] = useState(null);
   const navigate = useNavigate();
 
   const fmt = (n) => formatMoney(lang, n);
@@ -244,82 +245,19 @@ export default function Dashboard() {
   ];
 
   return (
-    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 4px" }}>
+    <div className="max-w-6xl mx-auto px-3 md:px-4 lg:px-6">
       {/* ── HERO GREETING ── */}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #1e3a5f 0%, #1a56db 100%)",
-          borderRadius: 20,
-          padding: "24px 20px",
-          marginBottom: 20,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          boxShadow: "0 16px 48px rgba(26,86,219,0.2)",
-          position: "relative",
-          overflow: "hidden",
-          gap: 16,
-        }}
-        className="md:!flex-row md:!items-center md:!padding-[36px_40px] md:!marginBottom-28 md:!gap-0"
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: -40,
-            right: -40,
-            width: 220,
-            height: 220,
-            background: "rgba(255,255,255,0.04)",
-            borderRadius: "50%",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: -60,
-            right: 100,
-            width: 160,
-            height: 160,
-            background: "rgba(255,255,255,0.03)",
-            borderRadius: "50%",
-          }}
-        />
+      <div className="bg-gradient-to-br from-[#1e3a5f] to-[#1a56db] rounded-2xl md:rounded-3xl p-5 md:p-8 lg:p-10 mb-4 md:mb-6 lg:mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6 shadow-2xl shadow-blue-500/20 relative overflow-hidden">
+        <div className="absolute -top-10 -right-10 w-32 h-32 md:w-56 md:h-56 bg-white/5 rounded-full" />
+        <div className="absolute -bottom-16 right-24 w-24 h-24 md:w-40 md:h-40 bg-white/5 rounded-full" />
         <div>
-          <p
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: "rgba(255,255,255,0.6)",
-              textTransform: "uppercase",
-              letterSpacing: "0.18em",
-              marginBottom: 6,
-            }}
-            className="md:!fontSize-12 md:!marginBottom-8"
-          >
+          <p className="text-[10px] md:text-xs font-bold text-white/60 uppercase tracking-wider mb-1.5 md:mb-2">
             {formattedDate}
           </p>
-          <h1
-            style={{
-              fontSize: 24,
-              fontWeight: 900,
-              color: "#fff",
-              letterSpacing: "-0.02em",
-              marginBottom: 8,
-              lineHeight: 1.2,
-            }}
-            className="md:!fontSize-32 md:!marginBottom-10"
-          >
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-black text-white tracking-tight mb-2 md:mb-2.5 leading-tight">
             {t.welcome}, {user?.fullName?.split(" ").slice(-1)[0]} 👋
           </h1>
-          <p
-            style={{
-              fontSize: 13,
-              color: "rgba(255,255,255,0.65)",
-              fontWeight: 500,
-            }}
-            className="md:!fontSize-14"
-          >
+          <p className="text-xs md:text-sm text-white/65 font-medium">
             {upcoming.length > 0
               ? t.upcomingCount(upcoming.length)
               : t.healthyWish}
@@ -328,62 +266,18 @@ export default function Dashboard() {
         {soonAppts.length > 0 && (
           <div
             onClick={() => navigate("/dashboard/booking")}
-            style={{
-              background: "rgba(255,255,255,0.12)",
-              backdropFilter: "blur(12px)",
-              borderRadius: 16,
-              padding: "14px 18px",
-              cursor: "pointer",
-              border: "1px solid rgba(255,255,255,0.2)",
-              flexShrink: 0,
-              width: "100%",
-            }}
-            className="md:!borderRadius-20 md:!padding-[18px_24px] md:!width-auto"
+            className="bg-white/10 backdrop-blur-md rounded-xl md:rounded-2xl p-3.5 md:p-4 lg:p-6 cursor-pointer border border-white/20 flex-shrink-0 w-full md:w-auto hover:bg-white/15 transition-all"
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 4,
-              }}
-            >
-              <div
-                style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: "50%",
-                  background: "#f87171",
-                  animation: "pulse 1s infinite",
-                }}
-              />
-              <p
-                style={{
-                  fontSize: 10,
-                  fontWeight: 800,
-                  color: "#fca5a5",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.1em",
-                }}
-                className="md:!fontSize-11"
-              >
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-2.5 h-2.5 rounded-full bg-red-400 animate-pulse" />
+              <p className="text-[10px] md:text-xs font-black text-red-300 uppercase tracking-wider">
                 {t.apptSoon}
               </p>
             </div>
-            <p
-              style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}
-              className="md:!fontSize-20"
-            >
+            <p className="text-lg md:text-xl font-black text-white">
               {soonAppts[0].time}
             </p>
-            <p
-              style={{
-                fontSize: 11,
-                color: "rgba(255,255,255,0.7)",
-                marginTop: 2,
-              }}
-              className="md:!fontSize-12"
-            >
+            <p className="text-[10px] md:text-xs text-white/70 mt-0.5">
               {getDoctorDisplayName(soonAppts[0].doctor?.userId?.fullName)}
             </p>
           </div>
@@ -391,54 +285,18 @@ export default function Dashboard() {
         {unpaidBills.length > 0 && soonAppts.length === 0 && (
           <div
             onClick={() => navigate("/dashboard/billing")}
-            style={{
-              background: "rgba(255,255,255,0.12)",
-              backdropFilter: "blur(12px)",
-              borderRadius: 16,
-              padding: "14px 18px",
-              cursor: "pointer",
-              border: "1px solid rgba(255,165,0,0.4)",
-              flexShrink: 0,
-              width: "100%",
-            }}
-            className="md:!borderRadius-20 md:!padding-[18px_24px] md:!width-auto"
+            className="bg-white/10 backdrop-blur-md rounded-xl md:rounded-2xl p-3.5 md:p-4 lg:p-6 cursor-pointer border border-orange-400/40 flex-shrink-0 w-full md:w-auto hover:bg-white/15 transition-all"
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                marginBottom: 4,
-              }}
-            >
-              <AlertCircle size={12} color="#fbbf24" className="md:!size-14" />
-              <p
-                style={{
-                  fontSize: 10,
-                  fontWeight: 800,
-                  color: "#fbbf24",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.1em",
-                }}
-                className="md:!fontSize-11"
-              >
+            <div className="flex items-center gap-1.5 mb-1">
+              <AlertCircle size={12} className="text-amber-400" />
+              <p className="text-[10px] md:text-xs font-black text-amber-400 uppercase tracking-wider">
                 {t.unpaidAlert(unpaidBills.length)}
               </p>
             </div>
-            <p
-              style={{ fontSize: 18, fontWeight: 900, color: "#fff" }}
-              className="md:!fontSize-20"
-            >
+            <p className="text-lg md:text-xl font-black text-white">
               {fmt(unpaidBills.reduce((s, b) => s + b.totalAmount, 0))}
             </p>
-            <p
-              style={{
-                fontSize: 11,
-                color: "rgba(255,255,255,0.6)",
-                marginTop: 2,
-              }}
-              className="md:!fontSize-12"
-            >
+            <p className="text-[10px] md:text-xs text-white/60 mt-0.5">
               {t.payNow}
             </p>
           </div>
@@ -446,97 +304,38 @@ export default function Dashboard() {
       </div>
 
       {/* ── STAT CARDS ── */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2,1fr)",
-          gap: 12,
-          marginBottom: 20,
-        }}
-        className="md:!gridTemplateColumns-[repeat(4,1fr)] md:!gap-16 md:!marginBottom-28"
-      >
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 lg:gap-6 mb-4 md:mb-6 lg:mb-8">
         {STATS.map((s) => (
           <div
             key={s.label}
             onClick={() => navigate(s.link)}
-            style={{
-              background: "var(--card-bg)",
-              borderRadius: 20,
-              padding: "20px 22px",
-              border: "1px solid var(--border-color)",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
-              cursor: "pointer",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.08)";
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.borderColor = "var(--text-tertiary)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.03)";
-              e.currentTarget.style.transform = "none";
-              e.currentTarget.style.borderColor = "var(--border-color)";
-            }}
+            className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl p-4 md:p-5 lg:p-6 border border-[var(--border-color)] shadow-sm hover:shadow-lg hover:-translate-y-0.5 hover:border-[var(--text-tertiary)] transition-all cursor-pointer"
           >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                marginBottom: 16,
-              }}
-            >
+            <div className="flex justify-between items-start mb-3 md:mb-4">
               <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 14,
-                  background: s.bg,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border: `1px solid ${s.color}30`,
-                }}
+                className="w-10 h-10 md:w-11 md:h-11 rounded-xl flex items-center justify-center"
+                style={{ background: s.bg, border: `1px solid ${s.color}30` }}
               >
-                <s.icon size={22} style={{ color: s.color }} />
+                <s.icon
+                  size={20}
+                  className="md:size-22"
+                  style={{ color: s.color }}
+                />
               </div>
               <ArrowUpRight
-                size={16}
-                style={{ color: "var(--text-tertiary)", marginTop: 4 }}
+                size={14}
+                className="text-[var(--text-tertiary)] mt-1"
               />
             </div>
-            <p
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: "var(--text-secondary)",
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-                marginBottom: 4,
-              }}
-            >
+            <p className="text-[10px] md:text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1">
               {s.label}
             </p>
             <p
-              style={{
-                fontSize: s.money ? 16 : 28,
-                fontWeight: 900,
-                color: "var(--text-primary)",
-                letterSpacing: "-0.02em",
-                lineHeight: 1,
-              }}
+              className={`font-black text-[var(--text-primary)] tracking-tight leading-none ${s.money ? "text-base md:text-lg" : "text-2xl md:text-3xl"}`}
             >
               {s.value}
             </p>
-            <p
-              style={{
-                fontSize: 11,
-                color: "var(--text-tertiary)",
-                marginTop: 4,
-                fontWeight: 600,
-              }}
-            >
+            <p className="text-[10px] md:text-xs text-[var(--text-tertiary)] mt-1 font-semibold">
               {s.sub}
             </p>
           </div>
@@ -544,152 +343,45 @@ export default function Dashboard() {
       </div>
 
       {/* ── MAIN GRID ── */}
-      <div
-        style={{ display: "grid", gridTemplateColumns: "1fr", gap: 20 }}
-        className="md:!gridTemplateColumns-[1fr_380px]"
-      >
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4 md:gap-5 lg:gap-6">
         {/* Appointments */}
-        <div
-          style={{
-            background: "var(--card-bg)",
-            borderRadius: 24,
-            border: "1px solid var(--border-color)",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "20px 24px",
-              background: "var(--bg-secondary)",
-              borderBottom: "1px solid var(--border-color)",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div
-                style={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: 11,
-                  background: "#dbeafe",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border: "1px solid #bfdbfe",
-                }}
-              >
-                <Calendar size={18} color="#2563eb" />
+        <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm overflow-hidden">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4 md:p-5 lg:p-6 bg-[var(--bg-secondary)] border-b border-[var(--border-color)]">
+            <div className="flex items-center gap-2.5 md:gap-3">
+              <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center border border-blue-200 dark:border-blue-800">
+                <Calendar
+                  size={16}
+                  className="md:size-[18px] text-blue-600 dark:text-blue-400"
+                />
               </div>
-              <h3
-                style={{
-                  fontWeight: 800,
-                  fontSize: 15,
-                  color: "var(--text-primary)",
-                }}
-              >
+              <h3 className="font-extrabold text-sm md:text-base text-[var(--text-primary)]">
                 {t.myAppts}
               </h3>
             </div>
-            <div style={{ display: "flex", gap: 8 }}>
+            <div className="flex gap-2 w-full sm:w-auto">
               <button
                 onClick={() => navigate("/dashboard/history")}
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: "var(--text-secondary)",
-                  background: "var(--bg-tertiary)",
-                  border: "1px solid var(--border-color)",
-                  borderRadius: 8,
-                  padding: "6px 14px",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.background = "var(--border-color)")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.background = "var(--bg-tertiary)")
-                }
+                className="flex-1 sm:flex-none text-[11px] md:text-xs font-bold text-[var(--text-secondary)] bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg px-3 md:px-4 py-1.5 md:py-2 cursor-pointer hover:bg-[var(--border-color)] transition-all"
               >
                 {t.viewAll}
               </button>
               <button
                 onClick={() => navigate("/dashboard/booking")}
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: "#fff",
-                  background: "#2563eb",
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "6px 14px",
-                  cursor: "pointer",
-                  boxShadow: "0 2px 8px rgba(37,99,235,0.3)",
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.background = "#1d4ed8")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.background = "#2563eb")
-                }
+                className="flex-1 sm:flex-none text-[11px] md:text-xs font-bold text-white bg-blue-600 border-none rounded-lg px-3 md:px-4 py-1.5 md:py-2 cursor-pointer shadow-md shadow-blue-500/30 hover:bg-blue-700 transition-all"
               >
                 {t.newAppt}
               </button>
             </div>
           </div>
-          <div
-            style={{
-              maxHeight: 420,
-              overflowY: "auto",
-              overflowX: "hidden",
-              scrollbarWidth: "thin",
-              scrollbarColor: "var(--border-color) transparent",
-            }}
-          >
+          <div className="max-h-[420px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-[var(--border-color)]">
             {loading ? (
-              <div
-                style={{
-                  padding: 40,
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                <div
-                  style={{
-                    width: 32,
-                    height: 32,
-                    border: "3px solid var(--bg-tertiary)",
-                    borderTopColor: "#2563eb",
-                    borderRadius: "50%",
-                    animation: "spin 0.7s linear infinite",
-                  }}
-                />
+              <div className="p-10 flex justify-center">
+                <div className="w-8 h-8 border-3 border-[var(--bg-tertiary)] border-t-blue-600 rounded-full animate-spin" />
               </div>
             ) : appts.length === 0 ? (
-              <div
-                style={{
-                  padding: "60px 24px",
-                  textAlign: "center",
-                  color: "var(--text-tertiary)",
-                }}
-              >
-                <Calendar
-                  size={48}
-                  strokeWidth={1}
-                  style={{ margin: "0 auto 12px" }}
-                />
-                <p
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 700,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.15em",
-                  }}
-                >
+              <div className="p-12 md:p-16 text-center text-[var(--text-tertiary)]">
+                <Calendar size={40} strokeWidth={1} className="mx-auto mb-3" />
+                <p className="text-[11px] md:text-xs font-bold uppercase tracking-widest">
                   {t.noAppt}
                 </p>
               </div>
@@ -703,133 +395,54 @@ export default function Dashboard() {
                   <div
                     key={a._id}
                     onClick={() => navigate(`/dashboard/appointment/${a._id}`)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 16,
-                      padding: "16px 24px",
-                      borderBottom: "1px solid var(--border-color)",
-                      background: isSoon ? "#fff7f7" : "transparent",
-                      transition: "all 0.15s",
-                      cursor: "pointer",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = "var(--bg-secondary)";
-                      e.currentTarget.style.transform = "translateX(6px)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = isSoon
-                        ? "#fff7f7"
-                        : "transparent";
-                      e.currentTarget.style.transform = "none";
-                    }}
+                    className={`flex items-center gap-3 md:gap-4 p-4 md:p-6 border-b border-[var(--border-color)] ${isSoon ? "bg-red-50/50 dark:bg-red-900/10" : ""} hover:bg-[var(--bg-secondary)] hover:translate-x-1 transition-all cursor-pointer`}
                   >
                     <div
+                      className="w-12 h-12 md:w-14 md:h-14 rounded-xl flex flex-col items-center justify-center flex-shrink-0"
                       style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: 15,
                         background: st.bg,
                         border: `1px solid ${st.color}40`,
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
                       }}
                     >
                       <span
-                        style={{
-                          fontSize: 10,
-                          fontWeight: 800,
-                          color: st.color,
-                          lineHeight: 1,
-                          textTransform: "uppercase",
-                        }}
+                        className="text-[10px] font-black leading-none uppercase"
+                        style={{ color: st.color }}
                       >
                         {formattedApptMonth}
                       </span>
                       <span
-                        style={{
-                          fontSize: 18,
-                          fontWeight: 900,
-                          color: st.color,
-                          lineHeight: 1,
-                        }}
+                        className="text-lg md:text-xl font-black leading-none"
+                        style={{ color: st.color }}
                       >
                         {apptDate.getDate()}
                       </span>
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p
-                        style={{
-                          fontWeight: 800,
-                          fontSize: 14,
-                          color: "var(--text-primary)",
-                          lineHeight: 1.3,
-                        }}
-                      >
+                    <div className="flex-1 min-w-0">
+                      <p className="font-extrabold text-sm md:text-base text-[var(--text-primary)] leading-tight truncate">
                         {getDoctorDisplayName(a.doctor?.userId?.fullName)}
                         {isSoon && (
-                          <span
-                            style={{
-                              marginLeft: 8,
-                              fontSize: 10,
-                              background: "#fee2e2",
-                              color: "#dc2626",
-                              padding: "2px 8px",
-                              borderRadius: 999,
-                              fontWeight: 800,
-                            }}
-                          >
+                          <span className="ml-2 text-[10px] bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full font-black">
                             {t.soon}
                           </span>
                         )}
                       </p>
-                      <p
-                        style={{
-                          fontSize: 12,
-                          color: "var(--text-secondary)",
-                          marginTop: 3,
-                          fontWeight: 600,
-                        }}
-                      >
+                      <p className="text-xs md:text-sm text-[var(--text-secondary)] mt-1 font-semibold truncate">
                         {getLocalizedDept(a.doctor?.department) || t.genDept} •{" "}
                         {a.time}
                       </p>
                     </div>
-                    <div
-                      style={{ display: "flex", gap: 8, alignItems: "center" }}
-                    >
+                    <div className="flex gap-2 items-center">
                       {a.status !== "completed" && a.status !== "cancelled" && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedTicketAppt(a);
+                            if (a.paymentStatus === "paid") {
+                              setSelectedTicketAppt(a);
+                            } else {
+                              setPaymentModal(a);
+                            }
                           }}
-                          style={{
-                            fontSize: 11,
-                            fontWeight: 900,
-                            color: "#ea580c",
-                            background: "#ffedd5",
-                            border: "1px solid #fed7aa",
-                            padding: "5px 12px",
-                            borderRadius: 999,
-                            whiteSpace: "nowrap",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: 6,
-                            cursor: "pointer",
-                            transition: "all 0.15s",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = "#f97316";
-                            e.currentTarget.style.color = "#fff";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = "#ffedd5";
-                            e.currentTarget.style.color = "#ea580c";
-                          }}
+                          className="text-[11px] font-black text-orange-600 bg-orange-100 border border-orange-200 px-3 py-1.5 rounded-full whitespace-nowrap inline-flex items-center gap-1.5 cursor-pointer hover:bg-orange-500 hover:text-white transition-all"
                         >
                           <svg
                             width="12"
@@ -840,7 +453,7 @@ export default function Dashboard() {
                             strokeWidth="2.5"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            style={{ flexShrink: 0 }}
+                            className="flex-shrink-0"
                           >
                             <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
                             <polyline points="14 2 14 8 20 8" />
@@ -850,15 +463,8 @@ export default function Dashboard() {
                         </button>
                       )}
                       <span
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 800,
-                          color: st.color,
-                          background: st.bg,
-                          padding: "5px 12px",
-                          borderRadius: 999,
-                          whiteSpace: "nowrap",
-                        }}
+                        className="text-[11px] font-black px-3 py-1.5 rounded-full whitespace-nowrap"
+                        style={{ color: st.color, background: st.bg }}
                       >
                         {st.label}
                       </span>
@@ -871,33 +477,17 @@ export default function Dashboard() {
         </div>
 
         {/* Banner Image */}
-        <div
-          style={{
-            borderRadius: 24,
-            overflow: "hidden",
-            border: "1px solid var(--border-color)",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
-            maxHeight: 480,
-          }}
-        >
+        <div className="rounded-2xl md:rounded-3xl overflow-hidden border border-[var(--border-color)] shadow-sm max-h-[480px] hidden lg:block">
           <img
             src="https://i.pinimg.com/736x/2c/8a/90/2c8a9004feae986bbc7282ba4aa8cda2.jpg"
             alt="Promo"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            className="w-full h-full object-cover"
           />
         </div>
       </div>
 
       {/* ── QUICK ACTIONS ── */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2,1fr)",
-          gap: 12,
-          marginTop: 20,
-        }}
-        className="md:!gridTemplateColumns-[repeat(4,1fr)] md:!gap-14"
-      >
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 lg:gap-6 mt-4 md:mt-5 lg:mt-6">
         {[
           {
             label: t.booking,
@@ -931,51 +521,19 @@ export default function Dashboard() {
           <div
             key={q.label}
             onClick={() => navigate(q.link)}
-            style={{
-              background: "var(--card-bg)",
-              borderRadius: 18,
-              padding: "18px 20px",
-              border: "1px solid var(--border-color)",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: 14,
-              transition: "all 0.2s",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,0.06)";
-              e.currentTarget.style.transform = "translateY(-1px)";
-              e.currentTarget.style.borderColor = "var(--text-tertiary)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.02)";
-              e.currentTarget.style.transform = "none";
-              e.currentTarget.style.borderColor = "var(--border-color)";
-            }}
+            className="bg-[var(--card-bg)] rounded-xl md:rounded-2xl p-4 md:p-5 border border-[var(--border-color)] cursor-pointer flex items-center gap-3 md:gap-4 transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-[var(--text-tertiary)]"
           >
             <div
-              style={{
-                width: 42,
-                height: 42,
-                borderRadius: 13,
-                background: q.bg,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-                border: `1px solid ${q.color}30`,
-              }}
+              className="w-10 h-10 md:w-11 md:h-11 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{ background: q.bg, border: `1px solid ${q.color}30` }}
             >
-              <q.icon size={20} style={{ color: q.color }} />
+              <q.icon
+                size={18}
+                className="md:size-20"
+                style={{ color: q.color }}
+              />
             </div>
-            <p
-              style={{
-                fontWeight: 800,
-                fontSize: 13,
-                color: "var(--text-primary)",
-              }}
-            >
+            <p className="font-extrabold text-xs md:text-sm text-[var(--text-primary)]">
               {q.label}
             </p>
           </div>
@@ -1001,254 +559,84 @@ export default function Dashboard() {
             padding: 16,
           }}
         >
-          <div
-            style={{
-              background: "var(--card-bg)",
-              borderRadius: 32,
-              width: "100%",
-              maxWidth: 400,
-              overflow: "hidden",
-              boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
-              border: "1px solid var(--border-color)",
-              fontFamily: "Inter, system-ui, sans-serif",
-            }}
-          >
+          <div className="bg-[var(--card-bg)] rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-[var(--border-color)]">
             {/* Ticket Header with Colorful Project Logo */}
-            <div
-              style={{
-                padding: "24px 24px 16px",
-                borderBottom: "1px dashed var(--border-color)",
-                textAlign: "center",
-                position: "relative",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  marginBottom: 12,
-                }}
-              >
+            <div className="p-6 md:p-8 border-b border-dashed border-[var(--border-color)] text-center relative">
+              <div className="flex justify-center mb-3">
                 <img
                   src="/LOGO.png"
                   alt="MediCare"
-                  style={{ height: 36, width: "auto", objectFit: "contain" }}
+                  className="h-8 md:h-9 w-auto object-contain"
                 />
               </div>
-              <h3
-                style={{
-                  fontSize: 18,
-                  fontWeight: 900,
-                  letterSpacing: "-0.02em",
-                  margin: "8px 0 0",
-                  color: "var(--text-primary)",
-                }}
-              >
+              <h3 className="text-lg md:text-xl font-black tracking-tight text-[var(--text-primary)] mt-2">
                 {t.ticketTitle}
               </h3>
-              <p
-                style={{
-                  fontSize: 11,
-                  color: "var(--text-secondary)",
-                  marginTop: 4,
-                  fontWeight: 600,
-                  margin: "4px 0 0",
-                }}
-              >
+              <p className="text-[11px] md:text-xs text-[var(--text-secondary)] mt-1 font-semibold">
                 {t.ticketSubtitle}
               </p>
 
               {/* Left/Right ticket notches */}
-              <div
-                style={{
-                  position: "absolute",
-                  left: -8,
-                  bottom: -8,
-                  width: 16,
-                  height: 16,
-                  borderRadius: "50%",
-                  background: "rgba(0,0,0,0.6)",
-                  zIndex: 10,
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  right: -8,
-                  bottom: -8,
-                  width: 16,
-                  height: 16,
-                  borderRadius: "50%",
-                  background: "rgba(0,0,0,0.6)",
-                  zIndex: 10,
-                }}
-              />
+              <div className="absolute -left-2 -bottom-2 w-4 h-4 rounded-full bg-black/60 z-10" />
+              <div className="absolute -right-2 -bottom-2 w-4 h-4 rounded-full bg-black/60 z-10" />
             </div>
 
             {/* Ticket Body */}
-            <div style={{ padding: 24 }}>
+            <div className="p-6 md:p-8">
               {/* Big Queue Number */}
-              <div
-                style={{
-                  background: "#f0f7ff",
-                  border: "1px solid #e0f2fe",
-                  borderRadius: 16,
-                  padding: "16px 0",
-                  textAlign: "center",
-                  marginBottom: 24,
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 800,
-                    color: "#3b82f6",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    margin: "0 0 6px",
-                  }}
-                >
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-4 text-center mb-6">
+                <p className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1.5">
                   {t.yourQueue}
                 </p>
-                <div
-                  style={{
-                    display: "inline-flex",
-                    width: 88,
-                    height: 88,
-                    borderRadius: "50%",
-                    background:
-                      "linear-gradient(135deg, #102a63 0%, #2563eb 100%)",
-                    color: "#fff",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: 900,
-                    fontSize: 32,
-                    boxShadow: "0 10px 15px -3px rgba(59, 130, 246, 0.3)",
-                    margin: "8px 0",
-                  }}
-                >
+                <div className="inline-flex w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-[#102a63] to-blue-600 text-white items-center justify-center font-black text-3xl md:text-4xl shadow-lg shadow-blue-500/30 my-2">
                   #{selectedTicketAppt.queueNumber || "01"}
                 </div>
-                <p
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 700,
-                    margin: "6px 0 0",
-                    color: "var(--text-secondary)",
-                  }}
-                >
+                <p className="text-[10px] font-bold text-[var(--text-secondary)] mt-1.5">
                   {t.watchMonitor}
                 </p>
               </div>
 
               {/* Ticket Details */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 12,
-                  fontSize: 13,
-                  color: "var(--text-primary)",
-                  fontWeight: 600,
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    borderBottom: "1px solid var(--border-color)",
-                    paddingBottom: 8,
-                  }}
-                >
-                  <span
-                    style={{ color: "var(--text-tertiary)", fontWeight: 700 }}
-                  >
+              <div className="flex flex-col gap-3 text-xs md:text-sm font-semibold text-[var(--text-primary)]">
+                <div className="flex justify-between border-b border-[var(--border-color)] pb-2">
+                  <span className="font-bold text-[var(--text-tertiary)]">
                     {t.ticketId}
                   </span>
-                  <span
-                    style={{
-                      fontFamily: "monospace",
-                      fontWeight: 900,
-                      color: "var(--text-primary)",
-                      fontSize: 14,
-                    }}
-                  >
+                  <span className="font-mono font-black text-[var(--text-primary)] text-sm">
                     {selectedTicketAppt.ticketNumber}
                   </span>
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    borderBottom: "1px solid var(--border-color)",
-                    paddingBottom: 8,
-                  }}
-                >
-                  <span
-                    style={{ color: "var(--text-tertiary)", fontWeight: 700 }}
-                  >
+                <div className="flex justify-between border-b border-[var(--border-color)] pb-2">
+                  <span className="font-bold text-[var(--text-tertiary)]">
                     {t.patient}
                   </span>
-                  <span
-                    style={{ fontWeight: 800, color: "var(--text-primary)" }}
-                  >
+                  <span className="font-extrabold text-[var(--text-primary)]">
                     {user?.fullName}
                   </span>
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    borderBottom: "1px solid var(--border-color)",
-                    paddingBottom: 8,
-                  }}
-                >
-                  <span
-                    style={{ color: "var(--text-tertiary)", fontWeight: 700 }}
-                  >
+                <div className="flex justify-between border-b border-[var(--border-color)] pb-2">
+                  <span className="font-bold text-[var(--text-tertiary)]">
                     {t.physician}
                   </span>
-                  <span style={{ fontWeight: 800, color: "#102a63" }}>
+                  <span className="font-extrabold text-[#102a63]">
                     {getDoctorDisplayName(
                       selectedTicketAppt.doctor?.userId?.fullName,
                     )}
                   </span>
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    borderBottom: "1px solid var(--border-color)",
-                    paddingBottom: 8,
-                  }}
-                >
-                  <span
-                    style={{ color: "var(--text-tertiary)", fontWeight: 700 }}
-                  >
+                <div className="flex justify-between border-b border-[var(--border-color)] pb-2">
+                  <span className="font-bold text-[var(--text-tertiary)]">
                     {t.department}
                   </span>
-                  <span
-                    style={{ fontWeight: 800, color: "var(--text-primary)" }}
-                  >
+                  <span className="font-extrabold text-[var(--text-primary)]">
                     {getLocalizedDept(selectedTicketAppt.doctor?.department)}
                   </span>
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    borderBottom: "1px solid var(--border-color)",
-                    paddingBottom: 8,
-                  }}
-                >
-                  <span
-                    style={{ color: "var(--text-tertiary)", fontWeight: 700 }}
-                  >
+                <div className="flex justify-between border-b border-[var(--border-color)] pb-2">
+                  <span className="font-bold text-[var(--text-tertiary)]">
                     {t.schedule}
                   </span>
-                  <span
-                    style={{ fontWeight: 800, color: "var(--text-primary)" }}
-                  >
+                  <span className="font-extrabold text-[var(--text-primary)]">
                     {selectedTicketAppt.time} •{" "}
                     {formatDate(lang, selectedTicketAppt.date)}
                   </span>
@@ -1256,16 +644,8 @@ export default function Dashboard() {
               </div>
 
               {/* Dummy Barcode using high-tech SVGs */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  paddingTop: 20,
-                }}
-              >
-                <svg style={{ width: 256, height: 48 }} overflow="visible">
+              <div className="flex flex-col items-center justify-center pt-5">
+                <svg className="w-64 h-12" overflow="visible">
                   {[...Array(32)].map((_, i) => (
                     <rect
                       key={i}
@@ -1277,66 +657,63 @@ export default function Dashboard() {
                     />
                   ))}
                 </svg>
-                <p
-                  style={{
-                    fontSize: 9,
-                    color: "var(--text-tertiary)",
-                    fontFamily: "monospace",
-                    margin: "8px 0 0",
-                    letterSpacing: "0.15em",
-                  }}
-                >
+                <p className="text-[9px] text-[var(--text-tertiary)] font-mono tracking-widest mt-2">
                   {selectedTicketAppt._id}
                 </p>
               </div>
             </div>
 
             {/* Ticket Footer Buttons */}
-            <div
-              style={{
-                background: "var(--bg-secondary)",
-                padding: "16px 24px",
-                display: "flex",
-                gap: 12,
-                borderTop: "1px solid var(--border-color)",
-              }}
-            >
+            <div className="bg-[var(--bg-secondary)] p-4 md:p-6 flex gap-3 border-t border-[var(--border-color)]">
               <button
                 onClick={() => window.print()}
-                style={{
-                  flex: 1,
-                  padding: "10px 0",
-                  background: "#102a63",
-                  color: "#fff",
-                  fontSize: 12,
-                  fontWeight: 700,
-                  borderRadius: 12,
-                  border: "none",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 6,
-                  boxShadow: "0 4px 6px -1px rgba(16, 42, 99, 0.2)",
-                }}
+                className="flex-1 py-2.5 md:py-3 bg-[#102a63] text-white text-xs md:text-sm font-bold rounded-xl border-none cursor-pointer flex items-center justify-center gap-1.5 md:gap-2 shadow-md shadow-[#102a63]/20"
               >
                 <Printer size={14} />
                 {t.printTicket}
               </button>
               <button
                 onClick={() => setSelectedTicketAppt(null)}
-                style={{
-                  padding: "10px 16px",
-                  background: "#e2e8f0",
-                  color: "#475569",
-                  fontSize: 12,
-                  fontWeight: 700,
-                  borderRadius: 12,
-                  border: "none",
-                  cursor: "pointer",
-                }}
+                className="px-4 md:px-5 py-2.5 md:py-3 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs md:text-sm font-bold rounded-xl border-none cursor-pointer"
               >
                 {t.close}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Required Modal */}
+      {paymentModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl w-full max-w-md p-6 md:p-8 shadow-2xl border border-[var(--border-color)]">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/30 mb-4">
+              <CreditCard
+                size={32}
+                className="text-amber-600 dark:text-amber-400"
+              />
+            </div>
+            <h3 className="text-lg md:text-xl font-black text-[var(--text-primary)] mb-2 text-center">
+              Cần thanh toán phí khám
+            </h3>
+            <p className="text-sm md:text-base text-[var(--text-secondary)] mb-5 text-center leading-relaxed">
+              Vui lòng thanh toán phí khám trước khi xem phiếu STT.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPaymentModal(null)}
+                className="flex-1 px-4 py-3 bg-[var(--bg-tertiary)] text-[var(--text-secondary)] text-sm font-bold rounded-xl border border-[var(--border-color)] cursor-pointer"
+              >
+                Đóng
+              </button>
+              <button
+                onClick={() => {
+                  setPaymentModal(null);
+                  navigate("/dashboard/billing");
+                }}
+                className="flex-1 px-4 py-3 bg-orange-600 text-white text-sm font-bold rounded-xl border-none cursor-pointer hover:bg-orange-700 transition-colors"
+              >
+                Thanh toán ngay
               </button>
             </div>
           </div>

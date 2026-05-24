@@ -106,11 +106,7 @@ const Prescriptions = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-8 gap-3 md:gap-4">
         <div>
           <h1 className="text-xl md:text-3xl font-bold text-[var(--text-primary)] flex items-center gap-2 md:gap-3">
-            <Pill
-              className="text-primary animate-bounce-slow"
-              size={20}
-              md={32}
-            />
+            <Pill className="text-primary animate-bounce-slow" size={32} />
             {t.title}
           </h1>
           <p className="text-xs md:text-sm text-[var(--text-secondary)] mt-1 md:mt-2">
@@ -126,7 +122,7 @@ const Prescriptions = () => {
       ) : prescriptions.length === 0 ? (
         <div className="bg-[var(--card-bg)] rounded-2xl md:rounded-3xl p-6 md:p-12 text-center border border-[var(--border-color)] shadow-sm">
           <div className="w-16 h-16 md:w-20 md:h-20 bg-[var(--bg-tertiary)] rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
-            <Pill size={28} md={40} className="text-[var(--text-tertiary)]" />
+            <Pill size={40} className="text-[var(--text-tertiary)]" />
           </div>
           <h3 className="text-base md:text-xl font-bold text-[var(--text-secondary)]">
             {t.noPrescription}
@@ -158,8 +154,7 @@ const Prescriptions = () => {
                       {formatDate(lang, prescription.createdAt)}
                     </span>
                     <ChevronRight
-                      size={12}
-                      md={16}
+                      size={16}
                       className={
                         selectedPrescription?._id === prescription._id
                           ? "text-primary"
@@ -188,7 +183,7 @@ const Prescriptions = () => {
                   <div className="flex flex-col md:flex-row justify-between items-start gap-3 md:gap-4 relative z-10">
                     <div>
                       <div className="flex items-center gap-1.5 md:gap-2 text-white/80 text-xs md:text-sm mb-1 md:mb-2">
-                        <Clock size={10} md={14} />
+                        <Clock size={14} />
                         {t.datePrescribed}{" "}
                         {formatDateTime(lang, selectedPrescription.createdAt)}
                       </div>
@@ -201,7 +196,7 @@ const Prescriptions = () => {
                       </p>
                     </div>
                     <button className="bg-white/20 hover:bg-white/30 backdrop-blur-sm p-2 md:p-3 rounded-lg md:rounded-xl transition-all flex items-center gap-1.5 md:gap-2 text-[10px] md:text-sm font-bold border border-white/20">
-                      <Download size={14} md={18} /> {t.downloadPdf}
+                      <Download size={18} /> {t.downloadPdf}
                     </button>
                   </div>
                 </div>
@@ -211,7 +206,7 @@ const Prescriptions = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mb-6 md:mb-10 pb-6 md:pb-10 border-b border-[var(--border-color)]">
                     <div className="space-y-2 md:space-y-4">
                       <h4 className="text-[10px] md:text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-wider flex items-center gap-1.5 md:gap-2">
-                        <User size={10} md={14} /> {t.doctorTitle}
+                        <User size={14} /> {t.doctorTitle}
                       </h4>
                       <p className="text-sm md:text-lg font-bold text-[var(--text-primary)]">
                         {getDoctorDisplayName(
@@ -226,7 +221,7 @@ const Prescriptions = () => {
                     </div>
                     <div className="space-y-2 md:space-y-4">
                       <h4 className="text-[10px] md:text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-wider flex items-center gap-1.5 md:gap-2">
-                        <Activity size={10} md={14} /> {t.diagnosis}
+                        <Activity size={14} /> {t.diagnosis}
                       </h4>
                       <div className="p-3 md:p-4 bg-[var(--bg-tertiary)] rounded-xl md:rounded-2xl border border-[var(--border-color)]">
                         <p className="text-xs md:text-sm text-[var(--text-primary)] font-semibold">
@@ -239,7 +234,7 @@ const Prescriptions = () => {
                   {/* Medicines Table */}
                   <div className="mb-6 md:mb-10">
                     <h4 className="text-[10px] md:text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-wider mb-2 md:mb-4 flex items-center gap-1.5 md:gap-2">
-                      <Pill size={10} md={14} /> {t.medicinesList} (
+                      <Pill size={14} /> {t.medicinesList} (
                       {selectedPrescription.medicines?.length || 0})
                     </h4>
                     <div className="overflow-x-auto rounded-xl md:rounded-2xl border border-[var(--border-color)]">
@@ -291,7 +286,7 @@ const Prescriptions = () => {
                   {selectedPrescription.doctorNotes && (
                     <div className="bg-yellow-50/50 dark:bg-yellow-900/20 rounded-xl md:rounded-2xl p-4 md:p-6 border border-yellow-100 dark:border-yellow-900/30 mb-4 md:mb-8">
                       <h4 className="text-xs md:text-sm font-bold text-yellow-700 dark:text-yellow-500 mb-1 md:mb-2 flex items-center gap-1.5 md:gap-2">
-                        <FileText size={12} md={16} /> {t.doctorAdvice}
+                        <FileText size={16} /> {t.doctorAdvice}
                       </h4>
                       <p className="text-xs md:text-sm text-[var(--text-primary)] leading-relaxed italic">
                         {selectedPrescription.doctorNotes}

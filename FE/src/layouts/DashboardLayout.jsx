@@ -317,7 +317,7 @@ const DashboardLayout = () => {
       {/* Main Content */}
       <main className="flex-1 ml-64 p-4 md:p-8 bg-[var(--bg-primary)] main-content-mobile">
         {/* Mobile Top Bar */}
-        <div className="mobile-top-bar md:hidden mb-4">
+        <div className="mobile-top-bar desktop-hide md:hidden mb-4">
           <button
             className="hamburger-button"
             onClick={() => setSidebarOpen(true)}

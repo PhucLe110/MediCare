@@ -168,8 +168,7 @@ export default function Doctors() {
             <div className="relative">
               <Search
                 className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
-                size={14}
-                md={18}
+                size={18}
               />
               <input
                 type="text"
@@ -183,7 +182,7 @@ export default function Doctors() {
               onClick={() => setShowFilter(!showFilter)}
               className={`px-3 md:px-6 py-2 md:py-4 rounded-xl md:rounded-2xl transition-colors flex items-center justify-center ${showFilter ? "bg-[#102A63] text-white shadow-lg" : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--border-color)]"}`}
             >
-              <Filter size={16} md={20} />
+              <Filter size={20} />
             </button>
 
             {/* Filter Panel */}
@@ -312,8 +311,7 @@ export default function Doctors() {
               ))}
             </select>
             <ChevronRight
-              size={10}
-              md={14}
+              size={14}
               className={`absolute right-3 md:right-4 top-1/2 -translate-y-1/2 rotate-90 pointer-events-none ${activeTab !== "Tất cả" ? "text-white" : "text-[var(--text-tertiary)]"}`}
             />
           </div>
@@ -436,7 +434,7 @@ export default function Doctors() {
           <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12 text-center">
             <div>
               <div className="w-12 h-12 md:w-16 md:h-16 mx-auto bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-6">
-                <Users size={20} md={32} className="text-blue-200" />
+                <Users size={32} className="text-blue-200" />
               </div>
               <h4 className="text-3xl md:text-5xl font-black mb-1 md:mb-2">
                 {t.statTitle1}
@@ -447,7 +445,7 @@ export default function Doctors() {
             </div>
             <div>
               <div className="w-12 h-12 md:w-16 md:h-16 mx-auto bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-6">
-                <Award size={20} md={32} className="text-blue-200" />
+                <Award size={32} className="text-blue-200" />
               </div>
               <h4 className="text-3xl md:text-5xl font-black mb-1 md:mb-2">
                 {t.statTitle2}
@@ -458,7 +456,7 @@ export default function Doctors() {
             </div>
             <div>
               <div className="w-12 h-12 md:w-16 md:h-16 mx-auto bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-6">
-                <Activity size={20} md={32} className="text-blue-200" />
+                <Activity size={32} className="text-blue-200" />
               </div>
               <h4 className="text-3xl md:text-5xl font-black mb-1 md:mb-2">
                 {t.statTitle3}

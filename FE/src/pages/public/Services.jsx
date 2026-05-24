@@ -316,8 +316,7 @@ export default function Services() {
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-20">
           <div className="inline-flex items-center gap-2 px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-900/30 text-indigo-600 dark:text-indigo-400 mb-3 md:mb-4 shadow-sm animate-fade-in">
             <Heart
-              size={12}
-              md={14}
+              size={14}
               className="fill-indigo-600 dark:fill-indigo-400 animate-pulse"
             />
             <span className="text-[10px] md:text-[11px] font-black uppercase tracking-wider">
@@ -385,10 +384,10 @@ export default function Services() {
                   className="mt-auto flex items-center justify-between border-t border-[var(--border-color)] pt-3 md:pt-5 w-full text-left"
                 >
                   <span className="text-[10px] md:text-xs font-black text-[var(--text-tertiary)] group-hover:text-primary transition-colors uppercase tracking-[0.12em] flex items-center gap-1.5 md:gap-2">
-                    <Calendar size={12} md={14} /> {t.btnBook}
+                    <Calendar size={14} /> {t.btnBook}
                   </span>
                   <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center text-[var(--text-tertiary)] group-hover:bg-primary group-hover:text-white transition-all group-hover:translate-x-1 shadow-sm">
-                    <ChevronRight size={14} md={18} />
+                    <ChevronRight size={18} />
                   </div>
                 </button>
               </div>

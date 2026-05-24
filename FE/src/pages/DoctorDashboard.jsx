@@ -685,55 +685,55 @@ const DoctorDashboard = () => {
             };
             fetchData();
           }}
-          className="flex items-center gap-2 px-4 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-primary font-extrabold text-xs md:text-sm border border-blue-100 dark:border-blue-900/30 hover:bg-primary hover:text-white transition-all shadow-sm"
+          className="flex items-center gap-2 px-4 md:px-5 lg:px-5 py-2 md:py-3 lg:py-3 rounded-xl md:rounded-2xl lg:rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-primary font-extrabold text-xs md:text-sm lg:text-sm border border-blue-100 dark:border-blue-900/30 hover:bg-primary hover:text-white transition-all shadow-sm"
         >
           <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-          <span className="hidden md:inline">{t.refresh}</span>
+          <span className="hidden md:hidden lg:inline">{t.refresh}</span>
         </button>
       </div>
 
       {/* Profile Metrics Deck */}
       {profileData && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-6">
           {/* Card 1: Doctor profile */}
-          <div className="bg-gradient-to-br from-blue-900 to-indigo-950 text-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-lg shadow-indigo-900/10 border border-white/10 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 bg-white/5 rounded-full transform translate-x-8 -translate-y-8" />
-            <p className="text-[10px] md:text-[11px] font-black text-blue-200 uppercase tracking-widest">
+          <div className="bg-gradient-to-br from-blue-900 to-indigo-950 text-white p-4 md:p-6 lg:p-6 rounded-2xl md:rounded-3xl lg:rounded-3xl shadow-lg shadow-indigo-900/10 border border-white/10 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 lg:w-32 lg:h-32 bg-white/5 rounded-full transform translate-x-8 -translate-y-8" />
+            <p className="text-[10px] md:text-[11px] lg:text-[11px] font-black text-blue-200 uppercase tracking-widest">
               {t.physicianLabel}
             </p>
-            <h3 className="text-lg md:text-2xl font-black mt-2">
+            <h3 className="text-lg md:text-2xl lg:text-2xl font-black mt-2">
               {profileData.profile?.userId?.fullName}
             </h3>
-            <p className="text-[10px] md:text-xs text-blue-300 font-bold mt-1">
+            <p className="text-[10px] md:text-xs lg:text-xs text-blue-300 font-bold mt-1">
               {profileData.profile?.specialty} •{" "}
               {profileData.profile?.department}
             </p>
           </div>
 
           {/* Card 2: Tổng ca — split Hôm nay / Trong tháng */}
-          <div className="bg-[var(--card-bg)] p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-[var(--border-color)] hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
-              <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-primary flex items-center justify-center border border-blue-100 dark:border-blue-900/30">
+          <div className="bg-[var(--card-bg)] p-4 md:p-6 lg:p-6 rounded-2xl md:rounded-3xl lg:rounded-3xl shadow-sm border border-[var(--border-color)] hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-2 md:gap-3 lg:gap-3 mb-3 md:mb-4 lg:mb-4">
+              <div className="w-8 h-8 md:w-10 md:h-10 lg:w-10 lg:h-10 rounded-xl md:rounded-2xl lg:rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-primary flex items-center justify-center border border-blue-100 dark:border-blue-900/30">
                 <Calendar size={16} />
               </div>
-              <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-extrabold uppercase tracking-wide">
+              <p className="text-[10px] md:text-xs lg:text-xs text-[var(--text-secondary)] font-extrabold uppercase tracking-wide">
                 {t.totalAppts}
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-2 md:gap-3">
-              <div className="bg-blue-50/70 dark:bg-blue-900/30 rounded-xl md:rounded-2xl p-2 md:p-3 text-center border border-blue-100 dark:border-blue-900/30">
-                <h3 className="text-xl md:text-2xl font-black text-[var(--text-primary)]">
+            <div className="grid grid-cols-2 gap-2 md:gap-3 lg:gap-3">
+              <div className="bg-blue-50/70 dark:bg-blue-900/30 rounded-xl md:rounded-2xl lg:rounded-2xl p-2 md:p-3 lg:p-3 text-center border border-blue-100 dark:border-blue-900/30">
+                <h3 className="text-xl md:text-2xl lg:text-2xl font-black text-[var(--text-primary)]">
                   {todayApptsCount}
                 </h3>
-                <p className="text-[9px] md:text-[10px] font-black text-blue-500 dark:text-blue-400 uppercase tracking-wider mt-0.5">
+                <p className="text-[9px] md:text-[10px] lg:text-[10px] font-black text-blue-500 dark:text-blue-400 uppercase tracking-wider mt-0.5">
                   {t.today}
                 </p>
               </div>
-              <div className="bg-indigo-50/70 dark:bg-indigo-900/30 rounded-xl md:rounded-2xl p-2 md:p-3 text-center border border-indigo-100 dark:border-indigo-900/30">
-                <h3 className="text-xl md:text-2xl font-black text-[var(--text-primary)]">
+              <div className="bg-indigo-50/70 dark:bg-indigo-900/30 rounded-xl md:rounded-2xl lg:rounded-2xl p-2 md:p-3 lg:p-3 text-center border border-indigo-100 dark:border-indigo-900/30">
+                <h3 className="text-xl md:text-2xl lg:text-2xl font-black text-[var(--text-primary)]">
                   {monthApptsCount}
                 </h3>
-                <p className="text-[9px] md:text-[10px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-wider mt-0.5">
+                <p className="text-[9px] md:text-[10px] lg:text-[10px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-wider mt-0.5">
                   {t.thisMonth}
                 </p>
               </div>
@@ -741,18 +741,18 @@ const DoctorDashboard = () => {
           </div>
 
           {/* Card 3: Tái khám trong tháng */}
-          <div className="bg-[var(--card-bg)] p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-[var(--border-color)] flex items-center gap-3 md:gap-4 hover:shadow-md transition-shadow">
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-100 dark:border-amber-900/30">
+          <div className="bg-[var(--card-bg)] p-4 md:p-6 lg:p-6 rounded-2xl md:rounded-3xl lg:rounded-3xl shadow-sm border border-[var(--border-color)] flex items-center gap-3 md:gap-4 lg:gap-4 hover:shadow-md transition-shadow">
+            <div className="w-10 h-10 md:w-12 md:h-12 lg:w-12 lg:h-12 rounded-xl md:rounded-2xl lg:rounded-2xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-100 dark:border-amber-900/30">
               <RefreshCw size={18} />
             </div>
             <div>
-              <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-extrabold uppercase tracking-wide">
+              <p className="text-[10px] md:text-xs lg:text-xs text-[var(--text-secondary)] font-extrabold uppercase tracking-wide">
                 {t.followUpMonthTitle}
               </p>
-              <h3 className="text-xl md:text-2xl font-black text-[var(--text-primary)] mt-1">
+              <h3 className="text-xl md:text-2xl lg:text-2xl font-black text-[var(--text-primary)] mt-1">
                 {monthFollowUpCount}
               </h3>
-              <p className="text-[9px] md:text-[10px] text-[var(--text-tertiary)] font-bold mt-0.5">
+              <p className="text-[9px] md:text-[10px] lg:text-[10px] text-[var(--text-tertiary)] font-bold mt-0.5">
                 {t.followUpMonthSub}
               </p>
             </div>
@@ -761,17 +761,17 @@ const DoctorDashboard = () => {
       )}
 
       {/* Main Attending Panel */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 lg:gap-8">
         {/* Left column: Registry & Patient cards */}
-        <div className="lg:col-span-5 bg-[var(--card-bg)] rounded-2xl md:rounded-3xl border border-[var(--border-color)] shadow-sm overflow-hidden flex flex-col max-h-[700px] md:max-h-[850px]">
-          <div className="p-4 md:p-6 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">
-            <h2 className="text-base md:text-lg font-black text-[var(--text-primary)] uppercase tracking-tight flex items-center gap-2">
+        <div className="lg:col-span-5 bg-[var(--card-bg)] rounded-2xl md:rounded-3xl lg:rounded-3xl border border-[var(--border-color)] shadow-sm overflow-hidden flex flex-col max-h-[700px] md:max-h-[850px] lg:max-h-[850px]">
+          <div className="p-4 md:p-6 lg:p-6 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">
+            <h2 className="text-base md:text-lg lg:text-lg font-black text-[var(--text-primary)] uppercase tracking-tight flex items-center gap-2">
               <Users size={14} className="text-primary" />
               {t.patientList}
             </h2>
 
             {/* Filter Tabs */}
-            <div className="flex gap-1 bg-[var(--bg-tertiary)] p-1 rounded-xl mt-3 md:mt-4">
+            <div className="flex gap-1 bg-[var(--bg-tertiary)] p-1 rounded-xl mt-3 md:mt-4 lg:mt-4">
               {[
                 {
                   id: "confirmed",
@@ -796,7 +796,7 @@ const DoctorDashboard = () => {
                     setSelectedAppt(null);
                     setWaitingFilter("today");
                   }}
-                  className={`flex-1 py-1.5 md:py-2 text-[10px] md:text-xs font-bold rounded-lg transition-all ${
+                  className={`flex-1 py-1.5 md:py-2 lg:py-2 text-[10px] md:text-xs lg:text-xs font-bold rounded-lg transition-all ${
                     activeTab === tab.id
                       ? tab.color
                       : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
@@ -809,10 +809,10 @@ const DoctorDashboard = () => {
 
             {/* Sub-filter: Chờ khám → Hôm nay / Chọn ngày; Đã khám / Đã hủy → Chọn ngày */}
             {activeTab === "confirmed" && (
-              <div className="flex items-center gap-2 mt-2 md:mt-3 flex-wrap">
+              <div className="flex items-center gap-2 mt-2 md:mt-3 lg:mt-3 flex-wrap">
                 <button
                   onClick={() => setWaitingFilter("today")}
-                  className={`px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-bold transition-all ${
+                  className={`px-2 md:px-3 lg:px-3 py-1 md:py-1.5 lg:py-1.5 rounded-lg text-[10px] md:text-xs lg:text-xs font-bold transition-all ${
                     waitingFilter === "today"
                       ? "bg-primary text-white shadow-sm"
                       : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--border-color)]"
@@ -822,7 +822,7 @@ const DoctorDashboard = () => {
                 </button>
                 <button
                   onClick={() => setWaitingFilter("bydate")}
-                  className={`px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-bold transition-all ${
+                  className={`px-2 md:px-3 lg:px-3 py-1 md:py-1.5 lg:py-1.5 rounded-lg text-[10px] md:text-xs lg:text-xs font-bold transition-all ${
                     waitingFilter === "bydate"
                       ? "bg-primary text-white shadow-sm"
                       : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--border-color)]"
@@ -835,29 +835,29 @@ const DoctorDashboard = () => {
                     type="date"
                     value={filterDate}
                     onChange={(e) => setFilterDate(e.target.value)}
-                    className="px-2 py-1 rounded-lg border border-[var(--border-color)] text-[10px] md:text-xs focus:ring-primary focus:border-primary outline-none text-[var(--text-primary)] bg-[var(--card-bg)]"
+                    className="px-2 py-1 rounded-lg border border-[var(--border-color)] text-[10px] md:text-xs lg:text-xs focus:ring-primary focus:border-primary outline-none text-[var(--text-primary)] bg-[var(--card-bg)]"
                   />
                 )}
               </div>
             )}
             {(activeTab === "completed" || activeTab === "cancelled") && (
-              <div className="flex items-center gap-2 mt-2 md:mt-3">
-                <span className="text-[10px] md:text-xs font-bold text-[var(--text-tertiary)]">
+              <div className="flex items-center gap-2 mt-2 md:mt-3 lg:mt-3">
+                <span className="text-[10px] md:text-xs lg:text-xs font-bold text-[var(--text-tertiary)]">
                   {t.viewDate}
                 </span>
                 <input
                   type="date"
                   value={filterDate}
                   onChange={(e) => setFilterDate(e.target.value)}
-                  className="px-2 py-1 md:py-1.5 rounded-lg border border-[var(--border-color)] text-[10px] md:text-xs focus:ring-primary focus:border-primary outline-none text-[var(--text-primary)] bg-[var(--card-bg)]"
+                  className="px-2 py-1 md:py-1.5 lg:py-1.5 rounded-lg border border-[var(--border-color)] text-[10px] md:text-xs lg:text-xs focus:ring-primary focus:border-primary outline-none text-[var(--text-primary)] bg-[var(--card-bg)]"
                 />
               </div>
             )}
 
             {/* Search Box */}
-            <div className="relative mt-3 md:mt-4">
+            <div className="relative mt-3 md:mt-4 lg:mt-4">
               <Search
-                className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
+                className="absolute left-3 md:left-4 lg:left-4 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
                 size={14}
               />
               <input
@@ -865,20 +865,20 @@ const DoctorDashboard = () => {
                 placeholder={t.searchPatient}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 md:pl-11 pr-3 md:pr-4 py-2 md:py-2.5 rounded-xl border border-[var(--border-color)] text-xs md:text-sm focus:ring-primary focus:border-primary bg-[var(--card-bg)] outline-none text-[var(--text-primary)]"
+                className="w-full pl-9 md:pl-11 lg:pl-11 pr-3 md:pr-4 lg:pr-4 py-2 md:py-2.5 lg:py-2.5 rounded-xl border border-[var(--border-color)] text-xs md:text-sm lg:text-sm focus:ring-primary focus:border-primary bg-[var(--card-bg)] outline-none text-[var(--text-primary)]"
               />
             </div>
           </div>
 
           {/* List of cards */}
-          <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-2 md:space-y-3">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-6 space-y-2 md:space-y-3 lg:space-y-3">
             {filteredAppointments.length === 0 ? (
-              <div className="text-center py-8 md:py-12">
+              <div className="text-center py-8 md:py-12 lg:py-12">
                 <AlertCircle
                   className="mx-auto text-[var(--text-tertiary)] mb-2"
                   size={24}
                 />
-                <p className="text-xs md:text-sm font-bold text-[var(--text-tertiary)]">
+                <p className="text-xs md:text-sm lg:text-sm font-bold text-[var(--text-tertiary)]">
                   {t.noPatient}
                 </p>
               </div>

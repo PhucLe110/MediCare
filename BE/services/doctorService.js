@@ -177,6 +177,15 @@ const completeDiagnosis = async (
 
   let followUpAppointment = null;
   if (followUp?.date && followUp?.time) {
+    // Count paid appointments for the same doctor, date, and time
+    const paidCount = await Appointment.countDocuments({
+      doctor: appointment.doctor,
+      date: followUp.date,
+      time: followUp.time,
+      paymentStatus: "paid",
+      status: { $ne: "cancelled" },
+    });
+
     followUpAppointment = await Appointment.create({
       patient: appointment.patient,
       doctor: appointment.doctor,
@@ -186,7 +195,7 @@ const completeDiagnosis = async (
       status: "confirmed",
       paymentStatus: "paid",
       ticketNumber: `TK-${Math.floor(Math.random() * 10000)}`,
-      queueNumber: Math.floor(Math.random() * 50) + 1,
+      queueNumber: paidCount + 1,
       parentAppointment: appointmentId,
     });
   }

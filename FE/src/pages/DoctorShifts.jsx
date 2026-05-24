@@ -109,38 +109,56 @@ const DoctorShifts = () => {
   const generateSchedule = (doctor, reqs) => {
     const pattern = doctor.shiftPattern || "Cả tuần";
     const baseTimes = ["08:00", "09:00", "10:00", "14:00", "15:00", "16:00"];
-    const days = [];
+    const scheduleMap = new Map();
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Map shift patterns to day numbers (0 = Sunday, 1 = Monday, etc.)
+    const patternDays = {
+      "T2-T3-T4": [1, 2, 3], // Monday, Tuesday, Wednesday
+      "T5-T6-T7": [4, 5, 6], // Thursday, Friday, Saturday
+      "T2-T4-T6": [1, 3, 5], // Monday, Wednesday, Friday
+      "T3-T5-T7": [2, 4, 6], // Tuesday, Thursday, Saturday
+      "Cả tuần": [1, 2, 3, 4, 5, 6], // Monday to Saturday (no Sunday)
+    };
+
     for (let i = 0; i < 30; i++) {
       const d = new Date(today);
       d.setDate(d.getDate() + i);
-      const dayName = d.toLocaleDateString("vi-VN", { weekday: "long" });
+      const dayOfWeek = d.getDay(); // 0 = Sunday, 1 = Monday, etc.
       const dateStr = d.toISOString().split("T")[0];
 
-      if (pattern === "Cả tuần" || pattern === dayName) {
+      // Skip Sunday (day 0) - hospital doesn't work on Sundays
+      if (dayOfWeek === 0) {
+        continue;
+      }
+
+      if (pattern === "Cả tuần" || patternDays[pattern].includes(dayOfWeek)) {
+        const times = [];
         baseTimes.forEach((time) => {
           const isRequested = reqs.some(
             (r) =>
-              r.date === dateStr && r.time === time && r.status === "approved",
+              r.date === dateStr &&
+              r.times.includes(time) &&
+              r.status === "approved",
           );
           const isCancelled = reqs.some(
             (r) =>
               r.date === dateStr &&
-              r.time === time &&
+              r.times.includes(time) &&
               r.status === "approved" &&
               r.type === "cancel",
           );
           if (!isCancelled) {
-            days.push({ date: dateStr, time, isRequested });
+            times.push(time);
           }
         });
+        scheduleMap.set(dateStr, { date: d, times });
       }
     }
 
-    setSchedule(days);
+    setSchedule(Array.from(scheduleMap.values()));
   };
 
   useEffect(() => {
@@ -275,20 +293,17 @@ const DoctorShifts = () => {
           {toast.type === "success" ? (
             <CheckCircle
               className="text-emerald-500 dark:text-emerald-400 shrink-0"
-              size={16}
-              md={20}
+              size={20}
             />
           ) : toast.type === "warning" ? (
             <AlertCircle
               className="text-yellow-500 dark:text-yellow-400 shrink-0"
-              size={16}
-              md={20}
+              size={20}
             />
           ) : (
             <XCircle
               className="text-rose-500 dark:text-rose-400 shrink-0"
-              size={16}
-              md={20}
+              size={20}
             />
           )}
           <span className="font-bold text-xs md:text-sm">{toast.message}</span>
@@ -399,7 +414,7 @@ const DoctorShifts = () => {
               </>
             ) : (
               <>
-                <Send size={14} md={18} />{" "}
+                <Send size={18} />{" "}
                 {selectedTimes.length > 0
                   ? t.sendN(selectedTimes.length)
                   : t.sendRequest}
@@ -498,9 +513,9 @@ const DoctorShifts = () => {
                     className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center ${req.type === "add" ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" : "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400"}`}
                   >
                     {req.type === "add" ? (
-                      <Plus size={14} md={20} />
+                      <Plus size={20} />
                     ) : (
-                      <Trash2 size={14} md={20} />
+                      <Trash2 size={20} />
                     )}
                   </div>
                   <div>
@@ -508,14 +523,9 @@ const DoctorShifts = () => {
                       {req.type === "add" ? t.reqAdd : t.reqCancel}
                     </h3>
                     <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-medium flex items-center gap-1 md:gap-2 mt-0.5">
-                      <Calendar size={10} md={12} />{" "}
+                      <Calendar size={12} />{" "}
                       {new Date(req.date).toLocaleDateString(locale)}
-                      <Clock
-                        size={10}
-                        md={12}
-                        className="ml-0.5 md:ml-1"
-                      />{" "}
-                      {req.time}
+                      <Clock size={12} className="ml-0.5 md:ml-1" /> {req.time}
                     </p>
                   </div>
                 </div>
@@ -528,8 +538,7 @@ const DoctorShifts = () => {
         ) : (
           <div className="text-center py-8 md:py-12 text-[var(--text-tertiary)]">
             <AlertCircle
-              size={32}
-              md={48}
+              size={48}
               className="mx-auto mb-2 md:mb-4 opacity-20"
             />
             <p className="font-medium text-xs md:text-sm">{t.noHistory}</p>

@@ -234,27 +234,27 @@ export default function Notifications() {
   const urgentCount = all.filter((n) => n.urgent).length;
 
   return (
-    <div className="max-w-lg md:max-w-2xl mx-auto px-2 py-4 md:py-8">
+    <div className="w-full max-w-2xl mx-auto px-2 py-3 md:py-8 overflow-x-hidden h-screen md:h-auto overflow-y-auto">
       {/* Header */}
-      <div className="mb-6 md:mb-8">
-        <div className="flex items-center gap-3 md:gap-4 mb-2 md:mb-2">
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/30 shrink-0">
-            <Bell size={18} md={24} className="text-white" />
+      <div className="mb-4 md:mb-8">
+        <div className="flex items-center gap-2 md:gap-4 mb-2 md:mb-2">
+          <div className="w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/30 shrink-0">
+            <Bell size={20} className="text-white" />
           </div>
           <div className="flex-1">
-            <h1 className="text-xl md:text-[28px] font-black text-[var(--text-primary)] tracking-tight leading-none">
+            <h1 className="text-lg md:text-[28px] font-black text-[var(--text-primary)] tracking-tight leading-none">
               {t.title}
             </h1>
-            <p className="text-[10px] md:text-xs text-[var(--text-secondary)] font-semibold mt-1 md:mt-1">
+            <p className="text-[9px] md:text-xs text-[var(--text-secondary)] font-semibold mt-1 md:mt-1">
               {urgentCount > 0
                 ? `${urgentCount} ${t.urgentCountText}`
                 : t.defaultCountText}
             </p>
           </div>
           {urgentCount > 0 && (
-            <div className="ml-auto bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 rounded-xl md:rounded-2xl px-3 md:px-4 py-2 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              <p className="text-[10px] md:text-xs font-extrabold text-red-600 dark:text-red-400">
+            <div className="ml-auto bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 rounded-lg md:rounded-2xl px-2 md:px-4 py-1.5 md:py-2 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-red-500 animate-pulse" />
+              <p className="text-[9px] md:text-xs font-extrabold text-red-600 dark:text-red-400">
                 {urgentCount} {t.urgentText}
               </p>
             </div>
@@ -263,7 +263,7 @@ export default function Notifications() {
       </div>
 
       {/* Filter Pills */}
-      <div className="flex gap-2 md:gap-2 mb-4 md:mb-6 overflow-x-auto pb-1 scrollbar-hide">
+      <div className="grid grid-cols-2 md:flex md:flex-wrap gap-2 md:gap-2 mb-4 md:mb-6">
         {FILTERS.map((f) => {
           const cnt =
             f.key === "all"
@@ -274,7 +274,7 @@ export default function Notifications() {
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
-              className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full font-bold text-xs md:text-sm whitespace-nowrap transition-all border-none ${
+              className={`flex items-center justify-center gap-1 md:gap-2 px-2 md:px-4 py-1 md:py-2 rounded-full font-bold text-[10px] md:text-sm transition-all border-none ${
                 active
                   ? "bg-[var(--text-primary)] text-white shadow-md"
                   : "bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]"
@@ -302,18 +302,13 @@ export default function Notifications() {
         </div>
       ) : displayed.length === 0 ? (
         <div className="py-16 md:py-20 text-center text-[var(--text-tertiary)]">
-          <Bell
-            size={40}
-            md={64}
-            strokeWidth={1}
-            className="mx-auto mb-4 md:mb-4"
-          />
+          <Bell size={64} strokeWidth={1} className="mx-auto mb-4 md:mb-4" />
           <p className="font-bold text-xs md:text-sm uppercase tracking-widest">
             {t.noNotifications}
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-2.5 md:gap-2.5">
+        <div className="flex flex-col gap-2 md:gap-2.5">
           {displayed.map((n) => {
             const Icon = n.icon;
             const isReminder = n.type === "reminder";
@@ -329,9 +324,9 @@ export default function Notifications() {
                       : "border-[var(--border-color)] shadow-sm"
                 } hover:shadow-lg`}
               >
-                <div className="flex items-center gap-3 md:gap-4 p-3 md:p-5">
+                <div className="flex items-start gap-2 md:gap-4 p-2 md:p-5">
                   <div
-                    className={`w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex-shrink-0 flex items-center justify-center ${
+                    className={`w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl flex-shrink-0 flex items-center justify-center ${
                       isReminder
                         ? "bg-red-50 dark:bg-red-900/30 shadow-md shadow-red-500/20"
                         : n.urgent
@@ -341,7 +336,6 @@ export default function Notifications() {
                   >
                     <Icon
                       size={18}
-                      md={22}
                       className={
                         isReminder
                           ? "text-red-600 dark:text-red-400"
@@ -351,24 +345,25 @@ export default function Notifications() {
                       }
                     />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <p className="font-extrabold text-xs md:text-sm text-[var(--text-primary)] leading-tight">
-                        {n.title}
-                      </p>
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        {n.urgent && (
-                          <span
-                            className={`w-2 h-2 rounded-full animate-pulse ${isReminder ? "bg-red-500" : "bg-amber-500"}`}
-                          />
-                        )}
-                        {n.link && (
-                          <ChevronRight
-                            size={12}
-                            md={14}
-                            className="text-[var(--text-tertiary)]"
-                          />
-                        )}
+                  <div className="flex-1 min-w-0 overflow-hidden">
+                    <div className="flex flex-col gap-1 md:gap-2 mb-0.5">
+                      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-1 md:gap-2">
+                        <p className="font-extrabold text-[10px] md:text-sm text-[var(--text-primary)] leading-tight">
+                          {n.title}
+                        </p>
+                        <div className="flex items-center gap-1 md:gap-1.5 flex-shrink-0 md:mt-0">
+                          {n.urgent && (
+                            <span
+                              className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full animate-pulse ${isReminder ? "bg-red-500" : "bg-amber-500"}`}
+                            />
+                          )}
+                          {n.link && (
+                            <ChevronRight
+                              size={12}
+                              className="text-[var(--text-tertiary)]"
+                            />
+                          )}
+                        </div>
                       </div>
                     </div>
                     <p className="text-[11px] md:text-sm text-[var(--text-secondary)] font-medium leading-relaxed">

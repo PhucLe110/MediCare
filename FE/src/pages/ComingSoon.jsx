@@ -18,7 +18,7 @@ const ComingSoon = ({ titleKey = "settingsTitle" }) => {
   return (
     <div className="flex flex-col items-center justify-center h-[60vh] md:h-[70vh] text-center px-4">
       <div className="w-16 h-16 md:w-24 md:h-24 bg-blue-50 dark:bg-blue-900/30 text-blue-300 dark:text-blue-400 rounded-full flex items-center justify-center mb-4 md:mb-6">
-        <Construction size={32} md={48} />
+        <Construction size={48} />
       </div>
       <h1 className="text-xl md:text-2xl font-bold text-[var(--text-primary)] mb-1.5 md:mb-2">
         {title}

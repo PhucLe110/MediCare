@@ -224,7 +224,7 @@ export default function AdminBilling() {
         <div className="fixed inset-0 w-screen h-screen bg-slate-900/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-3 md:p-4">
           <div className="bg-[var(--card-bg)] w-full max-w-sm rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-2xl border border-[var(--border-color)] space-y-3 md:space-y-4">
             <div className="flex items-center gap-2 md:gap-3 text-indigo-600 dark:text-indigo-400">
-              <ShieldAlert size={24} md={28} />
+              <ShieldAlert size={28} />
               <h3 className="font-black text-base md:text-lg text-[var(--text-primary)]">
                 {t.confirmTitle}
               </h3>
@@ -268,8 +268,7 @@ export default function AdminBilling() {
           <div className="relative w-full md:w-80">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
-              size={16}
-              md={18}
+              size={18}
             />
             <input
               type="text"
@@ -349,11 +348,11 @@ export default function AdminBilling() {
                   <td className="p-3 md:p-4">
                     {b.status === "paid" ? (
                       <span className="flex items-center gap-1.5 text-[10px] md:text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                        <CheckCircle2 size={12} md={14} /> {t.statusPaid}
+                        <CheckCircle2 size={14} /> {t.statusPaid}
                       </span>
                     ) : (
                       <span className="flex items-center gap-1.5 text-[10px] md:text-xs font-bold text-orange-500 dark:text-orange-400">
-                        <Clock size={12} md={14} /> {t.statusUnpaid}
+                        <Clock size={14} /> {t.statusUnpaid}
                       </span>
                     )}
                   </td>
