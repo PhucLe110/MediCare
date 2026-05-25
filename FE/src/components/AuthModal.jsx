@@ -79,7 +79,7 @@ const trans = {
 };
 
 const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
-  const { t } = useTranslation(trans);
+  const { t, lang } = useTranslation(trans);
   const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -88,6 +88,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
   const [phone, setPhone] = useState("");
   const [gender, setGender] = useState("Nam");
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [forgotStep, setForgotStep] = useState(1);
   const [verificationCode, setVerificationCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -103,6 +104,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
     if (isOpen) {
       setMode(initialModeRef.current);
       setError("");
+      setSuccessMessage("");
       setForgotStep(1);
       setVerificationCode("");
       setNewPassword("");
@@ -123,6 +125,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccessMessage("");
 
     if (mode === "register" && password !== confirmPassword) {
       setError(t.errPasswordMatch);
@@ -146,13 +149,23 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
       const data = await res.json();
 
       if (data.success) {
-        saveAuthSession(data.data);
-        onClose();
-        if (data.data.role === "admin") navigate("/admin");
-        else if (data.data.role === "lab_staff")
-          navigate("/dashboard/lab-upload");
-        else if (data.data.role === "doctor") navigate("/dashboard/doctor");
-        else navigate("/dashboard");
+        if (mode === "register") {
+          setMode("login");
+          setPassword("");
+          setSuccessMessage(
+            lang === "vi"
+              ? "Đăng ký thành công! Vui lòng đăng nhập."
+              : "Registration successful! Please log in."
+          );
+        } else {
+          saveAuthSession(data.data);
+          onClose();
+          if (data.data.role === "admin") navigate("/admin");
+          else if (data.data.role === "lab_staff")
+            navigate("/dashboard/lab-upload");
+          else if (data.data.role === "doctor") navigate("/dashboard/doctor");
+          else navigate("/dashboard");
+        }
       } else {
         setError(data.message);
       }
@@ -316,6 +329,11 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
           {error && (
             <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-2.5 rounded-xl text-xs mb-3 font-medium text-center border border-red-100 dark:border-red-900/30">
               {error}
+            </div>
+          )}
+          {successMessage && (
+            <div className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 p-2.5 rounded-xl text-xs mb-3 font-semibold text-center border border-emerald-100 dark:border-emerald-900/30">
+              {successMessage}
             </div>
           )}
 
@@ -612,6 +630,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
                 onClick={() => {
                   setMode("login");
                   setError("");
+                  setSuccessMessage("");
                   setForgotStep(1);
                   setVerificationCode("");
                   setNewPassword("");
@@ -631,6 +650,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
                   onClick={() => {
                     setMode(mode === "login" ? "register" : "login");
                     setError("");
+                    setSuccessMessage("");
                   }}
                   className="font-bold text-primary hover:underline"
                 >

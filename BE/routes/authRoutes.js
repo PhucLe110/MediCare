@@ -28,9 +28,9 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-router.post("/register", authLimiter, register);
+router.post("/register", register);
 router.post("/login", authLimiter, login);
-router.post("/refresh", authLimiter, refresh);
+router.post("/refresh", refresh);
 router.post("/logout", logout);
 router.get("/me", protect, getMe);
 router.post("/forgot-password", authLimiter, forgotPassword);
