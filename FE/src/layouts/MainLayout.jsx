@@ -145,7 +145,7 @@ const MainLayout = () => {
             </Link>
 
             {/* Navigation - Desktop */}
-            <nav className="desktop-hide desktop-show space-x-8">
+            <nav className="desktop-show space-x-8">
               {navItems.map((item, index) => (
                 <Link
                   key={index}
@@ -162,7 +162,7 @@ const MainLayout = () => {
             </nav>
 
             {/* Actions & Toggles - Desktop */}
-            <div className="desktop-hide desktop-show items-center space-x-6">
+            <div className="desktop-show items-center space-x-6">
               {/* Modern Navbar Controls */}
               <div className="flex items-center gap-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] p-1 rounded-full shadow-inner">
                 {/* Theme Switcher */}
@@ -223,7 +223,7 @@ const MainLayout = () => {
 
             {/* Mobile Hamburger Button */}
             <button
-              className="hamburger-button desktop-hide"
+              className="hamburger-button"
               onClick={() => setMobileMenuOpen(true)}
             >
               <Menu size={24} />
