@@ -13,6 +13,7 @@ const MainLayout = () => {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showAppNotification, setShowAppNotification] = useState(false);
+  const [authButtonDisabled, setAuthButtonDisabled] = useState(false);
 
   useEffect(() => {
     if (theme === "dark") {
@@ -115,6 +116,16 @@ const MainLayout = () => {
 
   const t = trans[lang];
 
+  const handleAuthButtonClick = (mode) => {
+    setAuthButtonDisabled(true);
+    setAuthModal({ isOpen: true, mode });
+  };
+
+  const handleAuthModalClose = () => {
+    setAuthModal({ isOpen: false, mode: "login" });
+    setAuthButtonDisabled(false);
+  };
+
   const navItems = [
     { name: t.home, path: "/" },
     { name: t.about, path: "/about" },
@@ -205,16 +216,16 @@ const MainLayout = () => {
               {/* Auth Buttons */}
               <div className="flex items-center space-x-3">
                 <button
-                  onClick={() => setAuthModal({ isOpen: true, mode: "login" })}
-                  className="px-5 py-2.5 bg-[var(--bg-primary)] text-primary border border-primary text-sm font-bold rounded-full hover:bg-[var(--bg-secondary)] transition-all"
+                  onClick={() => handleAuthButtonClick("login")}
+                  disabled={authButtonDisabled}
+                  className="px-5 py-2.5 bg-[var(--bg-primary)] text-primary border border-primary text-sm font-bold rounded-full hover:bg-[var(--bg-secondary)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {t.login}
                 </button>
                 <button
-                  onClick={() =>
-                    setAuthModal({ isOpen: true, mode: "register" })
-                  }
-                  className="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-full hover:bg-primary-dark transition-all shadow-md shadow-primary/20"
+                  onClick={() => handleAuthButtonClick("register")}
+                  disabled={authButtonDisabled}
+                  className="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-full hover:bg-primary-dark transition-all shadow-md shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {t.register}
                 </button>
@@ -307,19 +318,21 @@ const MainLayout = () => {
         <div className="mobile-auth-buttons">
           <button
             onClick={() => {
-              setAuthModal({ isOpen: true, mode: "login" });
+              handleAuthButtonClick("login");
               setMobileMenuOpen(false);
             }}
-            className="px-5 py-3 bg-[var(--bg-primary)] text-primary border border-primary text-sm font-bold rounded-full hover:bg-[var(--bg-secondary)] transition-all"
+            disabled={authButtonDisabled}
+            className="px-5 py-3 bg-[var(--bg-primary)] text-primary border border-primary text-sm font-bold rounded-full hover:bg-[var(--bg-secondary)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t.login}
           </button>
           <button
             onClick={() => {
-              setAuthModal({ isOpen: true, mode: "register" });
+              handleAuthButtonClick("register");
               setMobileMenuOpen(false);
             }}
-            className="px-5 py-3 bg-primary text-white text-sm font-bold rounded-full hover:bg-primary-dark transition-all shadow-md shadow-primary/20"
+            disabled={authButtonDisabled}
+            className="px-5 py-3 bg-primary text-white text-sm font-bold rounded-full hover:bg-primary-dark transition-all shadow-md shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t.register}
           </button>
@@ -330,7 +343,7 @@ const MainLayout = () => {
         isOpen={authModal.isOpen}
         mode={authModal.mode}
         initialMode={authModal.mode}
-        onClose={() => setAuthModal({ isOpen: false, mode: "login" })}
+        onClose={handleAuthModalClose}
       />
 
       <main>
