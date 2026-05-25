@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Sun, Moon, Menu, X } from "lucide-react";
 import AuthModal from "../components/AuthModal";
 
@@ -14,6 +14,7 @@ const MainLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showAppNotification, setShowAppNotification] = useState(false);
   const [authButtonDisabled, setAuthButtonDisabled] = useState(false);
+  const authButtonDisabledRef = useRef(false);
 
   useEffect(() => {
     if (theme === "dark") {
@@ -117,12 +118,14 @@ const MainLayout = () => {
   const t = trans[lang];
 
   const handleAuthButtonClick = (mode) => {
+    authButtonDisabledRef.current = true;
     setAuthButtonDisabled(true);
     setAuthModal({ isOpen: true, mode });
   };
 
   const handleAuthModalClose = () => {
     setAuthModal({ isOpen: false, mode: "login" });
+    authButtonDisabledRef.current = false;
     setAuthButtonDisabled(false);
   };
 
@@ -217,15 +220,15 @@ const MainLayout = () => {
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => handleAuthButtonClick("login")}
-                  disabled={authButtonDisabled}
-                  className="px-5 py-2.5 bg-[var(--bg-primary)] text-primary border border-primary text-sm font-bold rounded-full hover:bg-[var(--bg-secondary)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={authButtonDisabled || authButtonDisabledRef.current}
+                  className="px-5 py-2.5 bg-[var(--bg-primary)] text-primary border border-primary text-sm font-bold rounded-full hover:bg-[var(--bg-secondary)] transition-all disabled:opacity-20 disabled:cursor-not-allowed disabled:grayscale disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-400"
                 >
                   {t.login}
                 </button>
                 <button
                   onClick={() => handleAuthButtonClick("register")}
-                  disabled={authButtonDisabled}
-                  className="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-full hover:bg-primary-dark transition-all shadow-md shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={authButtonDisabled || authButtonDisabledRef.current}
+                  className="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-full hover:bg-primary-dark transition-all shadow-md shadow-primary/20 disabled:opacity-20 disabled:cursor-not-allowed disabled:grayscale disabled:shadow-none disabled:bg-gray-300 disabled:text-gray-500"
                 >
                   {t.register}
                 </button>
@@ -321,8 +324,8 @@ const MainLayout = () => {
               handleAuthButtonClick("login");
               setMobileMenuOpen(false);
             }}
-            disabled={authButtonDisabled}
-            className="px-5 py-3 bg-[var(--bg-primary)] text-primary border border-primary text-sm font-bold rounded-full hover:bg-[var(--bg-secondary)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={authButtonDisabled || authButtonDisabledRef.current}
+            className="px-5 py-3 bg-[var(--bg-primary)] text-primary border border-primary text-sm font-bold rounded-full hover:bg-[var(--bg-secondary)] transition-all disabled:opacity-20 disabled:cursor-not-allowed disabled:grayscale disabled:bg-gray-200 disabled:border-gray-300 disabled:text-gray-400"
           >
             {t.login}
           </button>
@@ -331,8 +334,8 @@ const MainLayout = () => {
               handleAuthButtonClick("register");
               setMobileMenuOpen(false);
             }}
-            disabled={authButtonDisabled}
-            className="px-5 py-3 bg-primary text-white text-sm font-bold rounded-full hover:bg-primary-dark transition-all shadow-md shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={authButtonDisabled || authButtonDisabledRef.current}
+            className="px-5 py-3 bg-primary text-white text-sm font-bold rounded-full hover:bg-primary-dark transition-all shadow-md shadow-primary/20 disabled:opacity-20 disabled:cursor-not-allowed disabled:grayscale disabled:shadow-none disabled:bg-gray-300 disabled:text-gray-500"
           >
             {t.register}
           </button>

@@ -93,6 +93,8 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
   const [verificationCode, setVerificationCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [submitButtonDisabled, setSubmitButtonDisabled] = useState(false);
+  const submitButtonDisabledRef = useRef(false);
   const navigate = useNavigate();
   const initialModeRef = useRef(initialMode);
 
@@ -126,9 +128,13 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
     e.preventDefault();
     setError("");
     setSuccessMessage("");
+    submitButtonDisabledRef.current = true;
+    setSubmitButtonDisabled(true);
 
     if (mode === "register" && password !== confirmPassword) {
       setError(t.errPasswordMatch);
+      submitButtonDisabledRef.current = false;
+      setSubmitButtonDisabled(false);
       return;
     }
 
@@ -155,8 +161,10 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
           setSuccessMessage(
             lang === "vi"
               ? "Đăng ký thành công! Vui lòng đăng nhập."
-              : "Registration successful! Please log in."
+              : "Registration successful! Please log in.",
           );
+          submitButtonDisabledRef.current = false;
+          setSubmitButtonDisabled(false);
         } else {
           saveAuthSession(data.data);
           onClose();
@@ -168,15 +176,21 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
         }
       } else {
         setError(data.message);
+        submitButtonDisabledRef.current = false;
+        setSubmitButtonDisabled(false);
       }
     } catch {
       setError(t.errGeneric);
+      submitButtonDisabledRef.current = false;
+      setSubmitButtonDisabled(false);
     }
   };
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     setError("");
+    submitButtonDisabledRef.current = true;
+    setSubmitButtonDisabled(true);
 
     if (forgotStep === 1) {
       // Send verification code to email
@@ -189,11 +203,17 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
         const data = await res.json();
         if (data.success) {
           setForgotStep(2);
+          submitButtonDisabledRef.current = false;
+          setSubmitButtonDisabled(false);
         } else {
           setError(data.message || t.errGeneric);
+          submitButtonDisabledRef.current = false;
+          setSubmitButtonDisabled(false);
         }
       } catch {
         setError(t.errGeneric);
+        submitButtonDisabledRef.current = false;
+        setSubmitButtonDisabled(false);
       }
     } else if (forgotStep === 2) {
       // Verify code
@@ -206,16 +226,24 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
         const data = await res.json();
         if (data.success) {
           setForgotStep(3);
+          submitButtonDisabledRef.current = false;
+          setSubmitButtonDisabled(false);
         } else {
           setError(data.message || t.errGeneric);
+          submitButtonDisabledRef.current = false;
+          setSubmitButtonDisabled(false);
         }
       } catch {
         setError(t.errGeneric);
+        submitButtonDisabledRef.current = false;
+        setSubmitButtonDisabled(false);
       }
     } else if (forgotStep === 3) {
       // Reset password
       if (newPassword !== confirmPassword) {
         setError(t.errPasswordMatch);
+        submitButtonDisabledRef.current = false;
+        setSubmitButtonDisabled(false);
         return;
       }
       try {
@@ -232,11 +260,17 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
           setNewPassword("");
           setConfirmPassword("");
           setPassword("");
+          submitButtonDisabledRef.current = false;
+          setSubmitButtonDisabled(false);
         } else {
           setError(data.message || t.errGeneric);
+          submitButtonDisabledRef.current = false;
+          setSubmitButtonDisabled(false);
         }
       } catch {
         setError(t.errGeneric);
+        submitButtonDisabledRef.current = false;
+        setSubmitButtonDisabled(false);
       }
     }
   };
@@ -560,7 +594,10 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 px-4 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/30 mt-2 text-sm"
+                  disabled={
+                    submitButtonDisabled || submitButtonDisabledRef.current
+                  }
+                  className="w-full py-2.5 px-4 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/30 mt-2 text-sm disabled:opacity-20 disabled:cursor-not-allowed disabled:grayscale disabled:shadow-none disabled:bg-gray-300 disabled:text-gray-500"
                 >
                   {mode === "login" ? t.loginBtn : t.registerBtn}
                 </button>
@@ -581,8 +618,12 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
                     <button
                       type="button"
                       onClick={handleGoogleAuth}
-                      disabled={loading}
-                      className="w-full py-2.5 px-4 bg-white text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-all shadow-md border border-gray-300 flex items-center justify-center gap-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={
+                        loading ||
+                        submitButtonDisabled ||
+                        submitButtonDisabledRef.current
+                      }
+                      className="w-full py-2.5 px-4 bg-white text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-all shadow-md border border-gray-300 flex items-center justify-center gap-3 text-sm disabled:opacity-20 disabled:cursor-not-allowed disabled:grayscale disabled:shadow-none disabled:bg-gray-200 disabled:text-gray-400"
                     >
                       <svg className="w-5 h-5" viewBox="0 0 24 24">
                         <path
@@ -612,7 +653,10 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login" }) => {
             {mode === "forgot" && (
               <button
                 type="submit"
-                className="w-full py-2.5 px-4 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/30 mt-2 text-sm"
+                disabled={
+                  submitButtonDisabled || submitButtonDisabledRef.current
+                }
+                className="w-full py-2.5 px-4 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/30 mt-2 text-sm disabled:opacity-20 disabled:cursor-not-allowed disabled:grayscale disabled:shadow-none disabled:bg-gray-300 disabled:text-gray-500"
               >
                 {forgotStep === 1
                   ? t.sendCode
