@@ -57,8 +57,7 @@ const issueTokenPair = async (user, deviceInfo = {}) => {
 };
 
 const register = async (
-  { fullName, email, password, phone, gender },
-  deviceInfo = {}
+  { fullName, email, password, phone, gender }
 ) => {
   const userExists = await User.findOne({ email });
   if (userExists) throw new HttpError(400, "Email đã được sử dụng");
@@ -71,10 +70,16 @@ const register = async (
     gender: gender || "Nam",
   });
 
-  const tokens = await issueTokenPair(user, deviceInfo);
   return {
-    data: formatAuthUser(user, tokens.accessToken, tokens.refreshToken),
-    refreshToken: tokens.refreshToken,
+    data: {
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      gender: user.gender,
+      patientId: user.patientId,
+    }
   };
 };
 

@@ -1,5 +1,4 @@
 import { API_URL } from '../config';
-import { saveAuthSession } from '../utils/auth';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
@@ -96,8 +95,13 @@ const Register = () => {
       const data = await res.json();
 
       if (data.success) {
-        saveAuthSession(data.data);
-        navigate('/dashboard');
+        navigate('/login', { 
+          state: { 
+            message: lang === 'vi' 
+              ? 'Đăng ký thành công! Vui lòng đăng nhập.' 
+              : 'Registration successful! Please log in.' 
+          } 
+        });
       } else {
         setError(data.message);
       }

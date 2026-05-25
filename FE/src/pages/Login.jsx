@@ -1,7 +1,7 @@
 import { API_URL } from '../config';
 import { saveAuthSession } from '../utils/auth';
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
 import LangThemeControls from '../components/LangThemeControls';
 
@@ -40,6 +40,8 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const location = useLocation();
+  const [successMsg, setSuccessMsg] = useState(location.state?.message || '');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,6 +53,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMsg('');
 
     try {
       const res = await fetch(`${API_URL}/api/auth/login`, {
@@ -95,6 +98,7 @@ const Login = () => {
         </div>
 
         {error && <div className="bg-red-50 text-red-500 p-3 rounded-lg text-sm mb-4">{error}</div>}
+        {successMsg && <div className="bg-emerald-50 text-emerald-600 border border-emerald-200 p-3 rounded-lg text-sm mb-4 font-semibold text-center">{successMsg}</div>}
 
         <form className="space-y-6" onSubmit={handleLogin}>
           <div>

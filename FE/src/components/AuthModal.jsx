@@ -65,11 +65,13 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
   const [phone, setPhone] = useState('');
   const [gender, setGender] = useState('Nam');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     setMode(initialMode);
     setError('');
+    setSuccessMessage('');
   }, [isOpen, initialMode]);
 
   useEffect(() => {
@@ -89,6 +91,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage('');
 
     try {
       const endpoint = mode === 'login' ? '/api/auth/login' : '/api/auth/register';
@@ -105,12 +108,21 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
       const data = await res.json();
 
       if (data.success) {
-        saveAuthSession(data.data);
-        onClose();
-        if (data.data.role === 'admin') navigate('/admin');
-        else if (data.data.role === 'lab_staff') navigate('/dashboard/lab-upload');
-        else if (data.data.role === 'doctor') navigate('/dashboard/doctor');
-        else navigate('/dashboard');
+        if (mode === 'register') {
+          setMode('login');
+          setPassword('');
+          setSuccessMessage(lang === 'vi' 
+            ? 'Đăng ký thành công! Vui lòng đăng nhập.' 
+            : 'Registration successful! Please log in.'
+          );
+        } else {
+          saveAuthSession(data.data);
+          onClose();
+          if (data.data.role === 'admin') navigate('/admin');
+          else if (data.data.role === 'lab_staff') navigate('/dashboard/lab-upload');
+          else if (data.data.role === 'doctor') navigate('/dashboard/doctor');
+          else navigate('/dashboard');
+        }
       } else {
         setError(data.message);
       }
@@ -145,6 +157,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
           </div>
 
           {error && <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm mb-4 font-medium text-center border border-red-100">{error}</div>}
+          {successMessage && <div className="bg-emerald-50 text-emerald-600 p-3 rounded-xl text-sm mb-4 font-semibold text-center border border-emerald-100">{successMessage}</div>}
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             {mode === 'register' && (
@@ -226,7 +239,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
               {mode === 'login' ? t.noAccount : t.hasAccount}{' '}
               <button
                 type="button"
-                onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }}
+                onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); setSuccessMessage(''); }}
                 className="font-bold text-primary hover:underline"
               >
                 {mode === 'login' ? t.registerLink : t.loginLink}

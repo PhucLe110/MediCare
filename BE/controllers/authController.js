@@ -7,21 +7,7 @@ const getDeviceInfo = (req) => ({
 });
 
 exports.register = asyncHandler(async (req, res) => {
-  const deviceInfo = getDeviceInfo(req);
-  const { data, refreshToken } = await authService.register(
-    req.body,
-    deviceInfo,
-  );
-
-  // Set refresh token as httpOnly cookie
-  if (refreshToken) {
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
-  }
+  const { data } = await authService.register(req.body);
 
   res.status(201).json({ success: true, data });
 });
