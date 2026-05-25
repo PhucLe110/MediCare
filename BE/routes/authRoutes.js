@@ -33,9 +33,9 @@ router.post("/login", authLimiter, login);
 router.post("/refresh", refresh);
 router.post("/logout", logout);
 router.get("/me", protect, getMe);
-router.post("/forgot-password", authLimiter, forgotPassword);
-router.post("/verify-code", authLimiter, verifyCode);
-router.post("/reset-password", authLimiter, resetPassword);
+router.post("/forgot-password", forgotPassword);
+router.post("/verify-code", verifyCode);
+router.post("/reset-password", resetPassword);
 
 // Firebase Auth route
 router.post("/firebase-auth", firebaseAuth);
