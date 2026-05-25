@@ -41,7 +41,6 @@ import AdminAppointments from "./pages/admin/AdminAppointments";
 import AdminRecords from "./pages/admin/AdminRecords";
 import AdminInventory from "./pages/admin/AdminInventory";
 import AdminBilling from "./pages/admin/AdminBilling";
-import AdminAI from "./pages/admin/AdminAI";
 
 // Scroll to top component
 const ScrollToTop = () => {
@@ -101,7 +100,6 @@ function App() {
           <Route path="records" element={<AdminRecords />} />
           <Route path="inventory" element={<AdminInventory />} />
           <Route path="billing" element={<AdminBilling />} />
-          <Route path="ai" element={<AdminAI />} />
         </Route>
       </Routes>
     </Router>

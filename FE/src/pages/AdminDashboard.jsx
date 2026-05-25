@@ -221,71 +221,82 @@ export default function AdminDashboard() {
               <option>{t.chartFilterThisWeek}</option>
             </select>
           </div>
-          <div className="h-64 md:h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={revenueData}
-                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+          <div className="h-64 md:h-80 w-full">
+            {revenueData.length === 0 ? (
+              <div className="text-center py-16 md:py-20 text-[var(--text-tertiary)] font-medium text-xs md:text-sm">
+                {t.deptFreqEmpty}
+              </div>
+            ) : (
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+                minWidth={0}
+                minHeight={0}
               >
-                <defs>
-                  <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="var(--border-color)"
-                />
-                <XAxis
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{
-                    fill: "var(--text-secondary)",
-                    fontSize: 10,
-                    fontWeight: 600,
-                  }}
-                  dy={10}
-                />
-                <YAxis
-                  yAxisId="left"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{
-                    fill: "var(--text-secondary)",
-                    fontSize: 10,
-                    fontWeight: 600,
-                  }}
-                  tickFormatter={(val) => formatChartTick(lang, val)}
-                />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: "16px",
-                    border: "none",
-                    boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
-                    backgroundColor: "var(--card-bg)",
-                    color: "var(--text-primary)",
-                  }}
-                  formatter={(value, name) => [
-                    name === "revenue" ? fmt(value) : value,
-                    name === "revenue"
-                      ? t.chartTooltipRevenue
-                      : t.chartTooltipAppointments,
-                  ]}
-                />
-                <Area
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#10b981"
-                  strokeWidth={3}
-                  fillOpacity={1}
-                  fill="url(#colorRev)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+                <AreaChart
+                  data={revenueData}
+                  margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="var(--border-color)"
+                  />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fill: "var(--text-secondary)",
+                      fontSize: 10,
+                      fontWeight: 600,
+                    }}
+                    dy={10}
+                  />
+                  <YAxis
+                    yAxisId="left"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fill: "var(--text-secondary)",
+                      fontSize: 10,
+                      fontWeight: 600,
+                    }}
+                    tickFormatter={(val) => formatChartTick(lang, val)}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: "16px",
+                      border: "none",
+                      boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
+                      backgroundColor: "var(--card-bg)",
+                      color: "var(--text-primary)",
+                    }}
+                    formatter={(value, name) => [
+                      name === "revenue" ? fmt(value) : value,
+                      name === "revenue"
+                        ? t.chartTooltipRevenue
+                        : t.chartTooltipAppointments,
+                    ]}
+                  />
+                  <Area
+                    yAxisId="left"
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#10b981"
+                    strokeWidth={3}
+                    fillOpacity={1}
+                    fill="url(#colorRev)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
@@ -299,13 +310,18 @@ export default function AdminDashboard() {
               {t.deptFreqSub}
             </p>
           </div>
-          <div className="h-56 md:h-64">
+          <div className="h-56 md:h-64 w-full">
             {localizedDeptData.length === 0 ? (
               <div className="text-center py-16 md:py-20 text-[var(--text-tertiary)] font-medium text-xs md:text-sm">
                 {t.deptFreqEmpty}
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+                minWidth={0}
+                minHeight={0}
+              >
                 <BarChart
                   data={localizedDeptData}
                   layout="vertical"
