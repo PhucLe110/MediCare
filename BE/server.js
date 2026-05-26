@@ -42,6 +42,7 @@ const billingRoutes = require("./routes/billingRoutes");
 const webhookRoutes = require("./routes/webhookRoutes");
 const doctorRoutes = require("./routes/doctorRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const contactRoutes = require("./routes/contactRoutes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/appointments", appointmentRoutes);
@@ -53,6 +54,7 @@ app.use("/api/webhooks", webhookRoutes);
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api", billingRoutes);
+app.use("/api", contactRoutes);
 
 app.get("/", (req, res) => {
   res.send("MediCare API is running...");

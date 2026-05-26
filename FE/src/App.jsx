@@ -31,6 +31,11 @@ import DoctorShifts from "./pages/DoctorShifts";
 import About from "./pages/public/About";
 import Services from "./pages/public/Services";
 import Doctors from "./pages/public/Doctors";
+import FAQ from "./pages/public/FAQ";
+import UserGuide from "./pages/public/UserGuide";
+import PrivacyPolicy from "./pages/public/PrivacyPolicy";
+import TermsOfUse from "./pages/public/TermsOfUse";
+import Contact from "./pages/public/Contact";
 
 // Admin Pages
 import AdminLayout from "./layouts/AdminLayout";
@@ -68,6 +73,11 @@ function App() {
           <Route path="about" element={<About />} />
           <Route path="services" element={<Services />} />
           <Route path="doctors" element={<Doctors />} />
+          <Route path="faq" element={<FAQ />} />
+          <Route path="user-guide" element={<UserGuide />} />
+          <Route path="privacy" element={<PrivacyPolicy />} />
+          <Route path="terms" element={<TermsOfUse />} />
+          <Route path="contact" element={<Contact />} />
         </Route>
 
         {/* Dashboard Routes */}

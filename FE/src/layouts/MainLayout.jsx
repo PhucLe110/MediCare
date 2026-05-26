@@ -65,6 +65,7 @@ const MainLayout = () => {
       support: "Hỗ trợ",
       faq: "Câu hỏi thường gặp",
       userGuide: "Hướng dẫn sử dụng",
+      contact: "Liên hệ",
       privacyPolicy: "Chính sách bảo mật",
       termsOfUse: "Điều khoản sử dụng",
       contactInfo: "Thông tin liên hệ",
@@ -77,7 +78,6 @@ const MainLayout = () => {
       copyright: "© 2024 MediCare. Tất cả quyền được bảo lưu.",
       terms: "Điều khoản",
       privacy: "Bảo mật",
-      cookies: "Cookies",
       lightMode: "Chế độ Sáng",
       darkMode: "Chế độ Tối",
       appComingSoon: "Hệ thống sẽ cập nhật phiên bản app trong thời gian tới",
@@ -96,6 +96,7 @@ const MainLayout = () => {
       support: "Support Hub",
       faq: "Frequently Asked Questions",
       userGuide: "User Manual & Guides",
+      contact: "Contact Us",
       privacyPolicy: "Privacy & Security Policy",
       termsOfUse: "Terms of Service",
       contactInfo: "Contact Information",
@@ -108,7 +109,6 @@ const MainLayout = () => {
       copyright: "© 2024 MediCare Hospital. All Rights Reserved.",
       terms: "Terms",
       privacy: "Privacy",
-      cookies: "Cookies",
       lightMode: "Light Mode",
       darkMode: "Dark Mode",
       appComingSoon: "The app version will be updated in the near future",
@@ -472,24 +472,41 @@ const MainLayout = () => {
             </h4>
             <ul className="space-y-2 md:space-y-3 text-xs md:text-sm lg:text-sm text-blue-200 text-center md:text-left lg:text-left">
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link to="/faq" className="hover:text-white transition-colors">
                   {t.faq}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link
+                  to="/user-guide"
+                  className="hover:text-white transition-colors"
+                >
                   {t.userGuide}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link
+                  to="/contact"
+                  className="hover:text-white transition-colors"
+                >
+                  {t.contact}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/privacy"
+                  className="hover:text-white transition-colors"
+                >
                   {t.privacyPolicy}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link
+                  to="/terms"
+                  className="hover:text-white transition-colors"
+                >
                   {t.termsOfUse}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -578,15 +595,15 @@ const MainLayout = () => {
               {t.copyright}
             </p>
             <div className="flex gap-4 md:gap-6 text-xs md:text-sm lg:text-sm text-blue-300">
-              <a href="#" className="hover:text-white transition-colors">
+              <Link to="/terms" className="hover:text-white transition-colors">
                 {t.terms}
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
+              </Link>
+              <Link
+                to="/privacy"
+                className="hover:text-white transition-colors"
+              >
                 {t.privacy}
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
-                {t.cookies}
-              </a>
+              </Link>
             </div>
           </div>
         </div>
