@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
 } from "react-router-dom";
+import AccountBlockedModal from "./components/AccountBlockedModal";
 
 // Layouts
 import MainLayout from "./layouts/MainLayout";
@@ -63,9 +64,34 @@ const ScrollToTop = () => {
 };
 
 function App() {
+  const [accountBlocked, setAccountBlocked] = useState(false);
+  const [lang, setLang] = useState(localStorage.getItem("lang") || "vi");
+
+  // Listen for account blocked event
+  useEffect(() => {
+    const handleAccountBlocked = () => {
+      setAccountBlocked(true);
+    };
+
+    window.addEventListener("account-blocked", handleAccountBlocked);
+    return () =>
+      window.removeEventListener("account-blocked", handleAccountBlocked);
+  }, []);
+
+  // Update lang when language changes
+  useEffect(() => {
+    const handleLangChange = () => {
+      setLang(localStorage.getItem("lang") || "vi");
+    };
+    window.addEventListener("language-change", handleLangChange);
+    return () =>
+      window.removeEventListener("language-change", handleLangChange);
+  }, []);
+
   return (
     <Router>
       <ScrollToTop />
+      <AccountBlockedModal isOpen={accountBlocked} lang={lang} />
       <Routes>
         {/* Public Routes with Layout */}
         <Route path="/" element={<MainLayout />}>

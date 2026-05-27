@@ -131,7 +131,7 @@ export async function authFetch(url, options = {}) {
   if (res.status === 403) {
     clearAuthSession();
     if (typeof window !== "undefined") {
-      window.location.href = "/";
+      window.dispatchEvent(new Event("account-blocked"));
     }
     throw new Error("ACCOUNT_BLOCKED");
   }
