@@ -1,5 +1,5 @@
 // Centralized configuration for the frontend
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
 export {
   getStoredUser,
@@ -13,4 +13,4 @@ export {
   refreshAccessToken,
   ensureValidSession,
   logoutAuth,
-} from './utils/auth';
+} from "./utils/auth";
