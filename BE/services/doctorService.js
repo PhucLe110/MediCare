@@ -170,7 +170,7 @@ const completeDiagnosis = async (
   if (prescription?.totalMedicineCost > 0) {
     bill = await createMedicineBill(
       appointmentId,
-      appointment.patient,
+      appointment.patient._id,
       prescription,
     );
   }
