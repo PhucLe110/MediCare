@@ -128,6 +128,14 @@ export async function authFetch(url, options = {}) {
 
   let res = await fetch(url, buildInit());
 
+  if (res.status === 403) {
+    clearAuthSession();
+    if (typeof window !== "undefined") {
+      window.location.href = "/";
+    }
+    throw new Error("ACCOUNT_BLOCKED");
+  }
+
   if (res.status === 401) {
     let body = {};
     try {
