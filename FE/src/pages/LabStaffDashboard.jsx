@@ -433,17 +433,13 @@ const LabStaffDashboard = () => {
     const fetchRequests = async () => {
       setLoading(true);
       try {
-        const endpoint =
-          activeTab === "history"
-            ? "/api/lab-requests/history"
-            : "/api/lab-requests";
-        const res = await authFetch(`${API_URL}${endpoint}`);
+        const res = await authFetch(`${API_URL}/api/lab-requests`);
         const data = await res.json();
         if (data.success) {
           if (activeTab === "history") {
             setRequests(data.data.filter((r) => r.status === "completed"));
           } else {
-            setRequests(data.data);
+            setRequests(data.data.filter((r) => r.status !== "completed"));
           }
         }
       } catch {
@@ -535,11 +531,7 @@ const LabStaffDashboard = () => {
               const fetchRequests = async () => {
                 setLoading(true);
                 try {
-                  const endpoint =
-                    activeTab === "history"
-                      ? "/api/lab-requests/history"
-                      : "/api/lab-requests";
-                  const res = await authFetch(`${API_URL}${endpoint}`);
+                  const res = await authFetch(`${API_URL}/api/lab-requests`);
                   const data = await res.json();
                   if (data.success) {
                     if (activeTab === "history") {
@@ -547,7 +539,9 @@ const LabStaffDashboard = () => {
                         data.data.filter((r) => r.status === "completed"),
                       );
                     } else {
-                      setRequests(data.data);
+                      setRequests(
+                        data.data.filter((r) => r.status !== "completed"),
+                      );
                     }
                   }
                 } catch {
