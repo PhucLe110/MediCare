@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, Heart, Calendar } from "lucide-react";
 import { useTranslation } from "../../hooks/useTranslation";
+import { getStoredUser } from "../../utils/auth";
 
 const trans = {
   vi: {
@@ -299,7 +300,7 @@ export default function Services() {
   };
 
   const handleAction = (deptName) => {
-    const userInfo = localStorage.getItem("userInfo");
+    const userInfo = getStoredUser();
     if (userInfo) {
       navigate("/dashboard/booking", {
         state: { prefilledDepartment: deptName },
