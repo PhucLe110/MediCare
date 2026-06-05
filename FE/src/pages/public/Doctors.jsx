@@ -106,20 +106,40 @@ export default function Doctors() {
   const getDeptTranslation = (dept) => resolveDeptLabel(lang, dept, "doctors");
   const getSpecialtyTranslation = (spec) => resolveSpecialtyLabel(lang, spec);
 
-  // Nhóm bác sĩ theo khoa
+  // Nhóm bác sĩ theo khoa - chuẩn hóa tên khoa trước khi nhóm
   const groupedDoctors = doctors.reduce((acc, doc) => {
-    const dept = doc.department || otherDeptLabel(lang);
-    if (!acc[dept]) acc[dept] = [];
-    acc[dept].push(doc);
+    const rawDept = doc.department || otherDeptLabel(lang);
+    // Chuẩn hóa tên khoa: nếu không có "Khoa" ở đầu thì thêm vào
+    const normalizedDept = !rawDept.toLowerCase().startsWith("khoa")
+      ? `Khoa ${rawDept.charAt(0).toUpperCase() + rawDept.slice(1)}`
+      : rawDept;
+    if (!acc[normalizedDept]) acc[normalizedDept] = [];
+    acc[normalizedDept].push(doc);
     return acc;
   }, {});
 
   const departments = Object.keys(groupedDoctors);
 
-  // Lấy các chuyên khoa duy nhất
-  const specialties = [
-    ...new Set(doctors.map((d) => d.specialty).filter(Boolean)),
-  ];
+  // Chuẩn hóa bộ lọc department để khớp với tên đã chuẩn hóa
+  const normalizedFilters = {
+    ...filters,
+    department:
+      filters.department && !filters.department.toLowerCase().startsWith("khoa")
+        ? `Khoa ${filters.department.charAt(0).toUpperCase() + filters.department.slice(1)}`
+        : filters.department,
+  };
+
+  // Lấy các chuyên khoa duy nhất dựa trên khoa đã chọn
+  const specialties = filters.department
+    ? [
+        ...new Set(
+          doctors
+            .filter((d) => d.department === filters.department)
+            .map((d) => d.specialty)
+            .filter(Boolean),
+        ),
+      ]
+    : [...new Set(doctors.map((d) => d.specialty).filter(Boolean))];
 
   // Lọc bác sĩ
   const filteredDoctors = doctors.filter((doc) => {
@@ -131,7 +151,16 @@ export default function Doctors() {
 
     if (activeTab !== "Tất cả" && doc.department !== activeTab) return false;
 
-    if (filters.department && doc.department !== filters.department)
+    // Chuẩn hóa department của bác sĩ để so sánh với bộ lọc đã chuẩn hóa
+    const docDept = doc.department || otherDeptLabel(lang);
+    const normalizedDocDept = !docDept.toLowerCase().startsWith("khoa")
+      ? `Khoa ${docDept.charAt(0).toUpperCase() + docDept.slice(1)}`
+      : docDept;
+
+    if (
+      normalizedFilters.department &&
+      normalizedDocDept !== normalizedFilters.department
+    )
       return false;
     if (filters.specialty && doc.specialty !== filters.specialty) return false;
     if (filters.experience) {
@@ -145,9 +174,13 @@ export default function Doctors() {
   });
 
   const filteredGrouped = filteredDoctors.reduce((acc, doc) => {
-    const dept = doc.department || otherDeptLabel(lang);
-    if (!acc[dept]) acc[dept] = [];
-    acc[dept].push(doc);
+    const rawDept = doc.department || otherDeptLabel(lang);
+    // Chuẩn hóa tên khoa: nếu không có "Khoa" ở đầu thì thêm vào
+    const normalizedDept = !rawDept.toLowerCase().startsWith("khoa")
+      ? `Khoa ${rawDept.charAt(0).toUpperCase() + rawDept.slice(1)}`
+      : rawDept;
+    if (!acc[normalizedDept]) acc[normalizedDept] = [];
+    acc[normalizedDept].push(doc);
     return acc;
   }, {});
 
@@ -200,7 +233,11 @@ export default function Doctors() {
                     <select
                       value={filters.department}
                       onChange={(e) => {
-                        setFilters({ ...filters, department: e.target.value });
+                        setFilters({
+                          ...filters,
+                          department: e.target.value,
+                          specialty: "",
+                        });
                         if (e.target.value) setActiveTab("Tất cả");
                       }}
                       className="w-full p-2 md:p-3 bg-[var(--bg-tertiary)] rounded-lg md:rounded-xl border-none outline-none text-xs md:text-sm font-medium text-[var(--text-primary)]"
