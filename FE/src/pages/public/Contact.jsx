@@ -9,6 +9,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useTranslation } from "../../hooks/useTranslation";
+import { API_URL } from "../../config";
 
 const trans = {
   vi: {
@@ -107,7 +108,7 @@ const Contact = () => {
 
     try {
       // Send data to backend
-      const response = await fetch("http://localhost:5001/api/contact", {
+      const response = await fetch(`${API_URL}/api/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
