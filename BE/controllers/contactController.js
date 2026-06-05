@@ -9,6 +9,10 @@ const createTransporter = () => {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    // Force IPv4 to avoid IPv6 issues on Render
+    tls: {
+      rejectUnauthorized: false,
+    },
   });
 };
 
