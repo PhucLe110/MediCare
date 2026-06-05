@@ -1,20 +1,8 @@
 const asyncHandler = require("../utils/asyncHandler");
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-// Create transporter
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    // Force IPv4 to avoid IPv6 issues on Render
-    tls: {
-      rejectUnauthorized: false,
-    },
-  });
-};
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 exports.sendContactEmail = asyncHandler(async (req, res) => {
   const { name, email, phone, subject, message } = req.body;
@@ -29,9 +17,9 @@ exports.sendContactEmail = asyncHandler(async (req, res) => {
     });
   }
 
-  // Check if email credentials are configured
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error("Email credentials not configured");
+  // Check if Resend API key is configured
+  if (!process.env.RESEND_API_KEY) {
+    console.error("Resend API key not configured");
     return res.status(500).json({
       success: false,
       message: "Email service not configured. Please contact administrator.",
@@ -39,10 +27,13 @@ exports.sendContactEmail = asyncHandler(async (req, res) => {
   }
 
   try {
-    // Create email content
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: process.env.CONTACT_EMAIL || "23521199@gm.uit.edu.vn",
+    const contactEmail = process.env.CONTACT_EMAIL || "23521199@gm.uit.edu.vn";
+
+    console.log("Sending email to admin...");
+    // Send email to admin
+    await resend.emails.send({
+      from: "MediCare <onboarding@resend.dev>",
+      to: contactEmail,
       subject: `[Liên hệ từ MediCare] ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -65,17 +56,13 @@ exports.sendContactEmail = asyncHandler(async (req, res) => {
           </div>
         </div>
       `,
-    };
-
-    console.log("Sending email to admin...");
-    // Send email
-    const transporter = createTransporter();
-    await transporter.sendMail(mailOptions);
+    });
     console.log("Admin email sent successfully");
 
     // Send confirmation email to user
-    const confirmationMailOptions = {
-      from: process.env.EMAIL_USER,
+    console.log("Sending confirmation email to user...");
+    await resend.emails.send({
+      from: "MediCare <onboarding@resend.dev>",
       to: email,
       subject: "Xác nhận đã nhận thắc mắc - MediCare",
       html: `
@@ -108,10 +95,7 @@ exports.sendContactEmail = asyncHandler(async (req, res) => {
           </div>
         </div>
       `,
-    };
-
-    console.log("Sending confirmation email to user...");
-    await transporter.sendMail(confirmationMailOptions);
+    });
     console.log("Confirmation email sent successfully");
 
     res.status(200).json({
